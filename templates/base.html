@@ -1,0 +1,549 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/PIODURAN.png' %}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/PIODURAN.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/PIODURAN.png' %}">
+
+    <title>
+        {% block title %}
+            Applicant Services
+        {% endblock %}
+    </title>
+
+    <!-- Bootstrap 5 -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        :root {
+            --gov-blue: #0038a8;
+            --gov-dark-blue: #002b7f;
+            --gov-light-blue: #eaf2ff;
+            --gov-gold: #fcd116;
+            --gov-red: #ce1126;
+            --text-dark: #1f2937;
+            --border-color: #dbe3ef;
+            --background: #f5f7fa;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--background);
+            color: var(--text-dark);
+            font-family:
+                "Segoe UI",
+                Roboto,
+                Arial,
+                sans-serif;
+        }
+
+
+        /* =====================================================
+           GOVERNMENT HEADER
+        ===================================================== */
+
+        .government-header {
+            background: var(--gov-blue);
+            border-bottom: 4px solid var(--gov-gold);
+            color: white;
+        }
+
+        .government-header-inner {
+            min-height: 86px;
+            display: flex;
+            align-items: center;
+        }
+
+
+        /* =====================================================
+           GOVERNMENT LOGO
+        ===================================================== */
+
+        .government-logo {
+            width: 64px;
+            height: 64px;
+            margin-right: 15px;
+            flex-shrink: 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: white;
+            border: 2px solid rgba(255,255,255,0.85);
+            border-radius: 50%;
+
+            overflow: hidden;
+        }
+
+        .government-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+
+        /* =====================================================
+           HEADER TEXT
+        ===================================================== */
+
+        .government-title {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .government-subtitle {
+            margin: 3px 0 0;
+            font-size: 13px;
+            color: rgba(255,255,255,0.85);
+        }
+
+
+        /* =====================================================
+           NAVIGATION
+        ===================================================== */
+
+        .main-navigation {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .main-navigation .nav-link {
+            color: #374151;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 14px 18px;
+        }
+
+        .main-navigation .nav-link:hover {
+            color: var(--gov-blue);
+            background: var(--gov-light-blue);
+        }
+
+
+        /* =====================================================
+           MAIN CONTENT
+        ===================================================== */
+
+        .main-content {
+            min-height: calc(100vh - 180px);
+            padding: 40px 0 60px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            margin-bottom: 8px;
+            color: #172554;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 15px;
+        }
+
+
+        /* =====================================================
+           CARDS
+        ===================================================== */
+
+        .service-card {
+            height: 100%;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-3px);
+            border-color: #b7c9e8;
+            box-shadow: 0 8px 22px rgba(15, 35, 70, 0.08);
+        }
+
+        .service-card-body {
+            padding: 25px;
+        }
+
+        .service-number {
+            width: 42px;
+            height: 42px;
+            background: var(--gov-light-blue);
+            color: var(--gov-blue);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 700;
+
+            margin-bottom: 18px;
+        }
+
+        .service-card h3 {
+            color: #172554;
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 9px;
+        }
+
+        .service-card p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+
+            min-height: 67px;
+
+            margin-bottom: 20px;
+        }
+
+        .service-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            min-height: 42px;
+
+            background: var(--gov-blue);
+            border: 1px solid var(--gov-blue);
+
+            color: white;
+            text-decoration: none;
+
+            border-radius: 4px;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            transition: background 0.2s ease;
+        }
+
+        .service-button:hover {
+            background: var(--gov-dark-blue);
+            border-color: var(--gov-dark-blue);
+            color: white;
+        }
+
+
+        /* =====================================================
+           SECTION HEADER
+        ===================================================== */
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .section-heading-line {
+            width: 4px;
+            height: 25px;
+            background: var(--gov-blue);
+            border-radius: 1px;
+        }
+
+        .section-heading h2 {
+            margin: 0;
+            color: #172554;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+
+        /* =====================================================
+           ADMIN CARD
+        ===================================================== */
+
+        .admin-section {
+            margin-top: 45px;
+        }
+
+        .admin-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid #475569;
+            border-radius: 5px;
+            padding: 22px 25px;
+        }
+
+        .admin-card h3 {
+            margin: 0 0 6px;
+            color: #1e293b;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .admin-card p {
+            margin: 0 0 15px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .admin-button {
+            display: inline-block;
+            background: #334155;
+            color: white;
+
+            text-decoration: none;
+
+            padding: 9px 18px;
+
+            border-radius: 4px;
+
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .admin-button:hover {
+            background: #1e293b;
+            color: white;
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        .site-footer {
+            background: #172554;
+            color: white;
+            border-top: 4px solid var(--gov-gold);
+        }
+
+        .site-footer-inner {
+            padding: 25px 0;
+        }
+
+        .site-footer p {
+            margin: 0;
+            font-size: 13px;
+            color: rgba(255,255,255,0.75);
+        }
+
+        .footer-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 767px) {
+
+            .government-header-inner {
+                min-height: 76px;
+            }
+
+            .government-logo {
+                width: 50px;
+                height: 50px;
+                margin-right: 11px;
+            }
+
+            .government-title {
+                font-size: 17px;
+            }
+
+            .government-subtitle {
+                font-size: 11px;
+            }
+
+            .main-content {
+                padding: 30px 0 45px;
+            }
+
+            .page-header h1 {
+                font-size: 26px;
+            }
+
+            .service-card-body {
+                padding: 21px;
+            }
+
+            .service-card p {
+                min-height: auto;
+            }
+
+        }
+
+    </style>
+
+    {% block extra_css %}
+    {% endblock %}
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         GOVERNMENT HEADER
+    ===================================================== -->
+
+    <header class="government-header">
+
+        <div class="container">
+
+            <div class="government-header-inner">
+
+                <div class="government-logo">
+
+                    <img
+                        src="{% static 'images/PIODURAN.png' %}"
+                        alt="Pio Duran Logo"
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <h1 class="government-title">
+                        Pio Duran Online Registration and Applicant Services
+                    </h1>
+
+                    <p class="government-subtitle">
+                        Online Registration and Applicant Services
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         NAVIGATION
+    ===================================================== -->
+
+    <nav class="main-navigation">
+
+        <div class="container">
+
+            <div class="d-flex flex-wrap">
+
+                <a
+                    href="{% url 'home' %}"
+                    class="nav-link"
+                >
+                    Home
+                </a>
+
+                <a
+                    href="{% url 'new-registration' %}"
+                    class="nav-link"
+                >
+                    New Registration
+                </a>
+
+                {% comment %} <a
+                    href="{% url 'admin-login' %}"
+                    class="nav-link"
+                >
+                    Administrator
+                </a> {% endcomment %}
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ===================================================== -->
+
+    <main class="main-content">
+
+        <div class="container">
+
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ===================================================== -->
+
+    <footer class="site-footer">
+
+        <div class="container">
+
+            <div class="site-footer-inner">
+
+                <div class="footer-title">
+                    Voter Registration Services
+                </div>
+
+                <p>
+                    Online application and registration services
+                    for applicants.
+                </p>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- Bootstrap JS -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+
+    {% block extra_js %}
+    {% endblock %}
+
+</body>
+
+</html>

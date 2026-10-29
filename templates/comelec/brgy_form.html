@@ -1,0 +1,382 @@
+
+{% extends "admin.html" %}
+
+{% block title %}
+Add Barangay
+{% endblock %}
+
+{% block page_title %}
+Barangay Management
+{% endblock %}
+
+{% block page_subtitle %}
+Add a new barangay to the registration system
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* =========================================================
+   ADD BARANGAY PAGE
+   ========================================================= */
+
+.add-barangay-page {
+    width: 100%;
+}
+
+/* FORM CARD */
+
+.barangay-form-card {
+    background: #ffffff;
+    border: 1px solid #d9e1ec;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+/* HEADER */
+
+.barangay-form-header {
+    padding: 22px 26px;
+    border-bottom: 1px solid #e1e6ed;
+    background: #ffffff;
+}
+
+.barangay-form-header-content {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.barangay-form-icon {
+    width: 44px;
+    height: 44px;
+    background: #eaf2ff;
+    color: #0038a8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    border: 1px solid #d5e4ff;
+}
+
+.barangay-form-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #172033;
+}
+
+.barangay-form-description {
+    margin: 3px 0 0;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* BODY */
+
+.barangay-form-body {
+    padding: 30px 28px;
+}
+
+/* ALERT */
+
+.barangay-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 13px 15px;
+    margin-bottom: 25px;
+    border: 1px solid #f1b8b8;
+    background: #fff5f5;
+    color: #a61b1b;
+    font-size: 14px;
+}
+
+.barangay-error i {
+    font-size: 17px;
+    margin-top: 1px;
+}
+
+/* FORM GROUP */
+
+.barangay-field {
+    margin-bottom: 28px;
+}
+
+.barangay-field label {
+    display: block;
+    margin-bottom: 8px;
+    color: #1f2937;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.barangay-field .form-control {
+    min-height: 46px;
+    border: 1px solid #cbd5e1;
+    border-radius: 0;
+    padding: 10px 13px;
+    font-size: 14px;
+    color: #1f2937;
+    box-shadow: none;
+}
+
+.barangay-field .form-control:focus {
+    border-color: #0038a8;
+    box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.10);
+}
+
+.barangay-help {
+    display: block;
+    margin-top: 7px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* ACTIONS */
+
+.barangay-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    padding-top: 22px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.barangay-actions .btn {
+    min-height: 42px;
+    padding: 9px 18px;
+    border-radius: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.barangay-actions .btn-primary {
+    background: #0038a8;
+    border-color: #0038a8;
+}
+
+.barangay-actions .btn-primary:hover {
+    background: #002b7f;
+    border-color: #002b7f;
+}
+
+.barangay-actions .btn-outline-secondary {
+    border-color: #cbd5e1;
+    color: #374151;
+    background: #ffffff;
+}
+
+.barangay-actions .btn-outline-secondary:hover {
+    background: #f3f4f6;
+    color: #111827;
+    border-color: #9ca3af;
+}
+
+/* INFORMATION PANEL */
+
+.barangay-info-panel {
+    margin-top: 18px;
+    padding: 16px 18px;
+    border: 1px solid #dbe4f0;
+    background: #f7f9fc;
+}
+
+.barangay-info-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    color: #172033;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.barangay-info-panel-title i {
+    color: #0038a8;
+}
+
+.barangay-info-panel p {
+    margin: 0;
+    color: #667085;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 767.98px) {
+
+    .barangay-form-header {
+        padding: 18px;
+    }
+
+    .barangay-form-body {
+        padding: 22px 18px;
+    }
+
+    .barangay-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .barangay-actions .btn {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid px-0">
+
+    <div class="add-barangay-page">
+
+        <div class="row justify-content-center">
+
+            <div class="col-xl-7 col-lg-8 col-md-10">
+
+                <div class="barangay-form-card">
+
+                    <!-- HEADER -->
+
+                    <div class="barangay-form-header">
+
+                        <div class="barangay-form-header-content">
+
+                            <div class="barangay-form-icon">
+                                <i class="bi bi-building-add"></i>
+                            </div>
+
+                            <div>
+
+                                <h5 class="barangay-form-title">
+                                    Add Barangay
+                                </h5>
+
+                                <p class="barangay-form-description">
+                                    Register a new barangay in the municipality
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- BODY -->
+
+                    <div class="barangay-form-body">
+
+                        {% if error %}
+
+                        <div class="barangay-error">
+
+                            <i class="bi bi-exclamation-circle-fill"></i>
+
+                            <div>
+                                {{ error }}
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+
+
+                        <form method="POST">
+
+                            {% csrf_token %}
+
+
+                            <!-- BARANGAY NAME -->
+
+                            <div class="barangay-field">
+
+                                <label for="name">
+                                    Barangay Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    value="{{ name|default:'' }}"
+                                    class="form-control"
+                                    placeholder="Enter official barangay name"
+                                    autocomplete="off"
+                                    required
+                                    autofocus
+                                >
+
+                                <span class="barangay-help">
+                                    Enter the official registered name of the barangay.
+                                </span>
+
+                            </div>
+
+
+                            <!-- ACTIONS -->
+
+                            <div class="barangay-actions">
+
+                                <a
+                                    href="{% url 'brgy_list' %}"
+                                    class="btn btn-outline-secondary"
+                                >
+                                    <i class="bi bi-arrow-left me-1"></i>
+                                    Cancel
+                                </a>
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary"
+                                >
+                                    <i class="bi bi-check-lg me-1"></i>
+                                    Save Barangay
+                                </button>
+
+                            </div>
+
+                        </form>
+
+
+                        <!-- INFORMATION -->
+
+                        <div class="barangay-info-panel">
+
+                            <div class="barangay-info-panel-title">
+
+                                <i class="bi bi-info-circle"></i>
+
+                                Barangay Registration
+
+                            </div>
+
+                            <p>
+                                Make sure the barangay name is entered correctly
+                                before saving. The registered name will be used
+                                throughout the voter registration system.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,914 @@
+
+{% extends "admin.html" %}
+
+{% block title %}
+Transfer Request
+{% endblock %}
+
+{% block page_title %}
+Transfer Request
+{% endblock %}
+
+{% block page_subtitle %}
+Review applicant transfer request
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+/* =========================================================
+   TRANSFER DETAIL PAGE
+========================================================= */
+
+.transfer-page {
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.transfer-page-header {
+    background: #ffffff;
+    border: 1px solid #dfe4ea;
+    border-left: 4px solid #0038a8;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+}
+
+.transfer-page-header h4 {
+    color: #071a3a;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.transfer-page-header .request-number {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   COMMON CARD
+========================================================= */
+
+.transfer-card {
+    background: #ffffff;
+    border: 1px solid #dfe4ea;
+    margin-bottom: 20px;
+}
+
+.transfer-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 20px;
+    background: #f8f9fb;
+    border-bottom: 1px solid #dfe4ea;
+}
+
+.transfer-card-header .header-icon {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f0ff;
+    color: #0038a8;
+    border: 1px solid #cbd9f5;
+}
+
+.transfer-card-header h5 {
+    margin: 0;
+    color: #071a3a;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.transfer-card-body {
+    padding: 22px;
+}
+
+
+/* =========================================================
+   STATUS PANEL
+========================================================= */
+
+.status-panel {
+    background: #ffffff;
+    border: 1px solid #dfe4ea;
+    margin-bottom: 20px;
+}
+
+.status-panel-inner {
+    padding: 20px 22px;
+}
+
+.status-label {
+    display: block;
+    color: #6c757d;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 8px;
+}
+
+.status-date {
+    color: #071a3a;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.request-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 12px;
+    border: 1px solid transparent;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+.request-status.pending {
+    background: #fff4d6;
+    color: #856404;
+    border-color: #ffe08a;
+}
+
+.request-status.review {
+    background: #e4f2ff;
+    color: #075985;
+    border-color: #b8ddf5;
+}
+
+.request-status.approved {
+    background: #e5f6eb;
+    color: #146c43;
+    border-color: #b7e4c7;
+}
+
+.request-status.disapproved {
+    background: #fde8e8;
+    color: #b02a37;
+    border-color: #f1b5b9;
+}
+
+
+/* =========================================================
+   APPLICANT IDENTITY
+========================================================= */
+
+.applicant-identity {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 17px;
+    background: #f8f9fb;
+    border: 1px solid #dfe4ea;
+}
+
+.applicant-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f0ff;
+    color: #0038a8;
+    border: 1px solid #cbd9f5;
+    font-size: 20px;
+}
+
+.applicant-identity-name {
+    color: #071a3a;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.applicant-identity-id {
+    color: #6c757d;
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+
+/* =========================================================
+   ADDRESS COMPARISON
+========================================================= */
+
+.address-card {
+    height: 100%;
+    background: #ffffff;
+    border: 1px solid #dfe4ea;
+}
+
+.address-card.requested {
+    border-color: #0038a8;
+}
+
+.address-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 18px;
+    background: #f8f9fb;
+    border-bottom: 1px solid #dfe4ea;
+}
+
+.address-card.requested .address-card-header {
+    background: #0038a8;
+    color: #ffffff;
+    border-bottom-color: #0038a8;
+}
+
+.address-card-icon {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f0ff;
+    color: #0038a8;
+    border: 1px solid #cbd9f5;
+}
+
+.address-card.requested .address-card-icon {
+    background: rgba(255,255,255,.15);
+    color: #ffffff;
+    border-color: rgba(255,255,255,.3);
+}
+
+.address-card-header h5 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.address-card-body {
+    padding: 20px;
+}
+
+.address-item {
+    padding: 13px 15px;
+    background: #f8f9fb;
+    border: 1px solid #e1e5ea;
+    margin-bottom: 12px;
+}
+
+.address-item:last-child {
+    margin-bottom: 0;
+}
+
+.address-label {
+    display: block;
+    color: #6c757d;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 5px;
+}
+
+.address-value {
+    color: #212529;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.address-value.primary {
+    color: #071a3a;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   TRANSFER INDICATOR
+========================================================= */
+
+.transfer-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 80px;
+}
+
+.transfer-arrow {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f0ff;
+    color: #0038a8;
+    border: 1px solid #cbd9f5;
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   REASON
+========================================================= */
+
+.reason-card {
+    background: #ffffff;
+    border: 1px solid #dfe4ea;
+    margin-top: 20px;
+}
+
+.reason-box {
+    background: #f8f9fb;
+    border: 1px solid #dfe4ea;
+    border-left: 4px solid #0038a8;
+    padding: 18px 20px;
+    color: #343a40;
+    line-height: 1.7;
+    white-space: pre-line;
+}
+
+.reason-empty {
+    color: #6c757d;
+    font-style: italic;
+}
+
+
+/* =========================================================
+   ACTION PANEL
+========================================================= */
+
+.action-panel {
+    background: #ffffff;
+    border: 1px solid #dfe4ea;
+    margin-top: 20px;
+}
+
+.action-panel-header {
+    padding: 14px 20px;
+    background: #f8f9fb;
+    border-bottom: 1px solid #dfe4ea;
+}
+
+.action-panel-header strong {
+    color: #071a3a;
+    font-size: 14px;
+}
+
+.action-panel-body {
+    padding: 18px 20px;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.transfer-page .btn {
+    border-radius: 2px;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 9px 14px;
+}
+
+.transfer-page .btn-outline-secondary {
+    border-color: #adb5bd;
+    color: #495057;
+}
+
+.transfer-page .btn-outline-secondary:hover {
+    background: #f1f3f5;
+    color: #212529;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 991.98px) {
+
+    .transfer-indicator {
+        min-height: 50px;
+    }
+
+    .transfer-arrow {
+        transform: rotate(90deg);
+    }
+
+}
+
+
+@media (max-width: 767.98px) {
+
+    .transfer-page-header {
+        padding: 16px;
+    }
+
+    .transfer-page-header .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 15px;
+    }
+
+    .transfer-card-body,
+    .status-panel-inner {
+        padding: 16px;
+    }
+
+    .applicant-identity {
+        align-items: flex-start;
+    }
+
+    .action-buttons {
+        justify-content: stretch;
+    }
+
+    .action-buttons form,
+    .action-buttons .btn {
+        width: 100%;
+    }
+
+    .action-buttons form .btn {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid px-0">
+
+<div class="transfer-page">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="transfer-page-header">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+                <h4>
+                    Transfer Registration
+                </h4>
+
+                <div class="request-number">
+                    Request #{{ application.id }}
+                </div>
+
+            </div>
+
+            <a
+                href="{% url 'admin-applications' %}"
+                class="btn btn-outline-secondary"
+            >
+                <i class="bi bi-arrow-left me-1"></i>
+                Back to Applications
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         REQUEST STATUS
+    ====================================================== -->
+
+    <div class="status-panel">
+
+        <div class="status-panel-inner">
+
+            <div class="row align-items-center">
+
+                <div class="col-md-6">
+
+                    <span class="status-label">
+                        Request Status
+                    </span>
+
+                    {% if application.status == "PENDING" %}
+
+                        <span class="request-status pending">
+                            Pending
+                        </span>
+
+                    {% elif application.status == "REVIEW" %}
+
+                        <span class="request-status review">
+                            Review
+                        </span>
+
+                    {% elif application.status == "APPROVED" %}
+
+                        <span class="request-status approved">
+                            Approved
+                        </span>
+
+                    {% elif application.status == "DISAPPROVED" %}
+
+                        <span class="request-status disapproved">
+                            Disapproved
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+
+                    <span class="status-label">
+                        Requested At
+                    </span>
+
+                    <div class="status-date">
+                        {{ application.requested_at|date:"M d, Y h:i A" }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         APPLICANT
+    ====================================================== -->
+
+    <div class="transfer-card">
+
+        <div class="transfer-card-header">
+
+            <div class="header-icon">
+                <i class="bi bi-person"></i>
+            </div>
+
+            <h5>
+                Applicant Information
+            </h5>
+
+        </div>
+
+
+        <div class="transfer-card-body">
+
+            <div class="applicant-identity">
+
+                <div class="applicant-icon">
+                    <i class="bi bi-person"></i>
+                </div>
+
+                <div>
+
+                    <div class="applicant-identity-name">
+
+                        {{ application.applicant.lastname }},
+                        {{ application.applicant.firstname }}
+                        {{ application.applicant.middlename }}
+
+                    </div>
+
+                    <div class="applicant-identity-id">
+                        Applicant ID #{{ application.applicant.id }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ADDRESS COMPARISON
+    ====================================================== -->
+
+    <div class="row g-3 align-items-stretch">
+
+
+        <!-- CURRENT ADDRESS -->
+
+        <div class="col-lg-5">
+
+            <div class="address-card">
+
+                <div class="address-card-header">
+
+                    <div class="address-card-icon">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+
+                    <h5>
+                        Current Address
+                    </h5>
+
+                </div>
+
+
+                <div class="address-card-body">
+
+
+                    <div class="address-item">
+
+                        <span class="address-label">
+                            Barangay
+                        </span>
+
+                        <div class="address-value primary">
+
+                            {{ application.current_brgy.name|default:"Not specified" }}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="address-item">
+
+                        <span class="address-label">
+                            Municipality
+                        </span>
+
+                        <div class="address-value">
+                            {{ application.current_municipality }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="address-item">
+
+                        <span class="address-label">
+                            Province
+                        </span>
+
+                        <div class="address-value">
+                            {{ application.current_province }}
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TRANSFER INDICATOR -->
+
+        <div class="col-lg-2">
+
+            <div class="transfer-indicator">
+
+                <div class="transfer-arrow">
+                    <i class="bi bi-arrow-right"></i>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- REQUESTED ADDRESS -->
+
+        <div class="col-lg-5">
+
+            <div class="address-card requested">
+
+                <div class="address-card-header">
+
+                    <div class="address-card-icon">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+
+                    <h5>
+                        Requested Address
+                    </h5>
+
+                </div>
+
+
+                <div class="address-card-body">
+
+
+                    <div class="address-item">
+
+                        <span class="address-label">
+                            New Barangay
+                        </span>
+
+                        <div class="address-value primary">
+
+                            {{ application.new_brgy.name|default:"Not specified" }}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="address-item">
+
+                        <span class="address-label">
+                            Municipality
+                        </span>
+
+                        <div class="address-value">
+                            {{ application.new_municipality }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="address-item">
+
+                        <span class="address-label">
+                            Province
+                        </span>
+
+                        <div class="address-value">
+                            {{ application.new_province }}
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         REASON
+    ====================================================== -->
+
+    <div class="reason-card">
+
+        <div class="transfer-card-header">
+
+            <div class="header-icon">
+                <i class="bi bi-file-text"></i>
+            </div>
+
+            <h5>
+                Reason for Transfer
+            </h5>
+
+        </div>
+
+
+        <div class="transfer-card-body">
+
+            {% if application.reason %}
+
+                <div class="reason-box">
+                    {{ application.reason }}
+                </div>
+
+            {% else %}
+
+                <div class="reason-box reason-empty">
+                    No reason provided.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ACTIONS
+    ====================================================== -->
+
+    {% if application.status == "PENDING" or application.status == "REVIEW" %}
+
+    <div class="action-panel">
+
+        <div class="action-panel-header">
+
+            <strong>
+                Application Actions
+            </strong>
+
+        </div>
+
+
+        <div class="action-panel-body">
+
+            <div class="action-buttons">
+
+
+                <!-- REVIEW -->
+
+                <form
+                    method="POST"
+                    action="{% url 'admin-application-action' 'transfer' application.id 'review' %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-info text-white"
+                    >
+                        <i class="bi bi-eye me-1"></i>
+                        Review
+                    </button>
+
+                </form>
+
+
+                <!-- DISAPPROVE -->
+
+                <form
+                    method="POST"
+                    action="{% url 'admin-application-action' 'transfer' application.id 'disapprove' %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-danger"
+                        onclick="return confirm('Are you sure you want to disapprove this transfer request?');"
+                    >
+                        <i class="bi bi-x-circle me-1"></i>
+                        Disapprove
+                    </button>
+
+                </form>
+
+
+                <!-- APPROVE -->
+
+                <form
+                    method="POST"
+                    action="{% url 'admin-application-action' 'transfer' application.id 'approve' %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-success"
+                        onclick="return confirm('Are you sure you want to approve this transfer request?');"
+                    >
+                        <i class="bi bi-check-circle me-1"></i>
+                        Approve
+                    </button>
+
+                </form>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+</div>
+
+</div>
+
+{% endblock %}

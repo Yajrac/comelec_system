@@ -1,0 +1,1349 @@
+
+{% extends "admin.html" %}
+
+{% block title %}
+New Registration
+{% endblock %}
+
+{% block page_title %}
+New Registration
+{% endblock %}
+
+{% block page_subtitle %}
+Review applicant registration
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* =========================================================
+   NEW REGISTRATION DETAIL
+========================================================= */
+
+.registration-detail {
+    width: 100%;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.registration-header {
+    background: #ffffff;
+    border: 1px solid #e1e5ea;
+    padding: 22px 24px;
+    margin-bottom: 20px;
+}
+
+.registration-header h4 {
+    color: #172033;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.registration-header p {
+    font-size: 13px;
+}
+
+.registration-header-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.registration-header-actions .btn {
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* =========================================================
+   STATUS CARD
+========================================================= */
+
+.registration-status-card {
+    background: #ffffff;
+    border: 1px solid #e1e5ea;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, .04);
+    margin-bottom: 20px;
+}
+
+.registration-status-card .card-body {
+    padding: 20px;
+}
+
+.registration-status-label {
+    display: block;
+    color: #6c757d;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+}
+
+.registration-status-date {
+    color: #172033;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.registration-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 11px;
+    font-size: 11px;
+    font-weight: 700;
+    border: 1px solid transparent;
+}
+
+.registration-badge-warning {
+    background: #fff4d6;
+    color: #856404;
+    border-color: #ffe69c;
+}
+
+.registration-badge-info {
+    background: #dff3fa;
+    color: #087990;
+    border-color: #b6effb;
+}
+
+.registration-badge-success {
+    background: #dff6e8;
+    color: #146c43;
+    border-color: #badbcc;
+}
+
+.registration-badge-danger {
+    background: #fbe2e5;
+    color: #b02a37;
+    border-color: #f1aeb5;
+}
+
+.registration-badge-secondary {
+    background: #eef0f2;
+    color: #495057;
+    border-color: #d8dce0;
+}
+
+/* =========================================================
+   VERIFICATION NOTICE
+========================================================= */
+
+.registration-verification-notice {
+    border: 1px solid;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}
+
+.registration-verification-warning {
+    background: #fff9e6;
+    border-color: #ffe69c;
+    color: #664d03;
+}
+
+.registration-verification-success {
+    background: #edf9f1;
+    border-color: #badbcc;
+    color: #0f5132;
+}
+
+.registration-verification-notice .notice-icon {
+    font-size: 25px;
+    flex-shrink: 0;
+}
+
+.registration-verification-notice h6 {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.registration-verification-notice p {
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* =========================================================
+   INFORMATION CARDS
+========================================================= */
+
+.registration-card {
+    background: #ffffff;
+    border: 1px solid #e1e5ea;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, .04);
+}
+
+.registration-card-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e8ed;
+    padding: 15px 20px;
+}
+
+.registration-card-header h5 {
+    color: #172033;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.registration-card-body {
+    padding: 20px;
+}
+
+/* =========================================================
+   INFORMATION FIELD
+========================================================= */
+
+.registration-field {
+    min-height: 52px;
+}
+
+.registration-field-label {
+    display: block;
+    color: #737b87;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 5px;
+}
+
+.registration-field-value {
+    color: #202733;
+    font-size: 13px;
+    font-weight: 500;
+    word-break: break-word;
+}
+
+.registration-field-value.strong {
+    font-weight: 700;
+}
+
+/* =========================================================
+   ACTION CARD
+========================================================= */
+
+.registration-action-card {
+    background: #ffffff;
+    border: 1px solid #e1e5ea;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, .04);
+    margin-top: 20px;
+}
+
+.registration-action-header {
+    background: #f8f9fb;
+    border-bottom: 1px solid #e5e8ed;
+    padding: 15px 20px;
+}
+
+.registration-action-header h5 {
+    color: #172033;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.registration-action-body {
+    padding: 18px 20px;
+}
+
+.registration-action-body .btn {
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 115px;
+}
+
+/* =========================================================
+   APPROVED PROCESSING CARD
+========================================================= */
+
+.registration-processing-card {
+    background: #ffffff;
+    border: 1px solid #cbdcff;
+    border-left: 4px solid #0038a8;
+    margin-top: 20px;
+}
+
+.registration-processing-card .card-body {
+    padding: 20px;
+}
+
+.registration-processing-title {
+    color: #172033;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.registration-processing-text {
+    color: #6c757d;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.registration-btn {
+    border-radius: 0 !important;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.registration-btn-primary {
+    background: #0038a8;
+    border-color: #0038a8;
+}
+
+.registration-btn-primary:hover {
+    background: #002b7f;
+    border-color: #002b7f;
+}
+
+.registration-btn-warning {
+    color: #664d03;
+}
+
+.registration-btn-success {
+    color: #ffffff;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 767.98px) {
+
+    .registration-header {
+        padding: 18px;
+    }
+
+    .registration-header-actions {
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .registration-header-actions .btn {
+        width: 100%;
+    }
+
+    .registration-card-body {
+        padding: 16px;
+    }
+
+    .registration-action-body .btn {
+        width: 100%;
+    }
+
+    .registration-action-body form {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid px-0 registration-detail">
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<div class="registration-header">
+
+    <div class="row align-items-center">
+
+        <div class="col-lg">
+
+            <h4>
+                New Registration
+            </h4>
+
+            <p class="text-muted mb-0 mt-1">
+                Application #{{ application.id }}
+            </p>
+
+        </div>
+
+
+        <div class="col-lg-auto mt-3 mt-lg-0">
+
+            <div class="registration-header-actions">
+
+
+                <!-- =================================================
+                     CONTINUE VERIFICATION
+                ================================================== -->
+
+                {% if application.status == "APPROVED" %}
+
+                    {% if application.verification_status == "BIOMETRICS_PENDING" %}
+
+                        <a
+                            href="{% url 'admin-applicant-biometric' application.id %}"
+                            class="btn btn-primary registration-btn registration-btn-primary"
+                        >
+
+                            <i class="bi bi-shield-check me-1"></i>
+
+                            Continue Verification
+
+                        </a>
+
+                    {% elif application.verification_status == "VERIFIED" %}
+
+                        <a
+                            href="{% url 'admin-applicant-biometric' application.id %}"
+                            class="btn btn-outline-success registration-btn"
+                        >
+
+                            <i class="bi bi-shield-check me-1"></i>
+
+                            View Verification
+
+                        </a>
+
+                    {% endif %}
+
+                {% endif %}
+
+
+                <!-- =================================================
+                     BACK
+                ================================================== -->
+
+                <a
+                    href="{% url 'admin-applications' %}"
+                    class="btn btn-outline-secondary registration-btn"
+                >
+
+                    <i class="bi bi-arrow-left me-1"></i>
+
+                    Back to Applications
+
+                </a>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     STATUS
+========================================================= -->
+
+<div class="registration-status-card">
+
+    <div class="card-body">
+
+        <div class="row align-items-center">
+
+
+            <!-- APPLICATION STATUS -->
+
+            <div class="col-lg-4">
+
+                <span class="registration-status-label">
+                    Application Status
+                </span>
+
+
+                {% if application.status == "PENDING" %}
+
+                    <span class="registration-badge registration-badge-warning">
+
+                        <i class="bi bi-hourglass-split me-1"></i>
+
+                        Pending
+
+                    </span>
+
+
+                {% elif application.status == "REVIEW" %}
+
+                    <span class="registration-badge registration-badge-info">
+
+                        <i class="bi bi-eye me-1"></i>
+
+                        Review
+
+                    </span>
+
+
+                {% elif application.status == "APPROVED" %}
+
+                    <span class="registration-badge registration-badge-success">
+
+                        <i class="bi bi-check-circle me-1"></i>
+
+                        Approved
+
+                    </span>
+
+
+                {% elif application.status == "DISAPPROVED" %}
+
+                    <span class="registration-badge registration-badge-danger">
+
+                        <i class="bi bi-x-circle me-1"></i>
+
+                        Disapproved
+
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- VERIFICATION STATUS -->
+
+            <div class="col-lg-4 mt-3 mt-lg-0">
+
+                <span class="registration-status-label">
+                    Verification Status
+                </span>
+
+
+                {% if application.verification_status == "VERIFIED" %}
+
+                    <span class="registration-badge registration-badge-success">
+
+                        <i class="bi bi-shield-check me-1"></i>
+
+                        Verified
+
+                    </span>
+
+
+                {% elif application.verification_status == "BIOMETRICS_PENDING" %}
+
+                    <span class="registration-badge registration-badge-warning">
+
+                        <i class="bi bi-fingerprint me-1"></i>
+
+                        Biometrics Pending
+
+                    </span>
+
+
+                {% else %}
+
+                    <span class="registration-badge registration-badge-secondary">
+
+                        <i class="bi bi-shield me-1"></i>
+
+                        Unverified
+
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- DATE -->
+
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+
+                <span class="registration-status-label">
+                    Date Submitted
+                </span>
+
+                <div class="registration-status-date">
+
+                    {{ application.date_joined|date:"M d, Y" }}
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     BIOMETRIC VERIFICATION PENDING
+========================================================= -->
+
+{% if application.status == "APPROVED" and application.verification_status == "BIOMETRICS_PENDING" %}
+
+<div class="registration-verification-notice registration-verification-warning">
+
+    <div class="d-flex align-items-start">
+
+        <i class="bi bi-exclamation-triangle-fill notice-icon me-3"></i>
+
+
+        <div class="flex-grow-1">
+
+            <h6 class="mb-1">
+                Biometric Verification Pending
+            </h6>
+
+
+            <p class="mb-3">
+
+                This application has already been approved.
+                The applicant is still unverified because the
+                fingerprint biometrics and electronic signature
+                have not yet been fully completed.
+
+            </p>
+
+
+            <!-- =================================================
+                 CONTINUE VERIFICATION
+            ================================================== -->
+
+            <a
+                href="{% url 'admin-applicant-biometric' application.id %}"
+                class="btn btn-primary registration-btn"
+            >
+
+                <i class="bi bi-shield-check me-1"></i>
+
+                Continue Verification
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{% elif application.status == "APPROVED" and application.verification_status == "VERIFIED" %}
+
+<div class="registration-verification-notice registration-verification-success">
+
+    <div class="d-flex align-items-start">
+
+        <i class="bi bi-shield-check notice-icon me-3"></i>
+
+
+        <div class="flex-grow-1">
+
+            <h6 class="mb-1">
+                Applicant Verified
+            </h6>
+
+
+            <p class="mb-3">
+
+                The applicant's fingerprints and electronic
+                signature have been completed successfully.
+
+            </p>
+
+
+            <a
+                href="{% url 'admin-applicant-biometric' application.id %}"
+                class="btn btn-outline-success registration-btn"
+            >
+
+                <i class="bi bi-eye me-1"></i>
+
+                View Verification
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+<!-- =========================================================
+     APPLICATION INFORMATION
+========================================================= -->
+
+<div class="row g-4">
+
+
+    <!-- =====================================================
+         PERSONAL INFORMATION
+    ====================================================== -->
+
+    <div class="col-lg-6">
+
+        <div class="registration-card h-100">
+
+            <div class="registration-card-header">
+
+                <h5>
+
+                    <i class="bi bi-person me-2 text-primary"></i>
+
+                    Personal Information
+
+                </h5>
+
+            </div>
+
+
+            <div class="registration-card-body">
+
+                <div class="row g-3">
+
+
+                    <div class="col-md-4">
+
+                        <div class="registration-field">
+
+                            <span class="registration-field-label">
+                                Last Name
+                            </span>
+
+                            <div class="registration-field-value strong">
+                                {{ application.lastname }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <div class="registration-field">
+
+                            <span class="registration-field-label">
+                                First Name
+                            </span>
+
+                            <div class="registration-field-value strong">
+                                {{ application.firstname }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <div class="registration-field">
+
+                            <span class="registration-field-label">
+                                Middle Name
+                            </span>
+
+                            <div class="registration-field-value strong">
+                                {{ application.middlename }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <div class="registration-field">
+
+                            <span class="registration-field-label">
+                                Age
+                            </span>
+
+                            <div class="registration-field-value">
+                                {{ application.age }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <div class="registration-field">
+
+                            <span class="registration-field-label">
+                                Sex
+                            </span>
+
+                            <div class="registration-field-value">
+                                {{ application.sex }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <div class="registration-field">
+
+                            <span class="registration-field-label">
+                                Birthdate
+                            </span>
+
+                            <div class="registration-field-value">
+
+                                {% if application.birthdate %}
+
+                                    {{ application.birthdate|date:"M d, Y" }}
+
+                                {% else %}
+
+                                    Not specified
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-12">
+
+                        <div class="registration-field">
+
+                            <span class="registration-field-label">
+                                Birthplace
+                            </span>
+
+                            <div class="registration-field-value">
+                                {{ application.birthplace }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ADDRESS
+    ====================================================== -->
+
+    <div class="col-lg-6">
+
+        <div class="registration-card h-100">
+
+            <div class="registration-card-header">
+
+                <h5>
+
+                    <i class="bi bi-geo-alt me-2 text-primary"></i>
+
+                    Address Information
+
+                </h5>
+
+            </div>
+
+
+            <div class="registration-card-body">
+
+
+                <div class="registration-field mb-4">
+
+                    <span class="registration-field-label">
+                        Barangay
+                    </span>
+
+                    <div class="registration-field-value strong">
+
+                        {{ application.brgy.name|default:"Not specified" }}
+
+                    </div>
+
+                </div>
+
+
+                <div class="registration-field mb-4">
+
+                    <span class="registration-field-label">
+                        Municipality
+                    </span>
+
+                    <div class="registration-field-value">
+                        {{ application.municipality }}
+                    </div>
+
+                </div>
+
+
+                <div class="registration-field">
+
+                    <span class="registration-field-label">
+                        Province
+                    </span>
+
+                    <div class="registration-field-value">
+                        {{ application.province }}
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CONTACT
+    ====================================================== -->
+
+    <div class="col-lg-6">
+
+        <div class="registration-card h-100">
+
+            <div class="registration-card-header">
+
+                <h5>
+
+                    <i class="bi bi-telephone me-2 text-primary"></i>
+
+                    Contact Information
+
+                </h5>
+
+            </div>
+
+
+            <div class="registration-card-body">
+
+
+                <div class="registration-field mb-4">
+
+                    <span class="registration-field-label">
+                        Phone Number
+                    </span>
+
+                    <div class="registration-field-value strong">
+                        {{ application.phone }}
+                    </div>
+
+                </div>
+
+
+                <div class="registration-field">
+
+                    <span class="registration-field-label">
+                        Email Address
+                    </span>
+
+                    <div class="registration-field-value">
+                        {{ application.email }}
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         REGISTRATION INFORMATION
+    ====================================================== -->
+
+    <div class="col-lg-6">
+
+        <div class="registration-card h-100">
+
+            <div class="registration-card-header">
+
+                <h5>
+
+                    <i class="bi bi-card-checklist me-2 text-primary"></i>
+
+                    Registration Information
+
+                </h5>
+
+            </div>
+
+
+            <div class="registration-card-body">
+
+
+                <div class="registration-field mb-4">
+
+                    <span class="registration-field-label">
+                        Application Type
+                    </span>
+
+                    <div class="registration-field-value">
+                        {{ application.get_application_type_display }}
+                    </div>
+
+                </div>
+
+
+                <div class="registration-field mb-4">
+
+                    <span class="registration-field-label">
+                        Citizenship
+                    </span>
+
+                    <div class="registration-field-value">
+                        {{ application.get_citizenship_status_display }}
+                    </div>
+
+                </div>
+
+
+                <div class="registration-field">
+
+                    <span class="registration-field-label">
+                        PWD Status
+                    </span>
+
+                    <div class="registration-field-value">
+                        {{ application.get_pwd_status_display }}
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FAMILY INFORMATION
+    ====================================================== -->
+
+    <div class="col-12">
+
+        <div class="registration-card">
+
+            <div class="registration-card-header">
+
+                <h5>
+
+                    <i class="bi bi-people me-2 text-primary"></i>
+
+                    Family Information
+
+                </h5>
+
+            </div>
+
+
+            <div class="registration-card-body">
+
+                <div class="row g-4">
+
+
+                    <div class="col-md-6">
+
+                        <div class="registration-field">
+
+                            <span class="registration-field-label">
+                                Father's Name
+                            </span>
+
+                            <div class="registration-field-value strong">
+                                {{ application.father }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <div class="registration-field">
+
+                            <span class="registration-field-label">
+                                Mother's Name
+                            </span>
+
+                            <div class="registration-field-value strong">
+                                {{ application.mother }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<!-- =========================================================
+     APPLICATION ACTIONS
+========================================================= -->
+
+{% if application.status == "PENDING" or application.status == "REVIEW" %}
+
+<div class="registration-action-card">
+
+    <div class="registration-action-header">
+
+        <h5>
+            Application Actions
+        </h5>
+
+    </div>
+
+
+    <div class="registration-action-body">
+
+        <div class="d-flex justify-content-end gap-2 flex-wrap">
+
+
+            <!-- REVIEW -->
+
+            <form
+                method="POST"
+                action="{% url 'admin-application-action' 'new' application.id 'review' %}"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="btn btn-info text-white registration-btn"
+                >
+
+                    <i class="bi bi-eye me-1"></i>
+
+                    Review
+
+                </button>
+
+            </form>
+
+
+            <!-- DISAPPROVE -->
+
+            <form
+                method="POST"
+                action="{% url 'admin-application-action' 'new' application.id 'disapprove' %}"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="btn btn-danger registration-btn"
+                    onclick="return confirm('Are you sure you want to disapprove this application?');"
+                >
+
+                    <i class="bi bi-x-circle me-1"></i>
+
+                    Disapprove
+
+                </button>
+
+            </form>
+
+
+            <!-- APPROVE -->
+
+            <form
+                method="POST"
+                action="{% url 'admin-application-action' 'new' application.id 'approve' %}"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="btn btn-success registration-btn"
+                    onclick="return confirm('Are you sure you want to approve this application?');"
+                >
+
+                    <i class="bi bi-check-circle me-1"></i>
+
+                    Approve
+
+                </button>
+
+            </form>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+<!-- =========================================================
+     APPROVED APPLICATION PROCESSING
+========================================================= -->
+
+{% if application.status == "APPROVED" %}
+
+<div class="registration-processing-card">
+
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+
+            <div>
+
+                <div class="registration-processing-title mb-1">
+
+                    Application Processing
+
+                </div>
+
+
+                {% if application.verification_status == "BIOMETRICS_PENDING" %}
+
+                    <div class="registration-processing-text">
+
+                        The application is approved.
+                        Biometric verification is still pending.
+
+                    </div>
+
+                {% elif application.verification_status == "VERIFIED" %}
+
+                    <div class="registration-processing-text">
+
+                        The application is approved and fully verified.
+
+                    </div>
+
+                {% else %}
+
+                    <div class="registration-processing-text">
+
+                        The application is approved but verification
+                        has not yet been completed.
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="d-flex gap-2 flex-wrap">
+
+
+                <!-- =================================================
+                     CONTINUE VERIFICATION
+                ================================================== -->
+
+                {% if application.verification_status == "BIOMETRICS_PENDING" %}
+
+                    <a
+                        href="{% url 'admin-applicant-biometric' application.id %}"
+                        class="btn btn-primary registration-btn"
+                    >
+
+                        <i class="bi bi-shield-check me-1"></i>
+
+                        Continue Verification
+
+                    </a>
+
+
+                <!-- =================================================
+                     VIEW VERIFICATION
+                ================================================== -->
+
+                {% elif application.verification_status == "VERIFIED" %}
+
+                    <a
+                        href="{% url 'admin-applicant-biometric' application.id %}"
+                        class="btn btn-outline-success registration-btn"
+                    >
+
+                        <i class="bi bi-shield-check me-1"></i>
+
+                        View Verification
+
+                    </a>
+
+                {% endif %}
+
+
+                <!-- BACK -->
+
+                <a
+                    href="{% url 'admin-applications' %}"
+                    class="btn btn-outline-secondary registration-btn"
+                >
+
+                    <i class="bi bi-arrow-left me-1"></i>
+
+                    Back to Applications
+
+                </a>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,1207 @@
+
+{% extends "admin.html" %}
+
+{% block title %}
+Update Information Request
+{% endblock %}
+
+{% block page_title %}
+Update Information Request
+{% endblock %}
+
+{% block page_subtitle %}
+Review requested applicant information changes
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+/* =========================================================
+   UPDATE DETAIL PAGE
+   ========================================================= */
+
+.update-detail-page {
+    width: 100%;
+}
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.update-page-header {
+    background: #ffffff;
+    border: 1px solid #e1e5ea;
+    padding: 22px 24px;
+    margin-bottom: 20px;
+}
+
+.update-page-header h4 {
+    color: #172033;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.update-page-header p {
+    font-size: 13px;
+}
+
+/* =========================================================
+   COMMON CARD
+   ========================================================= */
+
+.update-card {
+    background: #ffffff;
+    border: 1px solid #e1e5ea;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.04);
+    margin-bottom: 20px;
+}
+
+.update-card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e8ed;
+    background: #ffffff;
+}
+
+.update-card-header h5 {
+    margin: 0;
+    color: #172033;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.update-card-body {
+    padding: 20px;
+}
+
+/* =========================================================
+   HEADER ICON
+   ========================================================= */
+
+.update-section-icon {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #eaf2ff;
+    color: #0038a8;
+    margin-right: 10px;
+}
+
+/* =========================================================
+   STATUS CARD
+   ========================================================= */
+
+.update-status-card {
+    background: #ffffff;
+    border: 1px solid #dfe4ea;
+    border-left: 4px solid #0038a8;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}
+
+.update-status-label {
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+}
+
+.update-status-date {
+    color: #172033;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.update-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid transparent;
+}
+
+.update-status-pending {
+    background: #fff4d6;
+    color: #856404;
+    border-color: #ffe69c;
+}
+
+.update-status-review {
+    background: #dff3fa;
+    color: #087990;
+    border-color: #b6effb;
+}
+
+.update-status-approved {
+    background: #dff6e8;
+    color: #146c43;
+    border-color: #badbcc;
+}
+
+.update-status-disapproved {
+    background: #fbe2e5;
+    color: #b02a37;
+    border-color: #f1aeb5;
+}
+
+/* =========================================================
+   APPLICANT SUMMARY
+   ========================================================= */
+
+.update-applicant-summary {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.update-applicant-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eaf2ff;
+    color: #0038a8;
+    font-size: 21px;
+}
+
+.update-applicant-name {
+    color: #172033;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 3px;
+}
+
+.update-applicant-id {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+/* =========================================================
+   INFORMATION COMPARISON
+   ========================================================= */
+
+.update-comparison-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.update-comparison-title h5 {
+    margin: 0;
+    color: #172033;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.update-comparison-label {
+    padding: 5px 9px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.update-current-label {
+    color: #5f6368;
+    background: #f0f2f4;
+    border: 1px solid #dfe3e7;
+}
+
+.update-requested-label {
+    color: #0038a8;
+    background: #eaf2ff;
+    border: 1px solid #cfe0ff;
+}
+
+/* =========================================================
+   DATA ROW
+   ========================================================= */
+
+.update-data-list {
+    border-top: 1px solid #edf0f3;
+}
+
+.update-data-row {
+    display: grid;
+    grid-template-columns: 135px 1fr;
+    gap: 15px;
+    padding: 13px 0;
+    border-bottom: 1px solid #edf0f3;
+}
+
+.update-data-row:last-child {
+    border-bottom: 0;
+}
+
+.update-data-label {
+    color: #737b87;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.update-data-value {
+    color: #202733;
+    font-size: 13px;
+    font-weight: 500;
+    word-break: break-word;
+}
+
+.update-requested-card {
+    border: 1px solid #cbdcff;
+}
+
+.update-requested-card .update-card-header {
+    background: #0038a8;
+    border-bottom-color: #0038a8;
+}
+
+.update-requested-card .update-card-header h5 {
+    color: #ffffff;
+}
+
+/* =========================================================
+   CHANGED VALUE
+   ========================================================= */
+
+.update-changed-value {
+    color: #0038a8;
+    font-weight: 700;
+}
+
+/* =========================================================
+   OTHER INFORMATION
+   ========================================================= */
+
+.update-other-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid #edf0f3;
+}
+
+.update-other-item {
+    padding: 15px 18px;
+    border-right: 1px solid #edf0f3;
+}
+
+.update-other-item:last-child {
+    border-right: 0;
+}
+
+.update-other-label {
+    display: block;
+    color: #737b87;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 7px;
+}
+
+.update-other-value {
+    color: #202733;
+    font-size: 13px;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+/* =========================================================
+   REASON
+   ========================================================= */
+
+.update-reason-box {
+    background: #f8f9fb;
+    border: 1px solid #e3e7ec;
+    padding: 18px;
+    color: #343a40;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+/* =========================================================
+   ACTION PANEL
+   ========================================================= */
+
+.update-action-card {
+    background: #ffffff;
+    border: 1px solid #dfe4ea;
+    margin-top: 20px;
+}
+
+.update-action-header {
+    padding: 16px 20px;
+    background: #f8f9fb;
+    border-bottom: 1px solid #e3e7ec;
+}
+
+.update-action-header h5 {
+    margin: 0;
+    color: #172033;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.update-action-body {
+    padding: 18px 20px;
+}
+
+.update-action-description {
+    color: #6b7280;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.update-action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.update-action-buttons .btn {
+    min-width: 115px;
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 15px;
+}
+
+.update-back-btn {
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 991.98px) {
+
+    .update-other-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .update-other-item:nth-child(2) {
+        border-right: 0;
+    }
+
+    .update-other-item:nth-child(-n+2) {
+        border-bottom: 1px solid #edf0f3;
+    }
+}
+
+@media (max-width: 767.98px) {
+
+    .update-page-header {
+        padding: 18px;
+    }
+
+    .update-page-header .btn {
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .update-status-card {
+        padding: 16px;
+    }
+
+    .update-card-body {
+        padding: 16px;
+    }
+
+    .update-data-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    .update-other-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .update-other-item {
+        border-right: 0;
+        border-bottom: 1px solid #edf0f3;
+    }
+
+    .update-other-item:last-child {
+        border-bottom: 0;
+    }
+
+    .update-action-buttons {
+        justify-content: stretch;
+    }
+
+    .update-action-buttons form {
+        flex: 1 1 100%;
+    }
+
+    .update-action-buttons .btn {
+        width: 100%;
+    }
+}
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid px-0 update-detail-page">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="update-page-header">
+
+        <div class="row align-items-center">
+
+            <div class="col-md">
+
+                <h4>
+                    Update Information
+                </h4>
+
+                <p class="text-muted mb-0 mt-1">
+                    Request #{{ application.id }}
+                </p>
+
+            </div>
+
+            <div class="col-md-auto">
+
+                <a
+                    href="{% url 'admin-applications' %}"
+                    class="btn btn-outline-secondary update-back-btn"
+                >
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Back to Applications
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         STATUS
+         ===================================================== -->
+
+    <div class="update-status-card">
+
+        <div class="row align-items-center">
+
+            <div class="col-md-6">
+
+                <div class="update-status-label">
+                    Request Status
+                </div>
+
+                {% if application.status == "PENDING" %}
+
+                    <span class="update-status-badge update-status-pending">
+                        Pending
+                    </span>
+
+                {% elif application.status == "REVIEW" %}
+
+                    <span class="update-status-badge update-status-review">
+                        Under Review
+                    </span>
+
+                {% elif application.status == "APPROVED" %}
+
+                    <span class="update-status-badge update-status-approved">
+                        Approved
+                    </span>
+
+                {% elif application.status == "DISAPPROVED" %}
+
+                    <span class="update-status-badge update-status-disapproved">
+                        Disapproved
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+
+                <div class="update-status-label">
+                    Requested At
+                </div>
+
+                <div class="update-status-date">
+                    {{ application.requested_at|date:"M d, Y h:i A" }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         APPLICANT
+         ===================================================== -->
+
+    <div class="update-card">
+
+        <div class="update-card-header">
+
+            <h5>
+                <span class="update-section-icon">
+                    <i class="bi bi-person"></i>
+                </span>
+                Applicant Information
+            </h5>
+
+        </div>
+
+        <div class="update-card-body">
+
+            <div class="update-applicant-summary">
+
+                <div class="update-applicant-icon">
+                    <i class="bi bi-person"></i>
+                </div>
+
+                <div>
+
+                    <div class="update-applicant-name">
+
+                        {{ application.applicant.lastname }},
+                        {{ application.applicant.firstname }}
+                        {{ application.applicant.middlename }}
+
+                    </div>
+
+                    <div class="update-applicant-id">
+                        Applicant ID #{{ application.applicant.id }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CURRENT / REQUESTED INFORMATION
+         ===================================================== -->
+
+    <div class="row g-4">
+
+
+        <!-- =================================================
+             CURRENT INFORMATION
+             ================================================= -->
+
+        <div class="col-lg-6">
+
+            <div class="update-card h-100">
+
+                <div class="update-card-header">
+
+                    <div class="update-comparison-title mb-0">
+
+                        <h5>
+                            Current Information
+                        </h5>
+
+                        <span class="update-comparison-label update-current-label">
+                            Existing Record
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="update-card-body">
+
+                    <div class="update-data-list">
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Last Name
+                            </div>
+
+                            <div class="update-data-value">
+                                {{ application.applicant.lastname|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                First Name
+                            </div>
+
+                            <div class="update-data-value">
+                                {{ application.applicant.firstname|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Middle Name
+                            </div>
+
+                            <div class="update-data-value">
+                                {{ application.applicant.middlename|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Age
+                            </div>
+
+                            <div class="update-data-value">
+                                {{ application.applicant.age|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Sex
+                            </div>
+
+                            <div class="update-data-value">
+                                {{ application.applicant.sex|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Birthdate
+                            </div>
+
+                            <div class="update-data-value">
+
+                                {% if application.applicant.birthdate %}
+                                    {{ application.applicant.birthdate|date:"M d, Y" }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Birthplace
+                            </div>
+
+                            <div class="update-data-value">
+                                {{ application.applicant.birthplace|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Barangay
+                            </div>
+
+                            <div class="update-data-value">
+
+                                {% if application.applicant.brgy %}
+                                    {{ application.applicant.brgy.name }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Phone
+                            </div>
+
+                            <div class="update-data-value">
+                                {{ application.applicant.phone|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Email
+                            </div>
+
+                            <div class="update-data-value">
+                                {{ application.applicant.email|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             REQUESTED INFORMATION
+             ================================================= -->
+
+        <div class="col-lg-6">
+
+            <div class="update-card update-requested-card h-100">
+
+                <div class="update-card-header">
+
+                    <div class="update-comparison-title mb-0">
+
+                        <h5>
+                            Requested Information
+                        </h5>
+
+                        <span class="update-comparison-label update-requested-label">
+                            Proposed Changes
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="update-card-body">
+
+                    <div class="update-data-list">
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Last Name
+                            </div>
+
+                            <div class="update-data-value update-changed-value">
+                                {{ application.lastname|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                First Name
+                            </div>
+
+                            <div class="update-data-value update-changed-value">
+                                {{ application.firstname|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Middle Name
+                            </div>
+
+                            <div class="update-data-value update-changed-value">
+                                {{ application.middlename|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Age
+                            </div>
+
+                            <div class="update-data-value">
+                                {{ application.age|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Sex
+                            </div>
+
+                            <div class="update-data-value">
+                                {{ application.sex|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Birthdate
+                            </div>
+
+                            <div class="update-data-value">
+
+                                {% if application.birthdate %}
+                                    {{ application.birthdate|date:"M d, Y" }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Birthplace
+                            </div>
+
+                            <div class="update-data-value">
+                                {{ application.birthplace|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Barangay
+                            </div>
+
+                            <div class="update-data-value update-changed-value">
+
+                                {% if application.brgy %}
+                                    {{ application.brgy.name }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Phone
+                            </div>
+
+                            <div class="update-data-value">
+                                {{ application.phone|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-data-row">
+
+                            <div class="update-data-label">
+                                Email
+                            </div>
+
+                            <div class="update-data-value">
+                                {{ application.email|default:"Not specified" }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             OTHER INFORMATION
+             ================================================= -->
+
+        <div class="col-12">
+
+            <div class="update-card">
+
+                <div class="update-card-header">
+
+                    <h5>
+                        Other Information
+                    </h5>
+
+                </div>
+
+                <div class="update-card-body p-0">
+
+                    <div class="update-other-grid">
+
+
+                        <div class="update-other-item">
+
+                            <span class="update-other-label">
+                                PWD Status
+                            </span>
+
+                            <div class="update-other-value">
+
+                                {{ application.get_pwd_status_display|default:"Not specified" }}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-other-item">
+
+                            <span class="update-other-label">
+                                Citizenship
+                            </span>
+
+                            <div class="update-other-value">
+
+                                {{ application.get_citizenship_status_display|default:"Not specified" }}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-other-item">
+
+                            <span class="update-other-label">
+                                Father's Name
+                            </span>
+
+                            <div class="update-other-value">
+
+                                {{ application.father|default:"Not specified" }}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="update-other-item">
+
+                            <span class="update-other-label">
+                                Mother's Name
+                            </span>
+
+                            <div class="update-other-value">
+
+                                {{ application.mother|default:"Not specified" }}
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             REASON
+             ================================================= -->
+
+        <div class="col-12">
+
+            <div class="update-card">
+
+                <div class="update-card-header">
+
+                    <h5>
+                        Reason for Update
+                    </h5>
+
+                </div>
+
+                <div class="update-card-body">
+
+                    {% if application.reason %}
+
+                        <div class="update-reason-box">
+                            {{ application.reason }}
+                        </div>
+
+                    {% else %}
+
+                        <div class="text-muted small">
+                            No reason provided.
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ACTION BUTTONS
+         ===================================================== -->
+
+    {% if application.status == "PENDING" or application.status == "REVIEW" %}
+
+    <div class="update-action-card">
+
+        <div class="update-action-header">
+
+            <h5>
+                Application Actions
+            </h5>
+
+        </div>
+
+        <div class="update-action-body">
+
+            <div class="update-action-description">
+
+                Review the requested changes before deciding whether
+                to approve or disapprove this update request.
+
+            </div>
+
+
+            <div class="update-action-buttons">
+
+
+                <!-- REVIEW -->
+
+                <form
+                    method="POST"
+                    action="{% url 'admin-application-action' 'update' application.id 'review' %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-info text-white"
+                    >
+                        <i class="bi bi-eye me-1"></i>
+                        Review
+                    </button>
+
+                </form>
+
+
+                <!-- DISAPPROVE -->
+
+                <form
+                    method="POST"
+                    action="{% url 'admin-application-action' 'update' application.id 'disapprove' %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-danger"
+                        onclick="return confirm('Are you sure you want to disapprove this update request?');"
+                    >
+                        <i class="bi bi-x-circle me-1"></i>
+                        Disapprove
+                    </button>
+
+                </form>
+
+
+                <!-- APPROVE -->
+
+                <form
+                    method="POST"
+                    action="{% url 'admin-application-action' 'update' application.id 'approve' %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-success"
+                        onclick="return confirm('Are you sure you want to approve this update request?');"
+                    >
+                        <i class="bi bi-check-circle me-1"></i>
+                        Approve
+                    </button>
+
+                </form>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,1338 @@
+* {
+    box-sizing: border-box;
+}
+
+.update-page {
+    width: 100%;
+    min-height: 100vh;
+
+    background: #f4f6f9;
+
+    color: #1f2937;
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.registration-header {
+    width: 100%;
+
+    background: #0b2d5c;
+
+    color: #ffffff;
+
+    border-bottom: 4px solid #d4a017;
+}
+
+.registration-header-inner {
+    width: 100%;
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 17px 24px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 16px;
+}
+
+.registration-header-logo {
+    width: 65px;
+    height: 65px;
+
+    flex-shrink: 0;
+}
+
+.registration-header-logo img {
+    width: 65px;
+    height: 65px;
+
+    object-fit: contain;
+}
+
+.registration-header-content {
+    min-width: 0;
+}
+
+.registration-header-content h1 {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 23px;
+    font-weight: 700;
+
+    line-height: 1.3;
+}
+
+.registration-header-content p {
+    margin: 4px 0 0;
+
+    color: #dbe5f2;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   HEADER MAIN
+========================================================= */
+
+.registration-header-main {
+    width: 100%;
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 22px 24px 27px;
+}
+
+.registration-header-main h2 {
+    margin: 0 0 7px;
+
+    color: #ffffff;
+
+    font-size: 30px;
+    font-weight: 700;
+
+    line-height: 1.25;
+}
+
+.registration-header-main p {
+    max-width: 750px;
+
+    margin: 0 0 15px;
+
+    color: #dbe5f2;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+.application-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    min-height: 32px;
+
+    padding: 5px 12px;
+
+    border: 1px solid rgba(255, 255, 255, 0.3);
+
+    background: rgba(255, 255, 255, 0.08);
+
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.main-navigation {
+    width: 100%;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #d9dee7;
+
+    box-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+.main-navigation-inner {
+    width: 100%;
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    display: flex;
+    align-items: center;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    -webkit-overflow-scrolling: touch;
+
+    scrollbar-width: thin;
+}
+
+.main-navigation button {
+    min-height: 48px;
+
+    padding: 0 20px;
+
+    border: 0;
+
+    border-bottom: 3px solid transparent;
+
+    background: transparent;
+
+    color: #4b5563;
+
+    font-family: inherit;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.main-navigation button:hover {
+    background: #f1f5f9;
+
+    color: #0b2d5c;
+}
+
+.main-navigation button.active {
+    background: #f8fafc;
+
+    color: #0b2d5c;
+
+    border-bottom-color: #0b2d5c;
+}
+
+
+/* =========================================================
+   STEP INDICATOR
+========================================================= */
+
+.step-wrapper {
+    width: 100%;
+    max-width: 900px;
+
+    margin: 0 auto;
+
+    padding: 28px 20px 5px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+.step {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    min-width: 170px;
+}
+
+.step-number {
+    width: 35px;
+    height: 35px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: 2px solid #cbd5e1;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    color: #64748b;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.step.active .step-number {
+    border-color: #0b2d5c;
+
+    background: #0b2d5c;
+
+    color: #ffffff;
+}
+
+.step.completed .step-number {
+    border-color: #15803d;
+
+    background: #15803d;
+
+    color: #ffffff;
+}
+
+.step-label {
+    color: #64748b;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.step.active .step-label {
+    color: #0b2d5c;
+}
+
+.step.completed .step-label {
+    color: #15803d;
+}
+
+.step-line {
+    width: 100px;
+
+    height: 2px;
+
+    margin: 0 15px;
+
+    background: #dbe1e8;
+}
+
+.step-line.completed {
+    background: #15803d;
+}
+
+
+/* =========================================================
+   ALERT CONTAINER
+========================================================= */
+
+.alert-container {
+    width: 100%;
+    max-width: 1050px;
+
+    margin: 24px auto 0;
+
+    padding: 0 20px;
+}
+
+
+/* =========================================================
+   SUCCESS ALERT
+========================================================= */
+
+.success-alert {
+    width: 100%;
+
+    padding: 17px 20px;
+
+    border: 1px solid #bbf7d0;
+
+    border-left: 4px solid #15803d;
+
+    background: #f0fdf4;
+
+    color: #166534;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+}
+
+.success-alert > strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #166534;
+
+    font-size: 16px;
+}
+
+.success-alert > div {
+    margin-bottom: 4px;
+}
+
+.success-alert > div:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =========================================================
+   OFFLINE SUCCESS
+========================================================= */
+
+.offline-success {
+    border-color: #cbd5e1;
+
+    border-left-color: #0b2d5c;
+
+    background: #f8fafc;
+
+    color: #334155;
+}
+
+.offline-success > strong {
+    color: #0b2d5c;
+}
+
+.offline-details {
+    margin-top: 9px !important;
+
+    padding-top: 9px;
+
+    border-top: 1px solid #dbe2ea;
+}
+
+.online-details {
+    margin-top: 9px !important;
+
+    padding-top: 9px;
+
+    border-top: 1px solid #bbf7d0;
+}
+
+
+/* =========================================================
+   ERROR ALERT
+========================================================= */
+
+.error-alert {
+    width: 100%;
+
+    padding: 15px 18px;
+
+    border: 1px solid #fecdd3;
+
+    border-left: 4px solid #dc2626;
+
+    background: #fff1f2;
+
+    color: #991b1b;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+.error-alert strong {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #991b1b;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.update-main {
+    width: 100%;
+
+    padding: 25px 20px 60px;
+}
+
+
+/* =========================================================
+   FORM CARD
+========================================================= */
+
+.form-card {
+    width: 100%;
+    max-width: 1050px;
+
+    margin: 0 auto;
+
+    background: #ffffff;
+
+    border: 1px solid #dfe4ea;
+
+    box-shadow:
+        0 8px 25px rgba(15, 23, 42, 0.07);
+}
+
+.form-card-header {
+    padding: 24px 28px;
+
+    background: #0b2d5c;
+
+    border-bottom: 4px solid #d4a017;
+}
+
+.form-card-header h2 {
+    margin: 0 0 6px;
+
+    color: #ffffff;
+
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.form-card-header p {
+    margin: 0;
+
+    color: #dbe5f2;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+.form-card-body {
+    padding: 30px;
+}
+
+
+/* =========================================================
+   RECORD FOUND
+========================================================= */
+
+.record-found {
+    width: 100%;
+
+    margin-bottom: 20px;
+
+    padding: 15px 17px;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 12px;
+
+    background: #f0fdf4;
+
+    border: 1px solid #bbf7d0;
+
+    color: #166534;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+.record-found-icon {
+    width: 28px;
+    height: 28px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #15803d;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.record-found strong {
+    display: block;
+
+    margin-bottom: 2px;
+
+    color: #166534;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   APPLICANT SUMMARY
+========================================================= */
+
+.applicant-summary {
+    margin-bottom: 30px;
+
+    padding: 17px 20px;
+
+    background: #f8fafc;
+
+    border: 1px solid #dbe2ea;
+
+    border-left: 4px solid #0b2d5c;
+}
+
+.summary-label {
+    margin-bottom: 5px;
+
+    color: #667085;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.3px;
+}
+
+.summary-name {
+    color: #0b2d5c;
+
+    font-size: 17px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   FORM GRID
+========================================================= */
+
+.form-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+.search-grid {
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+}
+
+.form-group {
+    min-width: 0;
+}
+
+.form-group-wide {
+    grid-column: span 2;
+}
+
+
+/* =========================================================
+   SECTION TITLE
+========================================================= */
+
+.section-title {
+    margin: 30px 0 18px;
+
+    padding-bottom: 10px;
+
+    border-bottom: 1px solid #dfe4ea;
+
+    color: #0b2d5c;
+
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.form-card-body form > .section-title:first-child {
+    margin-top: 0;
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #344054;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   FORM CONTROL
+========================================================= */
+
+.form-control {
+    width: 100%;
+
+    min-height: 46px;
+
+    padding: 10px 12px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 3px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #1f2937;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.form-control::placeholder {
+    color: #98a2b3;
+}
+
+.form-control:focus {
+    border-color: #0b2d5c;
+
+    box-shadow:
+        0 0 0 3px rgba(11, 45, 92, 0.10);
+}
+
+.form-control:disabled {
+    background: #f2f4f7;
+
+    color: #667085;
+
+    cursor: not-allowed;
+}
+
+textarea.form-control {
+    min-height: 135px;
+
+    resize: vertical;
+
+    line-height: 1.6;
+}
+
+select.form-control {
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   INFORMATION NOTICE
+========================================================= */
+
+.information-notice {
+    width: 100%;
+
+    margin: 28px 0;
+
+    padding: 17px 19px;
+
+    border: 1px solid #dbe2ea;
+
+    border-left: 4px solid #0b2d5c;
+
+    background: #f8fafc;
+
+    color: #475467;
+
+    font-size: 13px;
+
+    line-height: 1.7;
+}
+
+.information-notice strong {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #0b2d5c;
+
+    font-size: 14px;
+}
+
+.information-notice div {
+    margin-bottom: 7px;
+}
+
+.information-notice div:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =========================================================
+   BUTTON ROW
+========================================================= */
+
+.button-row {
+    width: 100%;
+
+    padding-top: 20px;
+
+    border-top: 1px solid #e5e7eb;
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.btn {
+    min-height: 46px;
+
+    padding: 0 21px;
+
+    border-radius: 3px;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   GOVERNMENT BUTTON
+========================================================= */
+
+.btn-government,
+.btn-submit {
+    border: 1px solid #0b2d5c;
+
+    background: #0b2d5c;
+
+    color: #ffffff;
+}
+
+.btn-government:hover:not(:disabled),
+.btn-submit:hover:not(:disabled) {
+    background: #09264d;
+
+    border-color: #09264d;
+
+    box-shadow:
+        0 4px 10px rgba(11, 45, 92, 0.18);
+}
+
+
+/* =========================================================
+   SECONDARY
+========================================================= */
+
+.btn-secondary {
+    border: 1px solid #cbd5e1;
+
+    background: #ffffff;
+
+    color: #344054;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #f8fafc;
+
+    border-color: #94a3b8;
+
+    color: #0b2d5c;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.site-footer {
+    width: 100%;
+
+    background: #0b2d5c;
+
+    border-top: 4px solid #d4a017;
+}
+
+.site-footer-inner {
+    width: 100%;
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 24px 20px;
+
+    text-align: center;
+}
+
+.footer-title {
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.footer-subtitle {
+    margin-top: 5px;
+
+    color: #cbd5e1;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .form-grid,
+    .search-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .form-group-wide {
+        grid-column: span 2;
+    }
+
+    .step-line {
+        width: 70px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .registration-header-inner {
+        padding: 15px 17px;
+
+        gap: 12px;
+    }
+
+    .registration-header-logo {
+        width: 55px;
+        height: 55px;
+    }
+
+    .registration-header-logo img {
+        width: 55px;
+        height: 55px;
+    }
+
+    .registration-header-content h1 {
+        font-size: 19px;
+    }
+
+    .registration-header-content p {
+        font-size: 11px;
+    }
+
+
+    .registration-header-main {
+        padding: 18px 17px 22px;
+    }
+
+    .registration-header-main h2 {
+        font-size: 25px;
+    }
+
+    .registration-header-main p {
+        font-size: 13px;
+    }
+
+
+    .main-navigation-inner {
+        overflow-x: auto;
+
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .main-navigation button {
+        flex-shrink: 0;
+
+        padding: 0 16px;
+    }
+
+
+    .step-wrapper {
+        padding: 22px 12px 3px;
+    }
+
+    .step {
+        min-width: auto;
+
+        gap: 7px;
+    }
+
+    .step-label {
+        font-size: 11px;
+    }
+
+    .step-line {
+        width: 45px;
+
+        margin: 0 8px;
+    }
+
+
+    .alert-container {
+        padding: 0 12px;
+
+        margin-top: 18px;
+    }
+
+
+    .update-main {
+        padding: 20px 12px 45px;
+    }
+
+
+    .form-card-header {
+        padding: 20px;
+
+        border-bottom-width: 3px;
+    }
+
+    .form-card-header h2 {
+        font-size: 19px;
+    }
+
+    .form-card-header p {
+        font-size: 12px;
+    }
+
+    .form-card-body {
+        padding: 22px 20px;
+    }
+
+
+    .form-grid,
+    .search-grid {
+        grid-template-columns: 1fr;
+
+        gap: 16px;
+    }
+
+    .form-group-wide {
+        grid-column: span 1;
+    }
+
+
+    .section-title {
+        margin-top: 25px;
+
+        font-size: 16px;
+    }
+
+
+    .button-row {
+        flex-direction: column-reverse;
+
+        align-items: stretch;
+    }
+
+    .button-row .btn {
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 576px) {
+
+    .registration-header {
+        border-bottom-width: 3px;
+    }
+
+    .registration-header-inner {
+        padding: 12px;
+    }
+
+    .registration-header-logo {
+        width: 45px;
+        height: 45px;
+    }
+
+    .registration-header-logo img {
+        width: 45px;
+        height: 45px;
+    }
+
+    .registration-header-content h1 {
+        font-size: 15px;
+
+        line-height: 1.3;
+    }
+
+    .registration-header-content p {
+        margin-top: 2px;
+
+        font-size: 9px;
+    }
+
+
+    .registration-header-main {
+        padding: 16px 12px 20px;
+    }
+
+    .registration-header-main h2 {
+        font-size: 22px;
+    }
+
+    .registration-header-main p {
+        font-size: 12px;
+    }
+
+    .application-badge {
+        font-size: 10px;
+
+        min-height: 29px;
+    }
+
+
+    .main-navigation button {
+        min-height: 43px;
+
+        padding: 0 14px;
+
+        font-size: 12px;
+    }
+
+
+    .step-wrapper {
+        padding: 19px 8px 0;
+    }
+
+    .step-number {
+        width: 31px;
+        height: 31px;
+
+        font-size: 12px;
+    }
+
+    .step-label {
+        font-size: 10px;
+    }
+
+    .step-line {
+        width: 25px;
+
+        margin: 0 5px;
+    }
+
+
+    .update-main {
+        padding: 17px 8px 35px;
+    }
+
+
+    .alert-container {
+        padding: 0 8px;
+    }
+
+    .success-alert,
+    .error-alert {
+        padding: 14px 15px;
+
+        font-size: 12px;
+    }
+
+
+    .form-card {
+        border-left: 0;
+        border-right: 0;
+    }
+
+    .form-card-header {
+        padding: 17px 14px;
+    }
+
+    .form-card-body {
+        padding: 18px 14px;
+    }
+
+
+    .record-found {
+        padding: 13px;
+
+        font-size: 12px;
+    }
+
+    .record-found-icon {
+        width: 25px;
+        height: 25px;
+
+        font-size: 12px;
+    }
+
+    .record-found strong {
+        font-size: 13px;
+    }
+
+
+    .applicant-summary {
+        padding: 14px 15px;
+
+        margin-bottom: 24px;
+    }
+
+    .summary-label {
+        font-size: 10px;
+    }
+
+    .summary-name {
+        font-size: 15px;
+    }
+
+
+    .section-title {
+        margin: 22px 0 14px;
+
+        padding-bottom: 8px;
+
+        font-size: 15px;
+    }
+
+
+    .form-group label {
+        font-size: 13px;
+    }
+
+    .form-control {
+        min-height: 44px;
+
+        padding: 9px 11px;
+
+        font-size: 13px;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+    }
+
+
+    .information-notice {
+        margin: 22px 0;
+
+        padding: 14px 15px;
+
+        font-size: 11px;
+
+        line-height: 1.65;
+    }
+
+    .information-notice strong {
+        font-size: 12px;
+    }
+
+
+    .btn {
+        min-height: 45px;
+
+        font-size: 13px;
+    }
+
+
+    .site-footer-inner {
+        padding: 20px 12px;
+    }
+
+    .footer-title {
+        font-size: 13px;
+    }
+
+    .footer-subtitle {
+        font-size: 10px;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL DEVICES
+========================================================= */
+
+@media (max-width: 360px) {
+
+    .registration-header-content h1 {
+        font-size: 13px;
+    }
+
+    .registration-header-content p {
+        font-size: 8px;
+    }
+
+    .registration-header-logo {
+        width: 40px;
+        height: 40px;
+    }
+
+    .registration-header-logo img {
+        width: 40px;
+        height: 40px;
+    }
+
+
+    .registration-header-main h2 {
+        font-size: 20px;
+    }
+
+
+    .step-label {
+        font-size: 9px;
+    }
+
+    .step-line {
+        width: 18px;
+
+        margin: 0 3px;
+    }
+
+
+    .form-card-body {
+        padding: 15px 11px;
+    }
+
+    .form-card-header {
+        padding: 15px 11px;
+    }
+
+    .form-control {
+        font-size: 12px;
+    }
+}

@@ -1,0 +1,1271 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Update / Correction of Registration{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --gov-blue: #174a8b;
+        --gov-blue-dark: #103866;
+        --gov-blue-light: #eaf2fb;
+        --gov-border: #d7e0eb;
+        --gov-text: #263445;
+        --gov-muted: #64748b;
+        --gov-bg: #f4f7fb;
+        --gov-danger: #b42318;
+        --gov-success: #16794b;
+    }
+
+    .update-page {
+        background: var(--gov-bg);
+        min-height: 100vh;
+        padding: 35px 15px 55px;
+        color: var(--gov-text);
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .update-container {
+        width: 100%;
+        max-width: 1050px;
+        margin: 0 auto;
+    }
+
+    .page-heading {
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .government-mark {
+        width: 66px;
+        height: 66px;
+        border-radius: 50%;
+        margin: 0 auto 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gov-blue);
+        background: #fff;
+        border: 2px solid var(--gov-blue);
+    }
+
+    .government-mark svg {
+        width: 35px;
+        height: 35px;
+    }
+
+    .page-heading h1 {
+        font-size: clamp(23px, 4vw, 32px);
+        font-weight: 800;
+        margin: 0 0 8px;
+        color: var(--gov-blue-dark);
+    }
+
+    .page-heading p {
+        color: var(--gov-muted);
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    .page-heading .office-label {
+        color: var(--gov-blue);
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 8px;
+    }
+
+    .step-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin: 25px 0;
+        flex-wrap: wrap;
+    }
+
+    .step-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--gov-muted);
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .step-number {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 1px solid var(--gov-border);
+        background: #fff;
+        color: var(--gov-muted);
+    }
+
+    .step-item.active {
+        color: var(--gov-blue);
+    }
+
+    .step-item.active .step-number {
+        background: var(--gov-blue);
+        color: #fff;
+        border-color: var(--gov-blue);
+    }
+
+    .step-line {
+        width: 45px;
+        height: 2px;
+        background: var(--gov-border);
+    }
+
+    .form-card {
+        background: #fff;
+        border: 1px solid var(--gov-border);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 22px;
+        box-shadow: 0 4px 16px rgba(20, 45, 80, 0.04);
+    }
+
+    .form-card-header {
+        padding: 20px 24px;
+        background: #fff;
+        border-bottom: 1px solid var(--gov-border);
+        border-left: 4px solid var(--gov-blue);
+    }
+
+    .form-card-header h2 {
+        color: var(--gov-blue-dark);
+        font-size: 17px;
+        font-weight: 800;
+        margin: 0 0 5px;
+    }
+
+    .form-card-header p {
+        color: var(--gov-muted);
+        font-size: 13px;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .form-card-body {
+        padding: 24px;
+    }
+
+    .form-label {
+        display: block;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .form-control,
+    .form-select {
+        width: 100%;
+        min-height: 45px;
+        border: 1px solid #cbd5e1;
+        border-radius: 7px;
+        padding: 10px 12px;
+        background: #fff;
+        color: #1e293b;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    textarea.form-control {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--gov-blue);
+        outline: 3px solid rgba(23, 74, 139, 0.10);
+        box-shadow: none;
+    }
+
+    .form-control:disabled,
+    .form-select:disabled {
+        background: #f1f5f9;
+        cursor: not-allowed;
+    }
+
+    .form-text {
+        display: block;
+        margin-top: 6px;
+        color: var(--gov-muted);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .required-mark {
+        color: var(--gov-danger);
+    }
+
+    .optional-mark {
+        color: var(--gov-muted);
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .form-field {
+        min-width: 0;
+    }
+
+    .form-field.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .information-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 15px 17px;
+        margin-bottom: 22px;
+        border: 1px solid #bfd6f2;
+        border-radius: 8px;
+        background: var(--gov-blue-light);
+        color: #244b77;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .information-notice svg {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        margin-top: 1px;
+    }
+
+    .alert-box {
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .alert-error {
+        color: #842029;
+        background: #f8d7da;
+        border: 1px solid #f1aeb5;
+    }
+
+    .alert-success {
+        color: #0f5132;
+        background: #d1e7dd;
+        border: 1px solid #a3cfbb;
+    }
+
+    .alert-warning {
+        color: #664d03;
+        background: #fff3cd;
+        border: 1px solid #ffecb5;
+    }
+
+    .button-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 24px;
+    }
+
+    .btn-gov {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        min-height: 44px;
+        padding: 11px 20px;
+        border-radius: 7px;
+        border: 1px solid transparent;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background 0.15s ease;
+    }
+
+    .btn-gov svg {
+        width: 17px;
+        height: 17px;
+    }
+
+    .btn-primary-gov {
+        color: #fff;
+        background: var(--gov-blue);
+        border-color: var(--gov-blue);
+    }
+
+    .btn-primary-gov:hover {
+        color: #fff;
+        background: var(--gov-blue-dark);
+    }
+
+    .btn-primary-gov:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .btn-secondary-gov {
+        color: #334155;
+        background: #fff;
+        border-color: #cbd5e1;
+    }
+
+    .btn-secondary-gov:hover {
+        color: var(--gov-blue);
+        background: #f8fafc;
+    }
+
+    .record-found {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        padding: 16px;
+        margin-bottom: 22px;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 8px;
+    }
+
+    .record-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #dcfce7;
+        color: var(--gov-success);
+        font-weight: 800;
+    }
+
+    .record-found h3 {
+        font-size: 15px;
+        color: #166534;
+        font-weight: 800;
+        margin: 0 0 5px;
+    }
+
+    .record-found p {
+        color: #166534;
+        font-size: 13px;
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    .upload-area {
+        padding: 22px;
+        text-align: center;
+        background: #f8fafc;
+        border: 2px dashed #b8c8da;
+        border-radius: 9px;
+        transition: border-color 0.2s ease;
+    }
+
+    .upload-area:focus-within {
+        border-color: var(--gov-blue);
+    }
+
+    .upload-icon {
+        width: 42px;
+        height: 42px;
+        color: var(--gov-blue);
+        margin: 0 auto 10px;
+    }
+
+    .upload-area .form-label {
+        text-align: center;
+        font-size: 14px;
+    }
+
+    .upload-area input[type="file"] {
+        max-width: 100%;
+        background: #fff;
+        text-align: left;
+    }
+
+    .file-name {
+        display: block;
+        color: var(--gov-blue-dark);
+        font-size: 13px;
+        font-weight: 700;
+        margin-top: 12px;
+        overflow-wrap: anywhere;
+    }
+
+    .field-error {
+        color: var(--gov-danger);
+        font-size: 12px;
+        margin-top: 7px;
+        line-height: 1.5;
+    }
+
+    .privacy-note {
+        padding: 13px 15px;
+        background: #f8fafc;
+        border: 1px solid var(--gov-border);
+        border-radius: 8px;
+        color: #475569;
+        font-size: 12px;
+        line-height: 1.7;
+        margin-top: 15px;
+    }
+
+    .page-footer {
+        margin-top: 25px;
+        text-align: center;
+        color: var(--gov-muted);
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+    @media (max-width: 640px) {
+        .update-page {
+            padding: 22px 10px 35px;
+        }
+
+        .form-card-header,
+        .form-card-body {
+            padding: 18px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 17px;
+        }
+
+        .form-field.full-width {
+            grid-column: auto;
+        }
+
+        .step-line {
+            width: 20px;
+        }
+
+        .step-item {
+            font-size: 11px;
+        }
+
+        .button-row {
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+
+        .btn-gov {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    }
+</style>
+
+<div class="update-page">
+    <div class="update-container">
+
+        <header class="page-heading">
+            <div class="government-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 21h18"/>
+                    <path d="M5 21V8l7-4 7 4v13"/>
+                    <path d="M9 21v-7h6v7"/>
+                    <path d="M9 10h.01M15 10h.01"/>
+                </svg>
+            </div>
+
+            <div class="office-label">Voter Registration Services</div>
+            <h1>Update / Correction of Registration</h1>
+            <p>Request a correction or update to your existing voter registration record.</p>
+        </header>
+
+        <div class="step-indicator" aria-label="Registration update steps">
+            <div class="step-item {% if not applicant %}active{% endif %}">
+                <span class="step-number">1</span>
+                <span>Find Record</span>
+            </div>
+
+            <div class="step-line"></div>
+
+            <div class="step-item {% if applicant %}active{% endif %}">
+                <span class="step-number">2</span>
+                <span>Update Details</span>
+            </div>
+        </div>
+
+        {% if error %}
+            <div class="alert-box alert-error" role="alert">
+                <strong>Unable to continue.</strong>
+                {{ error }}
+            </div>
+        {% endif %}
+
+        {% if success %}
+            <div class="alert-box alert-success" role="status">
+                {{ success }}
+            </div>
+        {% endif %}
+
+        {% if not applicant %}
+
+            <div class="information-notice">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+                <div>
+                    <strong>Before you begin</strong><br>
+                    Enter your registration details as they appear in your existing record.
+                    Make sure the information is accurate so your record can be located.
+                    Middle name is optional if you do not have one.
+                </div>
+            </div>
+
+            <section class="form-card">
+                <div class="form-card-header">
+                    <h2>Step 1: Find Your Registration Record</h2>
+                    <p>Provide your registered name and date of birth to locate your record.</p>
+                </div>
+
+                <div class="form-card-body">
+                    <form method="POST" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="find_applicant">
+
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label for="search_lastname" class="form-label">
+                                    Last Name <span class="required-mark">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="search_lastname"
+                                    name="lastname"
+                                    class="form-control"
+                                    value="{{ form_data.lastname|default:'' }}"
+                                    autocomplete="family-name"
+                                    maxlength="100"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-field">
+                                <label for="search_firstname" class="form-label">
+                                    First Name <span class="required-mark">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="search_firstname"
+                                    name="firstname"
+                                    class="form-control"
+                                    value="{{ form_data.firstname|default:'' }}"
+                                    autocomplete="given-name"
+                                    maxlength="100"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-field">
+                                <label for="search_middlename" class="form-label">
+                                    Middle Name <span class="optional-mark">(Optional)</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="search_middlename"
+                                    name="middlename"
+                                    class="form-control"
+                                    value="{{ form_data.middlename|default:'' }}"
+                                    autocomplete="additional-name"
+                                    maxlength="100"
+                                >
+                                <small class="form-text">
+                                    Leave blank if you do not have a middle name or if none is recorded.
+                                </small>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="search_birthdate" class="form-label">
+                                    Date of Birth <span class="required-mark">*</span>
+                                </label>
+                                <input
+                                    type="date"
+                                    id="search_birthdate"
+                                    name="birthdate"
+                                    class="form-control"
+                                    value="{{ form_data.birthdate|default:'' }}"
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <div class="button-row">
+                            <a href="/" class="btn-gov btn-secondary-gov">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m15 18-6-6 6-6"/>
+                                </svg>
+                                Back to Home
+                            </a>
+
+                            <button type="submit" class="btn-gov btn-primary-gov">
+                                Find Registration Record
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M5 12h14"/>
+                                    <path d="m12 5 7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+        {% else %}
+
+            <div class="record-found">
+                <div class="record-icon" aria-hidden="true">✓</div>
+                <div>
+                    <h3>Registration Record Found</h3>
+                    <p>
+                        You are requesting a correction for
+                        <strong>
+                            {{ applicant.firstname }}
+                            {% if applicant.middlename %}{{ applicant.middlename }} {% endif %}
+                            {{ applicant.lastname }}
+                        </strong>.
+                        Review your information and enter the details you want to update.
+                    </p>
+                </div>
+            </div>
+
+            <div class="information-notice">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+                <div>
+                    <strong>Important</strong><br>
+                    Submitting this form creates an update request. Your existing registration
+                    information should not be considered changed until the authorized election
+                    officer reviews and approves the request. Upload a clear, valid supporting
+                    document for verification.
+                </div>
+            </div>
+
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+                id="updateRegistrationForm"
+            >
+                {% csrf_token %}
+                <input type="hidden" name="action" value="submit_update">
+                <input type="hidden" name="applicant_id" value="{{ applicant.id }}">
+
+                <!-- PERSONAL INFORMATION -->
+                <section class="form-card">
+                    <div class="form-card-header">
+                        <h2>1. Personal Information</h2>
+                        <p>Enter the correct personal details for your registration record.</p>
+                    </div>
+
+                    <div class="form-card-body">
+                        <div class="form-grid">
+
+                            <div class="form-field">
+                                <label for="lastname" class="form-label">
+                                    Last Name <span class="required-mark">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="lastname"
+                                    name="lastname"
+                                    class="form-control"
+                                    value="{{ form_data.lastname|default:applicant.lastname }}"
+                                    maxlength="100"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-field">
+                                <label for="firstname" class="form-label">
+                                    First Name <span class="required-mark">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="firstname"
+                                    name="firstname"
+                                    class="form-control"
+                                    value="{{ form_data.firstname|default:applicant.firstname }}"
+                                    maxlength="100"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-field">
+                                <label for="middlename" class="form-label">
+                                    Middle Name <span class="optional-mark">(Optional)</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="middlename"
+                                    name="middlename"
+                                    class="form-control"
+                                    value="{{ form_data.middlename|default:applicant.middlename }}"
+                                    maxlength="100"
+                                >
+                                <small class="form-text">
+                                    Leave blank if you do not have a middle name.
+                                </small>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="age" class="form-label">
+                                    Age <span class="required-mark">*</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    id="age"
+                                    name="age"
+                                    class="form-control"
+                                    value="{{ form_data.age|default:applicant.age }}"
+                                    min="1"
+                                    max="150"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-field">
+                                <label for="sex" class="form-label">
+                                    Sex <span class="required-mark">*</span>
+                                </label>
+                                <select id="sex" name="sex" class="form-select" required>
+                                    <option value="">Select sex</option>
+                                    <option value="MALE"
+                                        {% if form_data.sex|default:applicant.sex == "MALE" %}selected{% endif %}>
+                                        Male
+                                    </option>
+                                    <option value="FEMALE"
+                                        {% if form_data.sex|default:applicant.sex == "FEMALE" %}selected{% endif %}>
+                                        Female
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="civil_status" class="form-label">
+                                    Civil Status
+                                </label>
+                                <select id="civil_status" name="civil_status" class="form-select">
+                                    <option value="">Select civil status</option>
+                                    <option value="SINGLE"
+                                        {% if form_data.civil_status|default:applicant.civil_status == "SINGLE" %}selected{% endif %}>
+                                        Single
+                                    </option>
+                                    <option value="MARRIED"
+                                        {% if form_data.civil_status|default:applicant.civil_status == "MARRIED" %}selected{% endif %}>
+                                        Married
+                                    </option>
+                                    <option value="WIDOWED"
+                                        {% if form_data.civil_status|default:applicant.civil_status == "WIDOWED" %}selected{% endif %}>
+                                        Widowed
+                                    </option>
+                                    <option value="SEPARATED"
+                                        {% if form_data.civil_status|default:applicant.civil_status == "SEPARATED" %}selected{% endif %}>
+                                        Separated
+                                    </option>
+                                </select>
+                                <small class="form-text">
+                                    Make sure these values match your model's civil status choices.
+                                </small>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="birthdate" class="form-label">
+                                    Date of Birth <span class="required-mark">*</span>
+                                </label>
+                                <input
+                                    type="date"
+                                    id="birthdate"
+                                    name="birthdate"
+                                    class="form-control"
+                                    value="{{ form_data.birthdate|default:applicant.birthdate|date:'Y-m-d' }}"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-field">
+                                <label for="birthplace" class="form-label">
+                                    Place of Birth <span class="required-mark">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="birthplace"
+                                    name="birthplace"
+                                    class="form-control"
+                                    value="{{ form_data.birthplace|default:applicant.birthplace }}"
+                                    maxlength="255"
+                                    required
+                                >
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ADDRESS INFORMATION -->
+                <section class="form-card">
+                    <div class="form-card-header">
+                        <h2>2. Address Information</h2>
+                        <p>Review the address associated with your registration.</p>
+                    </div>
+
+                    <div class="form-card-body">
+                        <div class="form-grid">
+
+                            <div class="form-field">
+                                <label for="brgy_id" class="form-label">
+                                    Barangay <span class="required-mark">*</span>
+                                </label>
+                                <select id="brgy_id" name="brgy_id" class="form-select" required>
+                                    <option value="">Select barangay</option>
+                                    {% for barangay in barangays %}
+                                        <option
+                                            value="{{ barangay.id }}"
+                                            {% if form_data.brgy == barangay.id|stringformat:"s" or not form_data.brgy and applicant.brgy_id == barangay.id %}selected{% endif %}
+                                        >
+                                            {{ barangay.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="municipality" class="form-label">
+                                    Municipality <span class="required-mark">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="municipality"
+                                    name="municipality"
+                                    class="form-control"
+                                    value="{{ form_data.municipality|default:applicant.municipality|default:'Pio Duran' }}"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-field">
+                                <label for="province" class="form-label">
+                                    Province <span class="required-mark">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="province"
+                                    name="province"
+                                    class="form-control"
+                                    value="{{ form_data.province|default:applicant.province|default:'Albay' }}"
+                                    required
+                                >
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CONTACT INFORMATION -->
+                <section class="form-card">
+                    <div class="form-card-header">
+                        <h2>3. Contact Information</h2>
+                        <p>Provide your current contact details for communication about your request.</p>
+                    </div>
+
+                    <div class="form-card-body">
+                        <div class="form-grid">
+
+                            <div class="form-field">
+                                <label for="phone" class="form-label">
+                                    Mobile Number <span class="required-mark">*</span>
+                                </label>
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    class="form-control"
+                                    value="{{ form_data.phone|default:applicant.phone }}"
+                                    maxlength="11"
+                                    pattern="[0-9]{11}"
+                                    inputmode="numeric"
+                                    placeholder="09XXXXXXXXX"
+                                    required
+                                >
+                                <small class="form-text">
+                                    Enter an 11-digit Philippine mobile number.
+                                </small>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="email" class="form-label">
+                                    Email Address <span class="optional-mark">(Optional)</span>
+                                </label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    class="form-control"
+                                    value="{{ form_data.email|default:applicant.email|default:'' }}"
+                                    maxlength="254"
+                                    autocomplete="email"
+                                >
+                                <small class="form-text">
+                                    You may leave this blank if you do not have an email address.
+                                </small>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <!-- OTHER INFORMATION -->
+                <section class="form-card">
+                    <div class="form-card-header">
+                        <h2>4. Other Information</h2>
+                        <p>Review your citizenship, disability status, and parents' names.</p>
+                    </div>
+
+                    <div class="form-card-body">
+                        <div class="form-grid">
+
+                            <div class="form-field">
+                                <label for="pwd_status" class="form-label">
+                                    Person with Disability (PWD)
+                                    <span class="required-mark">*</span>
+                                </label>
+                                <select id="pwd_status" name="pwd_status" class="form-select" required>
+                                    <option value="NO"
+                                        {% if form_data.pwd_status|default:applicant.pwd_status == "NO" %}selected{% endif %}>
+                                        No
+                                    </option>
+                                    <option value="YES"
+                                        {% if form_data.pwd_status|default:applicant.pwd_status == "YES" %}selected{% endif %}>
+                                        Yes
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="citizenship_status" class="form-label">
+                                    Citizenship Status <span class="required-mark">*</span>
+                                </label>
+                                <select
+                                    id="citizenship_status"
+                                    name="citizenship_status"
+                                    class="form-select"
+                                    required
+                                >
+                                    <option value="BY_BIRTH"
+                                        {% if form_data.citizenship_status|default:applicant.citizenship_status == "BY_BIRTH" %}selected{% endif %}>
+                                        Filipino by Birth
+                                    </option>
+                                    <option value="NATURALIZED"
+                                        {% if form_data.citizenship_status|default:applicant.citizenship_status == "NATURALIZED" %}selected{% endif %}>
+                                        Naturalized Filipino
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="father" class="form-label">
+                                    Father's Full Name <span class="required-mark">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="father"
+                                    name="father"
+                                    class="form-control"
+                                    value="{{ form_data.father|default:applicant.father }}"
+                                    maxlength="255"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-field">
+                                <label for="mother" class="form-label">
+                                    Mother's Full Name <span class="required-mark">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="mother"
+                                    name="mother"
+                                    class="form-control"
+                                    value="{{ form_data.mother|default:applicant.mother }}"
+                                    maxlength="255"
+                                    required
+                                >
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VALID ID / SUPPORTING DOCUMENT -->
+                <section class="form-card">
+                    <div class="form-card-header">
+                        <h2>5. Valid ID / Supporting Document</h2>
+                        <p>Upload a clear document to support your requested correction or update.</p>
+                    </div>
+
+                    <div class="form-card-body">
+
+                        {% if applicant.valid_id_document %}
+                            <div class="alert-box alert-warning">
+                                <strong>Existing document on file.</strong>
+                                A document was uploaded with your original registration.
+                                Upload the supporting document for this update request below.
+                            </div>
+                        {% endif %}
+
+                        <div class="upload-area">
+                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="1.6"
+                                 stroke-linecap="round" stroke-linejoin="round"
+                                 aria-hidden="true">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <path d="m17 8-5-5-5 5"/>
+                                <path d="M12 3v12"/>
+                            </svg>
+
+                            <label for="valid_id_document" class="form-label">
+                                Select Valid ID / Supporting Document
+                                <span class="required-mark">*</span>
+                            </label>
+
+                            <input
+                                type="file"
+                                id="valid_id_document"
+                                name="valid_id_document"
+                                class="form-control"
+                                accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                                required
+                                aria-describedby="documentHelp documentFileName documentUploadError"
+                            >
+
+                            <small id="documentHelp" class="form-text">
+                                Accepted formats: PDF, JPG, JPEG, PNG. Maximum file size: 5 MB.
+                            </small>
+
+                            <span id="documentFileName" class="file-name" aria-live="polite"></span>
+
+                            <div
+                                id="documentUploadError"
+                                class="field-error"
+                                role="alert"
+                            ></div>
+                        </div>
+
+                        <div class="privacy-note">
+                            <strong>Document privacy:</strong>
+                            Upload only the document required to verify your request.
+                            Ensure the image or scan is readable. Your document should be
+                            handled and accessed only by authorized personnel in accordance
+                            with applicable data protection requirements.
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- REASON FOR UPDATE -->
+                <section class="form-card">
+                    <div class="form-card-header">
+                        <h2>6. Reason for Update / Correction</h2>
+                        <p>Explain which information needs correction and why.</p>
+                    </div>
+
+                    <div class="form-card-body">
+                        <div class="form-field">
+                            <label for="reason" class="form-label">
+                                Reason for Request <span class="required-mark">*</span>
+                            </label>
+                            <textarea
+                                id="reason"
+                                name="reason"
+                                class="form-control"
+                                minlength="5"
+                                maxlength="2000"
+                                placeholder="Explain the details that need to be corrected or updated..."
+                                required
+                            >{{ form_data.reason|default:'' }}</textarea>
+                            <small class="form-text">
+                                Provide a clear explanation. Maximum 2,000 characters.
+                            </small>
+                        </div>
+
+                        <div class="privacy-note">
+                            By submitting this request, you confirm that the information
+                            provided is accurate to the best of your knowledge and that the
+                            uploaded document is submitted to support your requested changes.
+                            Submission does not guarantee approval.
+                        </div>
+
+                        <div class="button-row">
+                            <a href="{% url 'update-registration' %}"
+                               class="btn-gov btn-secondary-gov">
+                                Cancel
+                            </a>
+
+                            <button
+                                type="submit"
+                                id="submitUpdateButton"
+                                class="btn-gov btn-primary-gov"
+                            >
+                                Submit Update Request
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 2 11 13"/>
+                                    <path d="m22 2-7 20-4-9-9-4Z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </form>
+
+        {% endif %}
+
+        <footer class="page-footer">
+            <strong>Voter Registration Services</strong><br>
+            Pio Duran, Albay<br>
+            Please ensure that all submitted information is accurate and complete.
+        </footer>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("valid_id_document");
+    const fileName = document.getElementById("documentFileName");
+    const fileError = document.getElementById("documentUploadError");
+    const updateForm = document.getElementById("updateRegistrationForm");
+    const submitButton = document.getElementById("submitUpdateButton");
+
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    const ALLOWED_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"];
+
+    if (fileInput) {
+        fileInput.addEventListener("change", function () {
+            fileError.textContent = "";
+            fileName.textContent = "";
+
+            const file = fileInput.files && fileInput.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            const extension = file.name.split(".").pop().toLowerCase();
+
+            if (!ALLOWED_EXTENSIONS.includes(extension)) {
+                fileError.textContent =
+                    "Invalid file format. Please select a PDF, JPG, JPEG, or PNG file.";
+                fileInput.value = "";
+                return;
+            }
+
+            if (file.size > MAX_FILE_SIZE) {
+                fileError.textContent =
+                    "The selected file exceeds the 5 MB limit. Please choose a smaller file.";
+                fileInput.value = "";
+                return;
+            }
+
+            if (file.size === 0) {
+                fileError.textContent =
+                    "The selected file is empty. Please choose another file.";
+                fileInput.value = "";
+                return;
+            }
+
+            fileName.textContent =
+                "Selected file: " + file.name +
+                " (" + (file.size / (1024 * 1024)).toFixed(2) + " MB)";
+        });
+    }
+
+    if (updateForm) {
+        updateForm.addEventListener("submit", function (event) {
+            if (fileError) {
+                fileError.textContent = "";
+            }
+
+            if (fileInput) {
+                const file = fileInput.files && fileInput.files[0];
+
+                if (!file) {
+                    event.preventDefault();
+                    fileError.textContent =
+                        "Please upload a valid ID or supporting document before submitting.";
+                    fileInput.focus();
+                    return;
+                }
+
+                const extension = file.name.split(".").pop().toLowerCase();
+
+                if (!ALLOWED_EXTENSIONS.includes(extension)) {
+                    event.preventDefault();
+                    fileError.textContent =
+                        "Invalid file format. Please select a PDF, JPG, JPEG, or PNG file.";
+                    fileInput.focus();
+                    return;
+                }
+
+                if (file.size === 0 || file.size > MAX_FILE_SIZE) {
+                    event.preventDefault();
+                    fileError.textContent =
+                        "The file must not be empty or larger than 5 MB.";
+                    fileInput.focus();
+                    return;
+                }
+            }
+
+            if (!updateForm.checkValidity()) {
+                event.preventDefault();
+                updateForm.reportValidity();
+                return;
+            }
+
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = "Submitting Request...";
+            }
+        });
+    }
+
+    const phoneInput = document.getElementById("phone");
+
+    if (phoneInput) {
+        phoneInput.addEventListener("input", function () {
+            this.value = this.value.replace(/\D/g, "").slice(0, 11);
+        });
+    }
+});
+</script>
+{% endblock %}

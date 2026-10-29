@@ -1,0 +1,891 @@
+
+{% extends "admin.html" %}
+
+{% block title %}
+Reactivation Request
+{% endblock %}
+
+{% block page_title %}
+Reactivation Request
+{% endblock %}
+
+{% block page_subtitle %}
+Review applicant reactivation request
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+/* =========================================================
+   REACTIVATION DETAIL PAGE
+========================================================= */
+
+.reactivation-page {
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.reactivation-page-header {
+    background: #ffffff;
+    border: 1px solid #dfe4ea;
+    border-left: 4px solid #0038a8;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+}
+
+.reactivation-page-header h4 {
+    color: #071a3a;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.reactivation-page-header .request-number {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   COMMON CARD
+========================================================= */
+
+.reactivation-card {
+    background: #ffffff;
+    border: 1px solid #dfe4ea;
+    margin-bottom: 20px;
+}
+
+.reactivation-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 20px;
+    background: #f8f9fb;
+    border-bottom: 1px solid #dfe4ea;
+}
+
+.reactivation-card-header .header-icon {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f0ff;
+    color: #0038a8;
+    border: 1px solid #cbd9f5;
+}
+
+.reactivation-card-header h5 {
+    margin: 0;
+    color: #071a3a;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.reactivation-card-body {
+    padding: 22px;
+}
+
+
+/* =========================================================
+   STATUS PANEL
+========================================================= */
+
+.status-panel {
+    background: #ffffff;
+    border: 1px solid #dfe4ea;
+    margin-bottom: 20px;
+}
+
+.status-panel-inner {
+    padding: 20px 22px;
+}
+
+.status-label {
+    display: block;
+    color: #6c757d;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 8px;
+}
+
+.status-value {
+    color: #071a3a;
+    font-weight: 600;
+}
+
+.status-date {
+    color: #071a3a;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.request-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 12px;
+    border: 1px solid transparent;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+.request-status.pending {
+    background: #fff4d6;
+    color: #856404;
+    border-color: #ffe08a;
+}
+
+.request-status.review {
+    background: #e4f2ff;
+    color: #075985;
+    border-color: #b8ddf5;
+}
+
+.request-status.approved {
+    background: #e5f6eb;
+    color: #146c43;
+    border-color: #b7e4c7;
+}
+
+.request-status.disapproved {
+    background: #fde8e8;
+    color: #b02a37;
+    border-color: #f1b5b9;
+}
+
+
+/* =========================================================
+   INFORMATION GRID
+========================================================= */
+
+.info-item {
+    min-height: 68px;
+    padding: 13px 15px;
+    background: #f8f9fb;
+    border: 1px solid #e1e5ea;
+}
+
+.info-label {
+    display: block;
+    color: #6c757d;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 6px;
+}
+
+.info-value {
+    color: #212529;
+    font-size: 14px;
+    font-weight: 500;
+    word-break: break-word;
+}
+
+.info-value.name {
+    color: #071a3a;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   APPLICANT IDENTIFIER
+========================================================= */
+
+.applicant-identity {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 17px;
+    background: #f8f9fb;
+    border: 1px solid #dfe4ea;
+    margin-bottom: 20px;
+}
+
+.applicant-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f0ff;
+    color: #0038a8;
+    border: 1px solid #cbd9f5;
+    font-size: 20px;
+}
+
+.applicant-identity-name {
+    color: #071a3a;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.applicant-identity-id {
+    color: #6c757d;
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+
+/* =========================================================
+   ACTIVE STATUS
+========================================================= */
+
+.active-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.active-badge.active {
+    color: #146c43;
+    background: #e5f6eb;
+    border: 1px solid #b7e4c7;
+}
+
+.active-badge.inactive {
+    color: #495057;
+    background: #e9ecef;
+    border: 1px solid #ced4da;
+}
+
+
+/* =========================================================
+   REASON
+========================================================= */
+
+.reason-box {
+    background: #f8f9fb;
+    border: 1px solid #dfe4ea;
+    border-left: 4px solid #0038a8;
+    padding: 18px 20px;
+    color: #343a40;
+    line-height: 1.7;
+    white-space: pre-line;
+}
+
+.reason-empty {
+    color: #6c757d;
+    font-style: italic;
+}
+
+
+/* =========================================================
+   ACTION PANEL
+========================================================= */
+
+.action-panel {
+    background: #ffffff;
+    border: 1px solid #dfe4ea;
+    margin-top: 20px;
+}
+
+.action-panel-header {
+    padding: 14px 20px;
+    background: #f8f9fb;
+    border-bottom: 1px solid #dfe4ea;
+}
+
+.action-panel-header strong {
+    color: #071a3a;
+    font-size: 14px;
+}
+
+.action-panel-body {
+    padding: 18px 20px;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.reactivation-page .btn {
+    border-radius: 2px;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 9px 14px;
+}
+
+.reactivation-page .btn-primary {
+    background: #0038a8;
+    border-color: #0038a8;
+}
+
+.reactivation-page .btn-primary:hover {
+    background: #002b7f;
+    border-color: #002b7f;
+}
+
+.reactivation-page .btn-outline-secondary {
+    border-color: #adb5bd;
+    color: #495057;
+}
+
+.reactivation-page .btn-outline-secondary:hover {
+    background: #f1f3f5;
+    color: #212529;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 767.98px) {
+
+    .reactivation-page-header {
+        padding: 16px;
+    }
+
+    .reactivation-page-header .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 15px;
+    }
+
+    .reactivation-card-body,
+    .status-panel-inner {
+        padding: 16px;
+    }
+
+    .applicant-identity {
+        align-items: flex-start;
+    }
+
+    .action-buttons {
+        justify-content: stretch;
+    }
+
+    .action-buttons form,
+    .action-buttons .btn {
+        width: 100%;
+    }
+
+    .action-buttons form .btn {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid px-0">
+
+<div class="reactivation-page">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="reactivation-page-header">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+                <h4>
+                    Reactivation Request
+                </h4>
+
+                <div class="request-number">
+                    Request #{{ application.id }}
+                </div>
+
+            </div>
+
+            <a
+                href="{% url 'admin-applications' %}"
+                class="btn btn-outline-secondary"
+            >
+                <i class="bi bi-arrow-left me-1"></i>
+                Back to Applications
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         REQUEST STATUS
+    ====================================================== -->
+
+    <div class="status-panel">
+
+        <div class="status-panel-inner">
+
+            <div class="row align-items-center">
+
+                <div class="col-md-6">
+
+                    <span class="status-label">
+                        Request Status
+                    </span>
+
+                    {% if application.status == "PENDING" %}
+
+                        <span class="request-status pending">
+                            Pending
+                        </span>
+
+                    {% elif application.status == "REVIEW" %}
+
+                        <span class="request-status review">
+                            Review
+                        </span>
+
+                    {% elif application.status == "APPROVED" %}
+
+                        <span class="request-status approved">
+                            Approved
+                        </span>
+
+                    {% elif application.status == "DISAPPROVED" %}
+
+                        <span class="request-status disapproved">
+                            Disapproved
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+
+                    <span class="status-label">
+                        Requested At
+                    </span>
+
+                    <div class="status-date">
+                        {{ application.requested_at|date:"M d, Y h:i A" }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         APPLICANT INFORMATION
+    ====================================================== -->
+
+    <div class="reactivation-card">
+
+        <div class="reactivation-card-header">
+
+            <div class="header-icon">
+                <i class="bi bi-person"></i>
+            </div>
+
+            <h5>
+                Applicant Information
+            </h5>
+
+        </div>
+
+
+        <div class="reactivation-card-body">
+
+
+            <!-- APPLICANT IDENTITY -->
+
+            <div class="applicant-identity">
+
+                <div class="applicant-icon">
+                    <i class="bi bi-person"></i>
+                </div>
+
+                <div>
+
+                    <div class="applicant-identity-name">
+
+                        {{ application.applicant.lastname }},
+                        {{ application.applicant.firstname }}
+                        {{ application.applicant.middlename }}
+
+                    </div>
+
+                    <div class="applicant-identity-id">
+                        Applicant ID #{{ application.applicant.id }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- APPLICANT DETAILS -->
+
+            <div class="row g-3">
+
+
+                <div class="col-md-6">
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Full Name
+                        </span>
+
+                        <div class="info-value name">
+
+                            {{ application.applicant.lastname }},
+                            {{ application.applicant.firstname }}
+                            {{ application.applicant.middlename }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Applicant ID
+                        </span>
+
+                        <div class="info-value">
+                            #{{ application.applicant.id }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Current Status
+                        </span>
+
+                        <div class="info-value">
+                            {{ application.applicant.get_status_display }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Barangay
+                        </span>
+
+                        <div class="info-value">
+                            {{ application.applicant.brgy.name|default:"Not specified" }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Municipality
+                        </span>
+
+                        <div class="info-value">
+                            {{ application.applicant.municipality }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Province
+                        </span>
+
+                        <div class="info-value">
+                            {{ application.applicant.province }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Phone
+                        </span>
+
+                        <div class="info-value">
+
+                            {% if application.applicant.phone %}
+                                {{ application.applicant.phone }}
+                            {% else %}
+                                <span class="text-muted">
+                                    Not specified
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Email
+                        </span>
+
+                        <div class="info-value">
+
+                            {% if application.applicant.email %}
+                                {{ application.applicant.email }}
+                            {% else %}
+                                <span class="text-muted">
+                                    Not specified
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <div class="info-item">
+
+                        <span class="info-label">
+                            Active Status
+                        </span>
+
+                        <div class="info-value">
+
+                            {% if application.applicant.is_active %}
+
+                                <span class="active-badge active">
+                                    Active
+                                </span>
+
+                            {% else %}
+
+                                <span class="active-badge inactive">
+                                    Inactive
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         REASON
+    ====================================================== -->
+
+    <div class="reactivation-card">
+
+        <div class="reactivation-card-header">
+
+            <div class="header-icon">
+                <i class="bi bi-file-text"></i>
+            </div>
+
+            <h5>
+                Reason for Reactivation
+            </h5>
+
+        </div>
+
+
+        <div class="reactivation-card-body">
+
+            {% if application.reason %}
+
+                <div class="reason-box">
+                    {{ application.reason }}
+                </div>
+
+            {% else %}
+
+                <div class="reason-box reason-empty">
+                    No reason provided.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ACTIONS
+    ====================================================== -->
+
+    {% if application.status == "PENDING" or application.status == "REVIEW" %}
+
+    <div class="action-panel">
+
+        <div class="action-panel-header">
+
+            <strong>
+                Application Actions
+            </strong>
+
+        </div>
+
+
+        <div class="action-panel-body">
+
+            <div class="action-buttons">
+
+
+                <!-- REVIEW -->
+
+                <form
+                    method="POST"
+                    action="{% url 'admin-application-action' 'reactivation' application.id 'review' %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-info text-white"
+                    >
+                        <i class="bi bi-eye me-1"></i>
+                        Review
+                    </button>
+
+                </form>
+
+
+                <!-- DISAPPROVE -->
+
+                <form
+                    method="POST"
+                    action="{% url 'admin-application-action' 'reactivation' application.id 'disapprove' %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-danger"
+                        onclick="return confirm('Are you sure you want to disapprove this reactivation request?');"
+                    >
+                        <i class="bi bi-x-circle me-1"></i>
+                        Disapprove
+                    </button>
+
+                </form>
+
+
+                <!-- APPROVE -->
+
+                <form
+                    method="POST"
+                    action="{% url 'admin-application-action' 'reactivation' application.id 'approve' %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-success"
+                        onclick="return confirm('Are you sure you want to approve this reactivation request?');"
+                    >
+                        <i class="bi bi-check-circle me-1"></i>
+                        Approve
+                    </button>
+
+                </form>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+</div>
+
+</div>
+
+{% endblock %}

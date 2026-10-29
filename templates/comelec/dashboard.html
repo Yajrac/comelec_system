@@ -1,0 +1,1288 @@
+{% extends "admin.html" %}
+
+
+{% block title %}
+    Overview - Pio Duran Registration System
+{% endblock %}
+
+
+{% block page_title %}
+    Overview
+{% endblock %}
+
+
+{% block page_subtitle %}
+    Registration system overview and application summary
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+/* =====================================================
+   DASHBOARD STAT CARDS
+===================================================== */
+
+.dashboard-stat-card {
+    border: 0 !important;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.dashboard-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 0.6rem 1.2rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.dashboard-stat-card .card-body {
+    padding: 1.35rem;
+}
+
+.dashboard-stat-card .text-muted {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.dashboard-stat-card h2 {
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   STAT ICON
+===================================================== */
+
+.dashboard-stat-icon {
+    width: 52px;
+    height: 52px;
+
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(255, 255, 255, 0.18) !important;
+    color: #ffffff !important;
+
+    backdrop-filter: blur(3px);
+}
+
+
+/* =====================================================
+   MAIN STAT CARD COLORS
+===================================================== */
+
+.dashboard-card-pending {
+    background: #d99a00 !important;
+}
+
+.dashboard-card-approved {
+    background: #198754 !important;
+}
+
+.dashboard-card-disapproved {
+    background: #dc3545 !important;
+}
+
+.dashboard-card-barangays {
+    background: #0d6efd !important;
+}
+
+
+/* =====================================================
+   VERIFICATION CARDS
+===================================================== */
+
+.dashboard-verification-card {
+    border: 0 !important;
+
+    color: #ffffff;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+
+    overflow: hidden;
+}
+
+.dashboard-verification-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0.6rem 1.2rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.dashboard-verification-card .card-body {
+    padding: 1.35rem;
+}
+
+.dashboard-verification-card .text-muted {
+    color: rgba(255, 255, 255, 0.82) !important;
+}
+
+.dashboard-verification-card .fs-4 {
+    color: #ffffff;
+}
+
+.dashboard-verification-card .fs-3 {
+    color: #ffffff !important;
+}
+
+
+/* =====================================================
+   VERIFICATION CARD COLORS
+===================================================== */
+
+.dashboard-card-total {
+    background: #343a40 !important;
+}
+
+.dashboard-card-review {
+    background: #087990 !important;
+}
+
+.dashboard-card-biometrics {
+    background: #c77700 !important;
+}
+
+.dashboard-card-verified {
+    background: #146c43 !important;
+}
+
+
+/* =====================================================
+   SECTION TITLES
+===================================================== */
+
+.dashboard-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.dashboard-table th {
+    font-size: 0.78rem;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.03em;
+
+    color: #6c757d;
+
+    white-space: nowrap;
+}
+
+.dashboard-table td {
+    vertical-align: middle;
+}
+
+
+/* =====================================================
+   STATUS BADGES
+===================================================== */
+
+.status-badge {
+    font-size: 0.75rem;
+
+    padding:
+        0.4rem
+        0.65rem;
+}
+
+
+/* =====================================================
+   CONTENT CARDS
+===================================================== */
+
+.dashboard-content-card {
+    border: 0;
+
+    box-shadow:
+        0 0.125rem
+        0.35rem
+        rgba(0, 0, 0, 0.08);
+}
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.dashboard-action-button {
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 767.98px) {
+
+    .dashboard-stat-card .card-body,
+    .dashboard-verification-card .card-body {
+        padding: 1.1rem;
+    }
+
+    .dashboard-stat-icon {
+        width: 46px;
+        height: 46px;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid px-0">
+
+
+    <!-- =====================================================
+         MAIN STATISTICS
+    ====================================================== -->
+
+    <div class="row g-4">
+
+
+        <!-- =================================================
+             PENDING
+        ================================================== -->
+
+        <div class="col-12 col-md-6 col-xl-3">
+
+            <div class="
+                card
+                h-100
+                dashboard-stat-card
+                dashboard-card-pending
+            ">
+
+                <div class="card-body">
+
+                    <div class="
+                        d-flex
+                        justify-content-between
+                        align-items-center
+                    ">
+
+                        <div>
+
+                            <p class="text-muted mb-1">
+                                Pending Applications
+                            </p>
+
+                            <h2 class="fw-bold mb-0">
+                                {{ pending_total }}
+                            </h2>
+
+                        </div>
+
+
+                        <div class="
+                            dashboard-stat-icon
+                            fs-4
+                        ">
+
+                            <i class="bi bi-hourglass-split"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             APPROVED
+        ================================================== -->
+
+        <div class="col-12 col-md-6 col-xl-3">
+
+            <div class="
+                card
+                h-100
+                dashboard-stat-card
+                dashboard-card-approved
+            ">
+
+                <div class="card-body">
+
+                    <div class="
+                        d-flex
+                        justify-content-between
+                        align-items-center
+                    ">
+
+                        <div>
+
+                            <p class="text-muted mb-1">
+                                Approved Applicants
+                            </p>
+
+                            <h2 class="fw-bold mb-0">
+                                {{ approved_applicants }}
+                            </h2>
+
+                        </div>
+
+
+                        <div class="
+                            dashboard-stat-icon
+                            fs-4
+                        ">
+
+                            <i class="bi bi-check-circle-fill"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             DISAPPROVED
+        ================================================== -->
+
+        <div class="col-12 col-md-6 col-xl-3">
+
+            <div class="
+                card
+                h-100
+                dashboard-stat-card
+                dashboard-card-disapproved
+            ">
+
+                <div class="card-body">
+
+                    <div class="
+                        d-flex
+                        justify-content-between
+                        align-items-center
+                    ">
+
+                        <div>
+
+                            <p class="text-muted mb-1">
+                                Disapproved Applicants
+                            </p>
+
+                            <h2 class="fw-bold mb-0">
+                                {{ inactive_applicants }}
+                            </h2>
+
+                        </div>
+
+
+                        <div class="
+                            dashboard-stat-icon
+                            fs-4
+                        ">
+
+                            <i class="bi bi-person-x-fill"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             BARANGAYS
+        ================================================== -->
+
+        <div class="col-12 col-md-6 col-xl-3">
+
+            <div class="
+                card
+                h-100
+                dashboard-stat-card
+                dashboard-card-barangays
+            ">
+
+                <div class="card-body">
+
+                    <div class="
+                        d-flex
+                        justify-content-between
+                        align-items-center
+                    ">
+
+                        <div>
+
+                            <p class="text-muted mb-1">
+                                Barangays
+                            </p>
+
+                            <h2 class="fw-bold mb-0">
+                                {{ barangay_count }}
+                            </h2>
+
+                        </div>
+
+
+                        <div class="
+                            dashboard-stat-icon
+                            fs-4
+                        ">
+
+                            <i class="bi bi-buildings-fill"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         VERIFICATION STATISTICS
+    ====================================================== -->
+
+    <div class="row g-4 mt-1">
+
+
+        <!-- =================================================
+             TOTAL APPLICATIONS
+        ================================================== -->
+
+        <div class="col-12 col-md-6 col-xl-3">
+
+            <div class="
+                card
+                dashboard-verification-card
+                dashboard-card-total
+            ">
+
+                <div class="card-body">
+
+                    <div class="
+                        d-flex
+                        align-items-center
+                        gap-3
+                    ">
+
+                        <div class="fs-3">
+
+                            <i class="bi bi-files"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="text-muted small">
+                                Total Applications
+                            </div>
+
+                            <div class="fs-4 fw-bold">
+                                {{ total_applications }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             REVIEW
+        ================================================== -->
+
+        <div class="col-12 col-md-6 col-xl-3">
+
+            <div class="
+                card
+                dashboard-verification-card
+                dashboard-card-review
+            ">
+
+                <div class="card-body">
+
+                    <div class="
+                        d-flex
+                        align-items-center
+                        gap-3
+                    ">
+
+                        <div class="fs-3">
+
+                            <i class="bi bi-eye"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="text-muted small">
+                                Under Review
+                            </div>
+
+                            <div class="fs-4 fw-bold">
+                                {{ review_total }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             BIOMETRICS
+        ================================================== -->
+
+        <div class="col-12 col-md-6 col-xl-3">
+
+            <div class="
+                card
+                dashboard-verification-card
+                dashboard-card-biometrics
+            ">
+
+                <div class="card-body">
+
+                    <div class="
+                        d-flex
+                        align-items-center
+                        gap-3
+                    ">
+
+                        <div class="fs-3">
+
+                            <i class="bi bi-fingerprint"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="text-muted small">
+                                Biometrics Pending
+                            </div>
+
+                            <div class="fs-4 fw-bold">
+                                {{ biometrics_pending }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             VERIFIED
+        ================================================== -->
+
+        <div class="col-12 col-md-6 col-xl-3">
+
+            <div class="
+                card
+                dashboard-verification-card
+                dashboard-card-verified
+            ">
+
+                <div class="card-body">
+
+                    <div class="
+                        d-flex
+                        align-items-center
+                        gap-3
+                    ">
+
+                        <div class="fs-3">
+
+                            <i class="bi bi-shield-check"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="text-muted small">
+                                Fully Verified
+                            </div>
+
+                            <div class="fs-4 fw-bold">
+                                {{ fully_verified }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         APPLICATION SUMMARY
+    ====================================================== -->
+
+    <div class="
+        card
+        border-0
+        shadow-sm
+        mt-4
+        dashboard-content-card
+    ">
+
+        <div class="card-body">
+
+            <div class="
+                d-flex
+                justify-content-between
+                align-items-center
+                mb-3
+            ">
+
+                <div>
+
+                    <h5 class="dashboard-section-title">
+                        Application Summary
+                    </h5>
+
+                    <div class="text-muted small mt-1">
+                        Current application status by application type
+                    </div>
+
+                </div>
+
+
+                <a
+                    href="{% url 'admin-reports' %}"
+                    class="
+                        btn
+                        btn-outline-primary
+                        btn-sm
+                        dashboard-action-button
+                    "
+                >
+
+                    <i class="bi bi-bar-chart me-1"></i>
+
+                    View Reports
+
+                </a>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="
+                    table
+                    table-hover
+                    dashboard-table
+                    mb-0
+                ">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Application Type
+                            </th>
+
+                            <th class="text-center">
+                                Total
+                            </th>
+
+                            <th class="text-center">
+                                Pending
+                            </th>
+
+                            <th class="text-center">
+                                Review
+                            </th>
+
+                            <th class="text-center">
+                                Approved
+                            </th>
+
+                            <th class="text-center">
+                                Disapproved
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for item in application_summary %}
+
+                        <tr>
+
+                            <td class="fw-semibold">
+                                {{ item.name }}
+                            </td>
+
+
+                            <td class="text-center">
+                                {{ item.total }}
+                            </td>
+
+
+                            <td class="text-center">
+
+                                {% if item.pending > 0 %}
+
+                                <span class="
+                                    badge
+                                    bg-warning-subtle
+                                    text-warning-emphasis
+                                    status-badge
+                                ">
+                                    {{ item.pending }}
+                                </span>
+
+                                {% else %}
+
+                                <span class="text-muted">
+                                    0
+                                </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td class="text-center">
+
+                                {% if item.review > 0 %}
+
+                                <span class="
+                                    badge
+                                    bg-info-subtle
+                                    text-info-emphasis
+                                    status-badge
+                                ">
+                                    {{ item.review }}
+                                </span>
+
+                                {% else %}
+
+                                <span class="text-muted">
+                                    0
+                                </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td class="text-center">
+
+                                {% if item.approved > 0 %}
+
+                                <span class="
+                                    badge
+                                    bg-success-subtle
+                                    text-success-emphasis
+                                    status-badge
+                                ">
+                                    {{ item.approved }}
+                                </span>
+
+                                {% else %}
+
+                                <span class="text-muted">
+                                    0
+                                </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td class="text-center">
+
+                                {% if item.disapproved > 0 %}
+
+                                <span class="
+                                    badge
+                                    bg-danger-subtle
+                                    text-danger-emphasis
+                                    status-badge
+                                ">
+                                    {{ item.disapproved }}
+                                </span>
+
+                                {% else %}
+
+                                <span class="text-muted">
+                                    0
+                                </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="
+                                    text-center
+                                    text-muted
+                                    py-4
+                                "
+                            >
+
+                                No applications found.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         RECENT APPLICATIONS
+    ====================================================== -->
+
+    <div class="
+        card
+        border-0
+        shadow-sm
+        mt-4
+        dashboard-content-card
+    ">
+
+        <div class="card-body">
+
+            <div class="
+                d-flex
+                justify-content-between
+                align-items-center
+                mb-3
+            ">
+
+                <div>
+
+                    <h5 class="dashboard-section-title">
+                        Recent Applicants
+                    </h5>
+
+                    <div class="text-muted small mt-1">
+                        Latest applicant registrations
+                    </div>
+
+                </div>
+
+
+                <a
+                    href="{% url 'admin-applicants' %}"
+                    class="
+                        btn
+                        btn-outline-primary
+                        btn-sm
+                        dashboard-action-button
+                    "
+                >
+
+                    <i class="bi bi-people me-1"></i>
+
+                    View Applicants
+
+                </a>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="
+                    table
+                    table-hover
+                    dashboard-table
+                    mb-0
+                ">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Applicant
+                            </th>
+
+                            <th>
+                                Barangay
+                            </th>
+
+                            <th>
+                                Application
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Verification
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for applicant in recent_applicants %}
+
+                        <tr>
+
+
+                            <!-- APPLICANT -->
+
+                            <td>
+
+                                <div class="fw-semibold">
+
+                                    {{ applicant.lastname }},
+                                    {{ applicant.firstname }}
+                                    {{ applicant.middlename }}
+
+                                </div>
+
+                                <div class="text-muted small">
+
+                                    ID #{{ applicant.id }}
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- BARANGAY -->
+
+                            <td>
+
+                                {% if applicant.brgy %}
+
+                                    {{ applicant.brgy.name }}
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- APPLICATION -->
+
+                            <td>
+
+                                {{ applicant.get_application_type_display }}
+
+                            </td>
+
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                {% if applicant.status == "PENDING" %}
+
+                                    <span class="
+                                        badge
+                                        bg-warning
+                                        text-dark
+                                        status-badge
+                                    ">
+                                        Pending
+                                    </span>
+
+                                {% elif applicant.status == "REVIEW" %}
+
+                                    <span class="
+                                        badge
+                                        bg-info
+                                        status-badge
+                                    ">
+                                        Review
+                                    </span>
+
+                                {% elif applicant.status == "APPROVED" %}
+
+                                    <span class="
+                                        badge
+                                        bg-success
+                                        status-badge
+                                    ">
+                                        Approved
+                                    </span>
+
+                                {% elif applicant.status == "DISAPPROVED" %}
+
+                                    <span class="
+                                        badge
+                                        bg-danger
+                                        status-badge
+                                    ">
+                                        Disapproved
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- VERIFICATION -->
+
+                            <td>
+
+                                {% if applicant.verification_status == "VERIFIED" %}
+
+                                    <span class="
+                                        badge
+                                        bg-success-subtle
+                                        text-success-emphasis
+                                        status-badge
+                                    ">
+                                        Verified
+                                    </span>
+
+                                {% elif applicant.verification_status == "BIOMETRICS_PENDING" %}
+
+                                    <span class="
+                                        badge
+                                        bg-warning-subtle
+                                        text-warning-emphasis
+                                        status-badge
+                                    ">
+                                        Biometrics Pending
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="
+                                        badge
+                                        bg-secondary-subtle
+                                        text-secondary-emphasis
+                                        status-badge
+                                    ">
+                                        Unverified
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- DATE -->
+
+                            <td class="text-nowrap">
+
+                                {{ applicant.date_joined|date:"M d, Y" }}
+
+                            </td>
+
+
+                            <!-- ACTION -->
+
+                            <td>
+
+                                <a
+                                    href="{% url 'admin-applicant-detail' applicant.id %}"
+                                    class="
+                                        btn
+                                        btn-sm
+                                        btn-outline-primary
+                                    "
+                                >
+
+                                    <i class="bi bi-eye"></i>
+
+                                </a>
+
+                            </td>
+
+
+                        </tr>
+
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="
+                                    text-center
+                                    text-muted
+                                    py-4
+                                "
+                            >
+
+                                No applicants found.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ADMINISTRATOR INFORMATION
+    ====================================================== -->
+
+    <div class="
+        card
+        border-0
+        shadow-sm
+        mt-4
+        mb-4
+        dashboard-content-card
+    ">
+
+        <div class="card-body">
+
+            <div class="
+                d-flex
+                align-items-start
+                gap-3
+            ">
+
+
+                <!-- ICON -->
+
+                <div class="
+                    text-primary
+                    fs-3
+                ">
+
+                    <i class="bi bi-shield-lock-fill"></i>
+
+                </div>
+
+
+                <!-- CONTENT -->
+
+                <div>
+
+                    <h5 class="fw-bold mb-1">
+                        Administrator Dashboard
+                    </h5>
+
+                    <p class="text-muted mb-0">
+
+                        Use the administrator navigation to manage
+                        applicants, review registration applications,
+                        manage barangays, monitor biometrics and
+                        signatures, generate reports, and print
+                        verified registration slips.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+{% endblock %}

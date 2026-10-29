@@ -1,0 +1,1355 @@
+{% extends "admin.html" %}
+
+{% block title %}
+Applications - Pio Duran Registration System
+{% endblock %}
+
+{% block page_title %}
+Applications
+{% endblock %}
+
+{% block page_subtitle %}
+Review and manage all applicant applications
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* =========================================================
+   APPLICATIONS PAGE
+========================================================= */
+
+.applications-page {
+    width: 100%;
+}
+
+
+/* =========================================================
+   FILTER CARD
+========================================================= */
+
+.application-filter-card {
+    background: #ffffff;
+    border: 1px solid #d9e1ec;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+}
+
+.application-filter-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid #e2e7ef;
+    background: #ffffff;
+}
+
+.application-filter-header-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.application-filter-icon {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #0038a8;
+    border: 0;
+    border-radius: 9px;
+
+    color: #ffffff;
+    font-size: 17px;
+}
+
+.application-filter-title {
+    margin: 0;
+    color: #172033;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.application-filter-subtitle {
+    margin: 2px 0 0;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.application-filter-body {
+    padding: 22px;
+}
+
+.application-filter-body .form-label {
+    color: #374151;
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+.application-filter-body .form-control,
+.application-filter-body .form-select {
+    min-height: 42px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+
+    font-size: 13px;
+    box-shadow: none;
+}
+
+.application-filter-body .form-control:focus,
+.application-filter-body .form-select:focus {
+    border-color: #0038a8;
+    box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.09);
+}
+
+.application-filter-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 2px;
+}
+
+.application-filter-actions .btn {
+    min-height: 42px;
+    padding: 8px 17px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.application-filter-actions .btn-primary {
+    background: #0038a8;
+    border-color: #0038a8;
+}
+
+.application-filter-actions .btn-primary:hover {
+    background: #002b7f;
+    border-color: #002b7f;
+}
+
+.application-filter-actions .btn-outline-secondary {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    color: #374151;
+}
+
+.application-filter-actions .btn-outline-secondary:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+
+/* =========================================================
+   APPLICATION LIST CARD
+========================================================= */
+
+.application-list-card {
+    background: #ffffff;
+    border: 1px solid #d9e1ec;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+}
+
+.application-list-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid #e2e7ef;
+    background: #ffffff;
+}
+
+.application-list-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.application-list-title {
+    margin: 0;
+    color: #172033;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.application-list-count {
+    display: block;
+    margin-top: 3px;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.application-table {
+    margin: 0;
+}
+
+.application-table thead th {
+    padding: 13px 16px;
+
+    background: #f4f7fb;
+    border-bottom: 1px solid #d9e1ec;
+
+    color: #4b5563;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+
+    white-space: nowrap;
+}
+
+.application-table tbody td {
+    padding: 15px 16px;
+
+    border-bottom: 1px solid #edf0f4;
+
+    color: #374151;
+    font-size: 13px;
+}
+
+.application-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.application-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.application-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+
+/* =========================================================
+   APPLICANT
+========================================================= */
+
+.applicant-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    min-width: 210px;
+}
+
+.applicant-icon {
+    width: 40px;
+    height: 40px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #0038a8;
+
+    border: 0;
+    border-radius: 9px;
+
+    color: #ffffff;
+    font-size: 15px;
+}
+
+.applicant-name {
+    color: #172033;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.applicant-email {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #6b7280;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+.application-badge,
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 27px;
+    padding: 4px 10px;
+
+    border: 1px solid transparent;
+    border-radius: 7px;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   APPLICATION TYPES
+========================================================= */
+
+.application-new {
+    background: #eaf2ff;
+    border-color: #cfe0ff;
+    color: #0038a8;
+}
+
+.application-update {
+    background: #e9f7fb;
+    border-color: #c9e9f0;
+    color: #176477;
+}
+
+.application-transfer {
+    background: #fff6df;
+    border-color: #f0d996;
+    color: #795700;
+}
+
+.application-reactivation {
+    background: #f0f1f3;
+    border-color: #d9dce1;
+    color: #4b5563;
+}
+
+.application-reinstatement {
+    background: #e9ebee;
+    border-color: #d2d6dc;
+    color: #1f2937;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status-pending {
+    background: #fff6df;
+    border-color: #f0d996;
+    color: #795700;
+}
+
+.status-review {
+    background: #e9f7fb;
+    border-color: #c9e9f0;
+    color: #176477;
+}
+
+.status-approved {
+    background: #eaf7ef;
+    border-color: #c8e6d2;
+    color: #176b39;
+}
+
+.status-disapproved {
+    background: #fff0f0;
+    border-color: #f0caca;
+    color: #a61b1b;
+}
+
+.status-default {
+    background: #f0f1f3;
+    border-color: #d9dce1;
+    color: #4b5563;
+}
+
+
+/* =========================================================
+   DATE
+========================================================= */
+
+.application-date {
+    color: #374151;
+    white-space: nowrap;
+}
+
+.application-time {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #8a94a3;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   ACTION
+========================================================= */
+
+.application-action-group {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 6px;
+
+    white-space: nowrap;
+}
+
+.application-view-btn {
+    min-width: 76px;
+
+    border-radius: 7px;
+    border-color: #b9c9df;
+
+    color: #0038a8;
+    background: #ffffff;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.application-view-btn:hover {
+    background: #0038a8;
+    border-color: #0038a8;
+    color: #ffffff;
+}
+
+.application-delete-btn {
+    min-width: 76px;
+
+    border-radius: 7px;
+
+    border-color: #e0b4b4;
+
+    color: #a61b1b;
+    background: #ffffff;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.application-delete-btn:hover {
+    background: #a61b1b;
+    border-color: #a61b1b;
+    color: #ffffff;
+}
+
+.application-disabled-btn {
+    min-width: 76px;
+
+    border-radius: 7px;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.application-empty {
+    padding: 65px 20px;
+    text-align: center;
+}
+
+.application-empty-icon {
+    width: 60px;
+    height: 60px;
+
+    margin: 0 auto 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f1f4f8;
+    border: 1px solid #dce2ea;
+
+    border-radius: 12px;
+
+    color: #8a94a3;
+    font-size: 23px;
+}
+
+.application-empty-title {
+    margin-bottom: 5px;
+
+    color: #374151;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.application-empty-text {
+    margin: 0;
+
+    color: #8a94a3;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.application-pagination {
+    padding: 17px 22px;
+
+    border-top: 1px solid #e2e7ef;
+
+    background: #ffffff;
+}
+
+.application-pagination-info {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.application-pagination .pagination {
+    margin: 0;
+}
+
+.application-pagination .page-link {
+    min-width: 34px;
+    min-height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px !important;
+    border-color: #d5dce6;
+
+    color: #374151;
+    font-size: 12px;
+
+    margin-left: 3px;
+}
+
+.application-pagination .page-link:hover {
+    background: #f1f5fa;
+    color: #0038a8;
+}
+
+.application-pagination .page-item.active .page-link {
+    background: #0038a8;
+    border-color: #0038a8;
+    color: #ffffff;
+}
+
+.application-pagination .page-item.disabled .page-link {
+    color: #a0a7b2;
+    background: #f8f9fb;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 991.98px) {
+
+    .application-filter-actions {
+        padding-top: 5px;
+    }
+
+}
+
+
+@media (max-width: 767.98px) {
+
+    .application-filter-header {
+        padding: 16px 18px;
+    }
+
+    .application-filter-body {
+        padding: 18px;
+    }
+
+    .application-list-header {
+        padding: 16px 18px;
+    }
+
+    .application-list-header-inner {
+        align-items: flex-start;
+    }
+
+    .application-table thead th,
+    .application-table tbody td {
+        padding-left: 13px;
+        padding-right: 13px;
+    }
+
+    .application-pagination {
+        padding: 15px 18px;
+    }
+
+    .application-pagination > div {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    .application-action-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .application-view-btn,
+    .application-delete-btn {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid px-0">
+
+    <div class="applications-page">
+
+
+        <!-- =====================================================
+             FILTER CARD
+        ====================================================== -->
+
+        <div class="application-filter-card mb-4">
+
+            <div class="application-filter-header">
+
+                <div class="application-filter-header-inner">
+
+                    <div class="application-filter-icon">
+
+                        <i class="bi bi-funnel"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h6 class="application-filter-title">
+                            Application Filters
+                        </h6>
+
+                        <p class="application-filter-subtitle">
+                            Search and filter submitted applications
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="application-filter-body">
+
+                <form method="GET">
+
+                    <div class="row g-3">
+
+
+                        <!-- SEARCH -->
+
+                        <div class="col-12 col-lg-4">
+
+                            <label class="form-label fw-semibold">
+                                Search
+                            </label>
+
+                            <input
+                                type="text"
+                                name="search"
+                                class="form-control"
+                                placeholder="Name, email or phone"
+                                value="{{ search }}"
+                            >
+
+                        </div>
+
+
+                        <!-- APPLICATION TYPE -->
+
+                        <div class="col-12 col-md-6 col-lg-2">
+
+                            <label class="form-label fw-semibold">
+                                Application
+                            </label>
+
+                            <select
+                                name="application_type"
+                                class="form-select"
+                            >
+
+                                <option value="">
+                                    All
+                                </option>
+
+                                <option
+                                    value="NEW"
+                                    {% if application_type == "NEW" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    New Registration
+                                </option>
+
+                                <option
+                                    value="UPDATE"
+                                    {% if application_type == "UPDATE" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Update / Correction
+                                </option>
+
+                                <option
+                                    value="TRANSFER"
+                                    {% if application_type == "TRANSFER" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Transfer
+                                </option>
+
+                                <option
+                                    value="REACTIVATION"
+                                    {% if application_type == "REACTIVATION" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Reactivation
+                                </option>
+
+                                <option
+                                    value="REINSTATEMENT"
+                                    {% if application_type == "REINSTATEMENT" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Reinstatement
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- STATUS -->
+
+                        <div class="col-12 col-md-6 col-lg-2">
+
+                            <label class="form-label fw-semibold">
+                                Status
+                            </label>
+
+                            <select
+                                name="status"
+                                class="form-select"
+                            >
+
+                                <option value="">
+                                    All
+                                </option>
+
+                                <option
+                                    value="PENDING"
+                                    {% if status == "PENDING" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Pending
+                                </option>
+
+                                <option
+                                    value="REVIEW"
+                                    {% if status == "REVIEW" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Review
+                                </option>
+
+                                <option
+                                    value="APPROVED"
+                                    {% if status == "APPROVED" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Approved
+                                </option>
+
+                                <option
+                                    value="DISAPPROVED"
+                                    {% if status == "DISAPPROVED" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Disapproved
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- DATE FROM -->
+
+                        <div class="col-12 col-md-6 col-lg-2">
+
+                            <label class="form-label fw-semibold">
+                                From
+                            </label>
+
+                            <input
+                                type="date"
+                                name="date_from"
+                                class="form-control"
+                                value="{{ date_from }}"
+                            >
+
+                        </div>
+
+
+                        <!-- DATE TO -->
+
+                        <div class="col-12 col-md-6 col-lg-2">
+
+                            <label class="form-label fw-semibold">
+                                To
+                            </label>
+
+                            <input
+                                type="date"
+                                name="date_to"
+                                class="form-control"
+                                value="{{ date_to }}"
+                            >
+
+                        </div>
+
+
+                        <!-- BUTTONS -->
+
+                        <div class="col-12">
+
+                            <div class="application-filter-actions">
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary"
+                                >
+
+                                    <i class="bi bi-search me-1"></i>
+
+                                    Search
+
+                                </button>
+
+
+                                <a
+                                    href="{% url 'admin-applications' %}"
+                                    class="btn btn-outline-secondary"
+                                >
+
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i>
+
+                                    Reset
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             APPLICATION LIST
+        ====================================================== -->
+
+        <div class="application-list-card">
+
+
+            <!-- HEADER -->
+
+            <div class="application-list-header">
+
+                <div class="application-list-header-inner">
+
+                    <div>
+
+                        <h5 class="application-list-title">
+                            Applications
+                        </h5>
+
+                        <span class="application-list-count">
+
+                            {{ page_obj.paginator.count }}
+
+                            application{{ page_obj.paginator.count|pluralize }}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- TABLE -->
+
+            <div class="table-responsive">
+
+                <table class="table application-table align-middle">
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="ps-4">
+                                Applicant
+                            </th>
+
+                            <th>
+                                Application
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Date Submitted
+                            </th>
+
+                            <th class="text-end pe-4">
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for application in page_obj %}
+
+                        <tr>
+
+
+                            <!-- APPLICANT -->
+
+                            <td class="ps-4">
+
+                                <div class="applicant-wrapper">
+
+                                    <div class="applicant-icon">
+
+                                        <i class="bi bi-person"></i>
+
+                                    </div>
+
+                                    <div>
+
+                                        <div class="applicant-name">
+
+                                            {{ application.applicant_name }}
+
+                                        </div>
+
+                                        {% if application.applicant.email %}
+
+                                        <span class="applicant-email">
+
+                                            {{ application.applicant.email }}
+
+                                        </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- APPLICATION TYPE -->
+
+                            <td>
+
+                                {% if application.type == "NEW" %}
+
+                                    <span class="application-badge application-new">
+                                        New Registration
+                                    </span>
+
+                                {% elif application.type == "UPDATE" %}
+
+                                    <span class="application-badge application-update">
+                                        Update / Correction
+                                    </span>
+
+                                {% elif application.type == "TRANSFER" %}
+
+                                    <span class="application-badge application-transfer">
+                                        Transfer
+                                    </span>
+
+                                {% elif application.type == "REACTIVATION" %}
+
+                                    <span class="application-badge application-reactivation">
+                                        Reactivation
+                                    </span>
+
+                                {% elif application.type == "REINSTATEMENT" %}
+
+                                    <span class="application-badge application-reinstatement">
+                                        Reinstatement
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                {% if application.status == "PENDING" %}
+
+                                    <span class="status-badge status-pending">
+                                        Pending
+                                    </span>
+
+                                {% elif application.status == "REVIEW" %}
+
+                                    <span class="status-badge status-review">
+                                        Review
+                                    </span>
+
+                                {% elif application.status == "APPROVED" %}
+
+                                    <span class="status-badge status-approved">
+                                        Approved
+                                    </span>
+
+                                {% elif application.status == "DISAPPROVED" %}
+
+                                    <span class="status-badge status-disapproved">
+                                        Disapproved
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-default">
+                                        {{ application.status_display }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- DATE -->
+
+                            <td>
+
+                                {% if application.date %}
+
+                                    <span class="application-date">
+
+                                        {{ application.date|date:"M d, Y" }}
+
+                                    </span>
+
+                                    <span class="application-time">
+
+                                        {{ application.date|date:"M d, Y" }}
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- ACTION -->
+
+                            <td class="text-end pe-4">
+
+                                <div class="application-action-group">
+
+
+                                    <!-- VIEW -->
+
+                                    {% if application.url_name %}
+
+                                        <a
+                                            href="{% url application.url_name application.id %}"
+                                            class="btn btn-sm application-view-btn"
+                                        >
+
+                                            <i class="bi bi-eye me-1"></i>
+
+                                            View
+
+                                        </a>
+
+                                    {% else %}
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-secondary application-disabled-btn"
+                                            disabled
+                                        >
+
+                                            <i class="bi bi-eye me-1"></i>
+
+                                            View
+
+                                        </button>
+
+                                    {% endif %}
+
+
+                                    <!-- DELETE -->
+
+                                    <form
+                                        method="POST"
+                                        action="{% url 'delete-application' application.id %}"
+                                        class="d-inline"
+                                        onsubmit="return confirm('Are you sure you want to delete this application? This action cannot be undone.');"
+                                    >
+
+                                        {% csrf_token %}
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm application-delete-btn"
+                                        >
+
+                                            <i class="bi bi-trash me-1"></i>
+
+                                            Delete
+
+                                        </button>
+
+                                    </form>
+
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="5"
+                                class="p-0"
+                            >
+
+                                <div class="application-empty">
+
+                                    <div class="application-empty-icon">
+
+                                        <i class="bi bi-file-earmark-x"></i>
+
+                                    </div>
+
+
+                                    <div class="application-empty-title">
+
+                                        No applications found
+
+                                    </div>
+
+
+                                    <p class="application-empty-text">
+
+                                        Try changing your search or filters.
+
+                                    </p>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- =====================================================
+                 PAGINATION
+            ====================================================== -->
+
+            {% if page_obj.paginator.num_pages > 1 %}
+
+            <div class="application-pagination">
+
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+
+                    <!-- PAGE INFORMATION -->
+
+                    <div class="application-pagination-info">
+
+                        Page
+                        {{ page_obj.number }}
+                        of
+                        {{ page_obj.paginator.num_pages }}
+
+                    </div>
+
+
+                    <!-- PAGINATION -->
+
+                    <nav aria-label="Application pagination">
+
+                        <ul class="pagination mb-0">
+
+
+                            <!-- PREVIOUS -->
+
+                            {% if page_obj.has_previous %}
+
+                            <li class="page-item">
+
+                                <a
+                                    class="page-link"
+                                    href="?page={{ page_obj.previous_page_number }}{% if search %}&amp;search={{ search|urlencode }}{% endif %}{% if application_type %}&amp;application_type={{ application_type|urlencode }}{% endif %}{% if status %}&amp;status={{ status|urlencode }}{% endif %}{% if date_from %}&amp;date_from={{ date_from|urlencode }}{% endif %}{% if date_to %}&amp;date_to={{ date_to|urlencode }}{% endif %}"
+                                >
+                                    Previous
+                                </a>
+
+                            </li>
+
+                            {% else %}
+
+                            <li class="page-item disabled">
+
+                                <span class="page-link">
+                                    Previous
+                                </span>
+
+                            </li>
+
+                            {% endif %}
+
+
+                            <!-- PAGE NUMBERS -->
+
+                            {% for page_number in page_obj.paginator.page_range %}
+
+                                {% if page_number == page_obj.number %}
+
+                                <li class="page-item active">
+
+                                    <span class="page-link">
+                                        {{ page_number }}
+                                    </span>
+
+                                </li>
+
+                                {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
+
+                                <li class="page-item">
+
+                                    <a
+                                        class="page-link"
+                                        href="?page={{ page_number }}{% if search %}&amp;search={{ search|urlencode }}{% endif %}{% if application_type %}&amp;application_type={{ application_type|urlencode }}{% endif %}{% if status %}&amp;status={{ status|urlencode }}{% endif %}{% if date_from %}&amp;date_from={{ date_from|urlencode }}{% endif %}{% if date_to %}&amp;date_to={{ date_to|urlencode }}{% endif %}"
+                                    >
+                                        {{ page_number }}
+                                    </a>
+
+                                </li>
+
+                                {% endif %}
+
+                            {% endfor %}
+
+
+                            <!-- NEXT -->
+
+                            {% if page_obj.has_next %}
+
+                            <li class="page-item">
+
+                                <a
+                                    class="page-link"
+                                    href="?page={{ page_obj.next_page_number }}{% if search %}&amp;search={{ search|urlencode }}{% endif %}{% if application_type %}&amp;application_type={{ application_type|urlencode }}{% endif %}{% if status %}&amp;status={{ status|urlencode }}{% endif %}{% if date_from %}&amp;date_from={{ date_from|urlencode }}{% endif %}{% if date_to %}&amp;date_to={{ date_to|urlencode }}{% endif %}"
+                                >
+                                    Next
+                                </a>
+
+                            </li>
+
+                            {% else %}
+
+                            <li class="page-item disabled">
+
+                                <span class="page-link">
+                                    Next
+                                </span>
+
+                            </li>
+
+                            {% endif %}
+
+                        </ul>
+
+                    </nav>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

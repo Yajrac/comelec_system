@@ -1,0 +1,2107 @@
+{% extends "admin.html" %}
+
+{% block title %}
+Reports
+{% endblock %}
+
+{% block page_title %}
+Reports
+{% endblock %}
+
+{% block page_subtitle %}
+Registration statistics and application reports
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* =====================================================
+   REPORT PAGE
+===================================================== */
+
+.report-page {
+    width: 100%;
+}
+
+
+/* =====================================================
+   GENERAL CARD
+===================================================== */
+
+.report-card {
+    background: #ffffff;
+
+    border: 1px solid #e1e5eb;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.04);
+}
+
+
+/* =====================================================
+   FILTER CARD
+===================================================== */
+
+.report-filter-card {
+
+    background: #ffffff;
+
+    border: 1px solid #e1e5eb;
+
+    border-radius: 8px;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.04);
+}
+
+
+.report-filter-card .card-body {
+
+    padding: 20px;
+}
+
+
+/* =====================================================
+   REPORT STAT CARDS
+===================================================== */
+
+.report-stat-card {
+
+    border: 0;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.08);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.report-stat-card:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0.6rem 1.2rem rgba(0, 0, 0, 0.15);
+}
+
+
+.report-stat-card .card-body {
+
+    padding: 18px 20px;
+}
+
+
+/* =====================================================
+   STAT CARD COLORS
+===================================================== */
+
+.report-stat-total {
+
+    background: #0d6efd;
+}
+
+
+.report-stat-verified {
+
+    background: #198754;
+}
+
+
+.report-stat-biometrics {
+
+    background: #c77700;
+}
+
+
+.report-stat-suspended {
+
+    background: #dc3545;
+}
+
+
+/* =====================================================
+   STAT ICON
+===================================================== */
+
+.report-stat-icon {
+
+    width: 46px;
+
+    height: 46px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: rgba(255, 255, 255, 0.18);
+
+    border: 1px solid rgba(255, 255, 255, 0.20);
+
+    border-radius: 6px;
+
+    color: #ffffff;
+
+    flex-shrink: 0;
+
+    font-size: 20px;
+}
+
+
+/* =====================================================
+   STAT TEXT
+===================================================== */
+
+.report-stat-label {
+
+    color: rgba(255, 255, 255, 0.82);
+
+    font-size: 12px;
+
+    margin-bottom: 2px;
+}
+
+
+.report-stat-value {
+
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 22px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+
+/* =====================================================
+   APPLICATION TYPE CARDS
+===================================================== */
+
+.application-type-card {
+
+    border: 0;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.08);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.application-type-card:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0.6rem 1.2rem rgba(0, 0, 0, 0.15);
+}
+
+
+.application-type-card .card-body {
+
+    padding: 17px 19px;
+}
+
+
+/* =====================================================
+   APPLICATION TYPE COLORS
+===================================================== */
+
+.application-type-new {
+
+    background: #0d6efd;
+}
+
+
+.application-type-update {
+
+    background: #6f42c1;
+}
+
+
+.application-type-transfer {
+
+    background: #087990;
+}
+
+
+.application-type-reactivation {
+
+    background: #c77700;
+}
+
+
+.application-type-reinstatement {
+
+    background: #343a40;
+}
+
+
+/* =====================================================
+   APPLICATION TYPE TEXT
+===================================================== */
+
+.application-type-label {
+
+    color: rgba(255, 255, 255, 0.82);
+
+    font-size: 11px;
+
+    font-weight: 500;
+}
+
+
+.application-type-value {
+
+    margin: 4px 0 0;
+
+    color: #ffffff;
+
+    font-size: 21px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+
+/* =====================================================
+   STATUS SECTION
+===================================================== */
+
+.status-card {
+
+    border: 1px solid #e1e5eb;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.04);
+}
+
+
+.status-card .card-header {
+
+    padding: 16px 20px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e1e5eb;
+}
+
+
+.report-section-title {
+
+    color: #172033;
+
+    font-size: 15px;
+
+    font-weight: 700;
+}
+
+
+.status-card .card-body {
+
+    padding: 20px;
+}
+
+
+/* =====================================================
+   STATUS ITEMS
+===================================================== */
+
+.status-item {
+
+    padding: 15px 17px;
+
+    border-radius: 7px;
+
+    color: #ffffff;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.status-item:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 5px 12px rgba(0, 0, 0, 0.10);
+}
+
+
+.status-item-pending {
+
+    background: #c77700;
+}
+
+
+.status-item-review {
+
+    background: #087990;
+}
+
+
+.status-item-approved {
+
+    background: #198754;
+}
+
+
+.status-item-disapproved {
+
+    background: #dc3545;
+}
+
+
+.status-label {
+
+    color: rgba(255, 255, 255, 0.82);
+
+    font-size: 11px;
+
+    margin-bottom: 4px;
+}
+
+
+.status-value {
+
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 21px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+
+/* =====================================================
+   CHART CONTAINER
+===================================================== */
+
+.chart-container {
+
+    position: relative;
+
+    height: 350px;
+}
+
+
+/* =====================================================
+   CHART CARD
+===================================================== */
+
+.chart-card {
+
+    border: 1px solid #e1e5eb;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.04);
+}
+
+
+.chart-card .card-header {
+
+    padding: 16px 20px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e1e5eb;
+}
+
+
+.chart-card .card-body {
+
+    padding: 20px;
+}
+
+
+/* =====================================================
+   REPORT TABLE CARD
+===================================================== */
+
+.report-table-card {
+
+    border: 1px solid #e1e5eb;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.04);
+}
+
+
+.report-table-card .card-header {
+
+    padding: 16px 20px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e1e5eb;
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.report-table {
+
+    margin: 0;
+
+    width: 100%;
+}
+
+
+.report-table thead th {
+
+    padding:
+        13px 18px;
+
+    background: #f8f9fb;
+
+    border-bottom:
+        1px solid #dfe3e8;
+
+    color: #5d6675;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.04em;
+
+    white-space: nowrap;
+}
+
+
+.report-table tbody td {
+
+    padding:
+        14px 18px;
+
+    border-bottom:
+        1px solid #edf0f3;
+
+    color: #374151;
+
+    vertical-align: middle;
+}
+
+
+.report-table tbody tr:last-child td {
+
+    border-bottom: none;
+}
+
+
+.report-table tbody tr {
+
+    transition:
+        background 0.12s ease;
+}
+
+
+.report-table tbody tr:hover {
+
+    background: #f8faff;
+}
+
+
+/* =====================================================
+   TABLE BADGES
+===================================================== */
+
+.report-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 30px;
+
+    padding:
+        4px 8px;
+
+    border-radius: 5px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+.report-badge-pending {
+
+    background: #fff3cd;
+
+    border: 1px solid #ffe69c;
+
+    color: #8a5a00;
+}
+
+
+.report-badge-review {
+
+    background: #cff4fc;
+
+    border: 1px solid #9eeaf9;
+
+    color: #087990;
+}
+
+
+.report-badge-approved {
+
+    background: #d1e7dd;
+
+    border: 1px solid #a3cfbb;
+
+    color: #146c43;
+}
+
+
+.report-badge-disapproved {
+
+    background: #f8d7da;
+
+    border: 1px solid #f1aeb5;
+
+    color: #b02a37;
+}
+
+
+.report-badge-verified {
+
+    background: #d1e7dd;
+
+    border: 1px solid #a3cfbb;
+
+    color: #146c43;
+}
+
+
+/* =====================================================
+   BARANGAY CHART
+===================================================== */
+
+.barangay-chart-container {
+
+    position: relative;
+
+    height: 450px;
+}
+
+
+/* =====================================================
+   FILTER BUTTONS
+===================================================== */
+
+.report-filter-btn {
+
+    border-radius: 6px;
+}
+
+
+/* =====================================================
+   REPORT ACTIONS
+===================================================== */
+
+.report-actions-title {
+
+    color: #172033;
+
+    font-size: 17px;
+
+    font-weight: 700;
+}
+
+
+.report-actions-description {
+
+    color: #6b7280;
+
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   PRINT
+===================================================== */
+
+@media print {
+
+    .admin-sidebar,
+    .sidebar,
+    .navbar,
+    .topbar,
+    .page-header,
+    .no-print,
+    .btn {
+
+        display: none !important;
+    }
+
+
+    .main-content,
+    .content,
+    .container-fluid {
+
+        margin: 0 !important;
+
+        padding: 0 !important;
+
+        width: 100% !important;
+    }
+
+
+    .card,
+    .report-card,
+    .report-filter-card,
+    .report-stat-card,
+    .application-type-card,
+    .status-card,
+    .chart-card,
+    .report-table-card {
+
+        box-shadow: none !important;
+
+        border: 1px solid #dee2e6 !important;
+    }
+
+
+    .chart-container {
+
+        height: 300px;
+    }
+
+
+    .barangay-chart-container {
+
+        height: 400px;
+    }
+
+
+    @page {
+
+        size: A4 landscape;
+
+        margin: 10mm;
+    }
+
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 991px) {
+
+    .chart-container {
+
+        height: 320px;
+    }
+
+
+    .barangay-chart-container {
+
+        height: 400px;
+    }
+
+}
+
+
+@media (max-width: 575px) {
+
+    .report-stat-card .card-body {
+
+        padding: 16px;
+    }
+
+
+    .report-stat-icon {
+
+        width: 42px;
+
+        height: 42px;
+
+        font-size: 18px;
+    }
+
+
+    .report-stat-value {
+
+        font-size: 20px;
+    }
+
+
+    .application-type-card .card-body {
+
+        padding: 15px 16px;
+    }
+
+
+    .status-card .card-body {
+
+        padding: 15px;
+    }
+
+
+    .chart-card .card-body {
+
+        padding: 15px;
+    }
+
+
+    .chart-container {
+
+        height: 280px;
+    }
+
+
+    .barangay-chart-container {
+
+        height: 350px;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="report-page">
+
+
+    <!-- =====================================================
+         FILTERS
+    ====================================================== -->
+
+    <div class="report-filter-card mb-4 no-print">
+
+        <div class="card-body">
+
+            <form method="GET">
+
+                <div class="row g-3 align-items-end">
+
+
+                    <div class="col-md-3">
+
+                        <label class="form-label fw-semibold">
+                            Date From
+                        </label>
+
+                        <input
+                            type="date"
+                            name="date_from"
+                            class="form-control"
+                            value="{{ date_from }}"
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <label class="form-label fw-semibold">
+                            Date To
+                        </label>
+
+                        <input
+                            type="date"
+                            name="date_to"
+                            class="form-control"
+                            value="{{ date_to }}"
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <label class="form-label fw-semibold">
+                            Application Type
+                        </label>
+
+                        <select
+                            name="application_type"
+                            class="form-select"
+                        >
+
+                            <option value="">
+                                All Applications
+                            </option>
+
+                            <option
+                                value="NEW"
+                                {% if application_type == "NEW" %}selected{% endif %}
+                            >
+                                New Registration
+                            </option>
+
+                            <option
+                                value="UPDATE"
+                                {% if application_type == "UPDATE" %}selected{% endif %}
+                            >
+                                Update Information
+                            </option>
+
+                            <option
+                                value="TRANSFER"
+                                {% if application_type == "TRANSFER" %}selected{% endif %}
+                            >
+                                Transfer
+                            </option>
+
+                            <option
+                                value="REACTIVATION"
+                                {% if application_type == "REACTIVATION" %}selected{% endif %}
+                            >
+                                Reactivation
+                            </option>
+
+                            <option
+                                value="REINSTATEMENT"
+                                {% if application_type == "REINSTATEMENT" %}selected{% endif %}
+                            >
+                                Reinstatement
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-3">
+
+                        <label class="form-label fw-semibold">
+                            Barangay
+                        </label>
+
+                        <select
+                            name="barangay"
+                            class="form-select"
+                        >
+
+                            <option value="">
+                                All Barangays
+                            </option>
+
+                            {% for barangay in barangays %}
+
+                                <option
+                                    value="{{ barangay.id }}"
+                                    {% if barangay_id == barangay.id|stringformat:"s" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ barangay.name }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-12">
+
+                        <div class="d-flex justify-content-end gap-2">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary report-filter-btn"
+                            >
+
+                                <i class="bi bi-funnel me-1"></i>
+
+                                Apply Filters
+
+                            </button>
+
+
+                            <a
+                                href="{% url 'admin-reports' %}"
+                                class="btn btn-outline-secondary report-filter-btn"
+                            >
+
+                                <i class="bi bi-arrow-counterclockwise me-1"></i>
+
+                                Reset
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         REPORT ACTIONS
+    ====================================================== -->
+
+    <div class="
+        d-flex
+        justify-content-between
+        align-items-center
+        mb-4
+        no-print
+    ">
+
+        <div>
+
+            <h5 class="report-actions-title mb-1">
+                Registration Reports
+            </h5>
+
+            <div class="report-actions-description">
+                Statistical summary of voter registration activity
+            </div>
+
+        </div>
+
+
+        <div class="d-flex gap-2">
+
+            <a
+                href="{% url 'admin-reports-export' %}"
+                class="btn btn-success report-filter-btn"
+            >
+
+                <i class="bi bi-file-earmark-spreadsheet me-1"></i>
+
+                Export CSV
+
+            </a>
+
+
+            <button
+                type="button"
+                onclick="window.print()"
+                class="btn btn-dark report-filter-btn"
+            >
+
+                <i class="bi bi-printer me-1"></i>
+
+                Print
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         STATISTICS
+    ====================================================== -->
+
+    <div class="row g-3 mb-4">
+
+
+        <!-- TOTAL -->
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="
+                report-stat-card
+                report-stat-total
+                h-100
+            ">
+
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center">
+
+                        <div class="report-stat-icon">
+
+                            <i class="bi bi-files"></i>
+
+                        </div>
+
+
+                        <div class="ms-3">
+
+                            <div class="report-stat-label">
+                                Total Applications
+                            </div>
+
+                            <h4 class="report-stat-value">
+                                {{ total_applications }}
+                            </h4>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- VERIFIED -->
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="
+                report-stat-card
+                report-stat-verified
+                h-100
+            ">
+
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center">
+
+                        <div class="report-stat-icon">
+
+                            <i class="bi bi-patch-check-fill"></i>
+
+                        </div>
+
+
+                        <div class="ms-3">
+
+                            <div class="report-stat-label">
+                                Fully Verified
+                            </div>
+
+                            <h4 class="report-stat-value">
+                                {{ verified_total }}
+                            </h4>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- BIOMETRICS -->
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="
+                report-stat-card
+                report-stat-biometrics
+                h-100
+            ">
+
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center">
+
+                        <div class="report-stat-icon">
+
+                            <i class="bi bi-fingerprint"></i>
+
+                        </div>
+
+
+                        <div class="ms-3">
+
+                            <div class="report-stat-label">
+                                Biometrics Pending
+                            </div>
+
+                            <h4 class="report-stat-value">
+                                {{ biometrics_pending_total }}
+                            </h4>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SUSPENDED -->
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="
+                report-stat-card
+                report-stat-suspended
+                h-100
+            ">
+
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center">
+
+                        <div class="report-stat-icon">
+
+                            <i class="bi bi-pause-circle-fill"></i>
+
+                        </div>
+
+
+                        <div class="ms-3">
+
+                            <div class="report-stat-label">
+                                Dissapproved
+                            </div>
+
+                            <h4 class="report-stat-value">
+                                {{ suspended_total }}
+                            </h4>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         APPLICATION TYPE SUMMARY
+    ====================================================== -->
+
+    <div class="row g-3 mb-4">
+
+
+        <!-- NEW -->
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="
+                application-type-card
+                application-type-new
+                h-100
+            ">
+
+                <div class="card-body">
+
+                    <div class="application-type-label">
+                        New Registration
+                    </div>
+
+                    <div class="application-type-value">
+                        {{ new_total }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- UPDATE -->
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="
+                application-type-card
+                application-type-update
+                h-100
+            ">
+
+                <div class="card-body">
+
+                    <div class="application-type-label">
+                        Update
+                    </div>
+
+                    <div class="application-type-value">
+                        {{ update_total }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TRANSFER -->
+
+        <div class="col-xl-2 col-md-6">
+
+            <div class="
+                application-type-card
+                application-type-transfer
+                h-100
+            ">
+
+                <div class="card-body">
+
+                    <div class="application-type-label">
+                        Transfer
+                    </div>
+
+                    <div class="application-type-value">
+                        {{ transfer_total }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- REACTIVATION -->
+
+        <div class="col-xl-2 col-md-6">
+
+            <div class="
+                application-type-card
+                application-type-reactivation
+                h-100
+            ">
+
+                <div class="card-body">
+
+                    <div class="application-type-label">
+                        Reactivation
+                    </div>
+
+                    <div class="application-type-value">
+                        {{ reactivation_total }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- REINSTATEMENT -->
+
+        <div class="col-xl-2 col-md-6">
+
+            <div class="
+                application-type-card
+                application-type-reinstatement
+                h-100
+            ">
+
+                <div class="card-body">
+
+                    <div class="application-type-label">
+                        Reinstatement
+                    </div>
+
+                    <div class="application-type-value">
+                        {{ reinstatement_total }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         STATUS CARDS
+    ====================================================== -->
+
+    <div class="status-card mb-4">
+
+        <div class="card-header">
+
+            <div class="report-section-title">
+                Application Status
+            </div>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+
+                <!-- PENDING -->
+
+                <div class="col-md-3">
+
+                    <div class="status-item status-item-pending">
+
+                        <div class="status-label">
+                            Pending
+                        </div>
+
+                        <div class="status-value">
+                            {{ pending_total }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- REVIEW -->
+
+                <div class="col-md-3">
+
+                    <div class="status-item status-item-review">
+
+                        <div class="status-label">
+                            Review
+                        </div>
+
+                        <div class="status-value">
+                            {{ review_total }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- APPROVED -->
+
+                <div class="col-md-3">
+
+                    <div class="status-item status-item-approved">
+
+                        <div class="status-label">
+                            Approved
+                        </div>
+
+                        <div class="status-value">
+                            {{ approved_total }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DISAPPROVED -->
+
+                <div class="col-md-3">
+
+                    <div class="status-item status-item-disapproved">
+
+                        <div class="status-label">
+                            Disapproved
+                        </div>
+
+                        <div class="status-value">
+                            {{ disapproved_total }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CHARTS
+    ====================================================== -->
+
+    <div class="row g-4 mb-4">
+
+
+        <!-- APPLICATION BAR CHART -->
+
+        <div class="col-xl-6">
+
+            <div class="chart-card h-100">
+
+                <div class="card-header">
+
+                    <div class="report-section-title">
+                        Applications by Type
+                    </div>
+
+                    <small class="text-muted">
+                        Total applications for each application category
+                    </small>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <div class="chart-container">
+
+                        <canvas id="applicationChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- STATUS BAR CHART -->
+
+        <div class="col-xl-6">
+
+            <div class="chart-card h-100">
+
+                <div class="card-header">
+
+                    <div class="report-section-title">
+                        Applications by Status
+                    </div>
+
+                    <small class="text-muted">
+                        Current application processing status
+                    </small>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <div class="chart-container">
+
+                        <canvas id="statusChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         BARANGAY CHART
+    ====================================================== -->
+
+    <div class="chart-card mb-4">
+
+        <div class="card-header">
+
+            <div class="report-section-title">
+                Applications per Barangay
+            </div>
+
+            <small class="text-muted">
+                Number of registration applications associated
+                with each barangay
+            </small>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="barangay-chart-container">
+
+                <canvas id="barangayChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         APPLICATION TYPE TABLE
+    ====================================================== -->
+
+    <div class="report-table-card mb-4">
+
+        <div class="card-header">
+
+            <div class="report-section-title">
+                Application Type Report
+            </div>
+
+        </div>
+
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="
+                    table
+                    report-table
+                    align-middle
+                ">
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="px-4">
+                                Application Type
+                            </th>
+
+                            <th class="text-center">
+                                Total
+                            </th>
+
+                            <th class="text-center">
+                                Pending
+                            </th>
+
+                            <th class="text-center">
+                                Review
+                            </th>
+
+                            <th class="text-center">
+                                Approved
+                            </th>
+
+                            <th class="text-center">
+                                Disapproved
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for item in application_type_report %}
+
+                        <tr>
+
+                            <td class="px-4 fw-semibold">
+                                {{ item.name }}
+                            </td>
+
+
+                            <td class="text-center fw-bold">
+                                {{ item.total }}
+                            </td>
+
+
+                            <td class="text-center">
+
+                                <span class="
+                                    report-badge
+                                    report-badge-pending
+                                ">
+                                    {{ item.pending }}
+                                </span>
+
+                            </td>
+
+
+                            <td class="text-center">
+
+                                <span class="
+                                    report-badge
+                                    report-badge-review
+                                ">
+                                    {{ item.review }}
+                                </span>
+
+                            </td>
+
+
+                            <td class="text-center">
+
+                                <span class="
+                                    report-badge
+                                    report-badge-approved
+                                ">
+                                    {{ item.approved }}
+                                </span>
+
+                            </td>
+
+
+                            <td class="text-center">
+
+                                <span class="
+                                    report-badge
+                                    report-badge-disapproved
+                                ">
+                                    {{ item.disapproved }}
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         BARANGAY TABLE
+    ====================================================== -->
+
+    <div class="report-table-card mb-4">
+
+        <div class="card-header">
+
+            <div class="report-section-title">
+                Barangay Report
+            </div>
+
+            <small class="text-muted">
+                Application distribution and verified applicants
+            </small>
+
+        </div>
+
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="
+                    table
+                    report-table
+                    align-middle
+                ">
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="px-4">
+                                #
+                            </th>
+
+                            <th>
+                                Barangay
+                            </th>
+
+                            <th class="text-center">
+                                New
+                            </th>
+
+                            <th class="text-center">
+                                Update
+                            </th>
+
+                            <th class="text-center">
+                                Transfer
+                            </th>
+
+                            <th class="text-center">
+                                Reactivation
+                            </th>
+
+                            <th class="text-center">
+                                Reinstatement
+                            </th>
+
+                            <th class="text-center">
+                                Total
+                            </th>
+
+                            <th class="text-center">
+                                Verified
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for item in barangay_report %}
+
+                        <tr>
+
+                            <td class="px-4 text-muted">
+                                {{ forloop.counter }}
+                            </td>
+
+
+                            <td class="fw-semibold">
+                                {{ item.name }}
+                            </td>
+
+
+                            <td class="text-center">
+                                {{ item.new }}
+                            </td>
+
+
+                            <td class="text-center">
+                                {{ item.update }}
+                            </td>
+
+
+                            <td class="text-center">
+                                {{ item.transfer }}
+                            </td>
+
+
+                            <td class="text-center">
+                                {{ item.reactivation }}
+                            </td>
+
+
+                            <td class="text-center">
+                                {{ item.reinstatement }}
+                            </td>
+
+
+                            <td class="text-center fw-bold">
+                                {{ item.total }}
+                            </td>
+
+
+                            <td class="text-center">
+
+                                {% if item.verified > 0 %}
+
+                                    <span class="
+                                        report-badge
+                                        report-badge-verified
+                                    ">
+                                        {{ item.verified }}
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        0
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="9"
+                                class="text-center py-5 text-muted"
+                            >
+
+                                No barangay data available.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         REPORT FOOTER
+    ====================================================== -->
+
+    <div class="text-muted small mb-4">
+
+        <div>
+            Generated from the Pio Duran Voter Registration System.
+        </div>
+
+        <div>
+            Report includes application status, application type,
+            barangay distribution, and verification statistics.
+        </div>
+
+    </div>
+
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+    // =========================================================
+    // APPLICATION DATA
+    // =========================================================
+
+    const applicationLabels = {{ application_chart_labels|safe }};
+    const applicationData = {{ application_chart_data|safe }};
+
+    const statusLabels = {{ status_chart_labels|safe }};
+    const statusData = {{ status_chart_data|safe }};
+
+    const barangayLabels = {{ barangay_chart_labels|safe }};
+    const barangayData = {{ barangay_chart_data|safe }};
+
+
+    // =========================================================
+    // APPLICATION TYPE CHART
+    // =========================================================
+
+    new Chart(
+        document.getElementById("applicationChart"),
+        {
+            type: "bar",
+
+            data: {
+                labels: applicationLabels,
+
+                datasets: [
+                    {
+                        label: "Applications",
+                        data: applicationData
+                    }
+                ]
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+                            precision: 0
+                        }
+
+                    }
+
+                }
+
+            }
+        }
+    );
+
+
+    // =========================================================
+    // STATUS CHART
+    // =========================================================
+
+    new Chart(
+        document.getElementById("statusChart"),
+        {
+            type: "bar",
+
+            data: {
+                labels: statusLabels,
+
+                datasets: [
+                    {
+                        label: "Applications",
+                        data: statusData
+                    }
+                ]
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+                            precision: 0
+                        }
+
+                    }
+
+                }
+
+            }
+        }
+    );
+
+
+    // =========================================================
+    // BARANGAY CHART
+    // =========================================================
+
+    new Chart(
+        document.getElementById("barangayChart"),
+        {
+            type: "bar",
+
+            data: {
+                labels: barangayLabels,
+
+                datasets: [
+                    {
+                        label: "Applications",
+                        data: barangayData
+                    }
+                ]
+            },
+
+            options: {
+
+                indexAxis: "y",
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    }
+
+                },
+
+                scales: {
+
+                    x: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+                            precision: 0
+                        }
+
+                    }
+
+                }
+
+            }
+        }
+    );
+
+</script>
+
+{% endblock %}

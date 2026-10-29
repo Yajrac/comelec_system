@@ -1,0 +1,875 @@
+{% extends "base.html" %}
+
+{% block title %}
+Verify Existing Registration
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.page-header {
+    margin-bottom: 28px;
+}
+
+.page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #002b7f;
+    margin-bottom: 6px;
+}
+
+.page-header p {
+    color: #6c757d;
+    margin: 0;
+    max-width: 800px;
+}
+
+
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
+
+.verify-card {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-top: 5px solid #0038a8;
+    border-radius: 6px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.card-header-government {
+    background: #f4f8ff;
+    padding: 24px 30px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.card-header-government h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #002b7f;
+}
+
+.card-header-government p {
+    margin: 5px 0 0;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.card-body-government {
+    padding: 30px;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.form-section {
+    margin-bottom: 26px;
+}
+
+.form-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #002b7f;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.form-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 7px;
+}
+
+.form-control {
+    min-height: 44px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-control:focus {
+    border-color: #0038a8;
+    box-shadow: 0 0 0 0.15rem rgba(0, 56, 168, 0.12);
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.btn-government {
+    display: inline-block;
+    background: #0038a8;
+    border: 1px solid #0038a8;
+    color: #ffffff;
+    padding: 11px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.btn-government:hover {
+    background: #002b7f;
+    border-color: #002b7f;
+    color: #ffffff;
+}
+
+.btn-secondary-government {
+    display: inline-block;
+    background: #ffffff;
+    border: 1px solid #adb5bd;
+    color: #343a40;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary-government:hover {
+    background: #f8f9fa;
+    border-color: #6c757d;
+    color: #212529;
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.error-box {
+    background: #f8d7da;
+    border: 1px solid #f1aeb5;
+    border-left: 5px solid #ce1126;
+    color: #842029;
+    padding: 16px 18px;
+    margin-bottom: 24px;
+}
+
+.error-box-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.error-box p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   EXISTING REGISTRATION
+   ========================================================= */
+
+.existing-box {
+    background: #fff8e1;
+    border: 1px solid #ffe69c;
+    border-left: 5px solid #fcd116;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.existing-box h3 {
+    margin: 0 0 8px;
+    color: #664d03;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.existing-box p {
+    margin: 0;
+    color: #664d03;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   APPLICANT INFORMATION
+   ========================================================= */
+
+.info-card {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    padding: 22px;
+    margin-bottom: 24px;
+}
+
+.detail-item {
+    margin-bottom: 18px;
+}
+
+.detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.detail-label {
+    display: block;
+    color: #6c757d;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 5px;
+}
+
+.detail-value {
+    color: #212529;
+    font-size: 15px;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #fff3cd;
+    border: 1px solid #ffecb5;
+    color: #664d03;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.active-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #d1e7dd;
+    border: 1px solid #a3cfbb;
+    color: #0f5132;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.inactive-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #f8d7da;
+    border: 1px solid #f1aeb5;
+    color: #842029;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   ACTION SECTION
+   ========================================================= */
+
+.action-box {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 22px;
+    margin-bottom: 24px;
+}
+
+.action-box h3 {
+    color: #002b7f;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.action-box p {
+    color: #6c757d;
+    margin-bottom: 18px;
+    line-height: 1.6;
+}
+
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+
+/* =========================================================
+   FOOTER ACTION
+   ========================================================= */
+
+.bottom-action {
+    padding-top: 4px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 767.98px) {
+
+    .page-header h1 {
+        font-size: 24px;
+    }
+
+    .card-header-government {
+        padding: 22px;
+    }
+
+    .card-body-government {
+        padding: 22px;
+    }
+
+    .info-card {
+        padding: 16px;
+    }
+
+    .action-box {
+        padding: 18px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons a {
+        width: 100%;
+        text-align: center;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+
+<!-- =====================================================
+     PAGE HEADER
+     ===================================================== -->
+
+<div class="page-header">
+
+    <h1>
+        Verify Existing Registration
+    </h1>
+
+    <p>
+        Before starting a new registration, please verify
+        that you do not already have an existing registration.
+    </p>
+
+</div>
+
+
+<!-- =====================================================
+     MAIN CARD
+     ===================================================== -->
+
+<div class="verify-card">
+
+
+    <!-- =================================================
+         HEADER
+         ================================================= -->
+
+    <div class="card-header-government">
+
+        {% if applicant %}
+
+            <h2>
+                Existing Registration Found
+            </h2>
+
+            <p>
+                A registration record matching the information
+                you provided already exists.
+            </p>
+
+        {% else %}
+
+            <h2>
+                Registration Verification
+            </h2>
+
+            <p>
+                Enter your information below to search for
+                an existing registration record.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =================================================
+         BODY
+         ================================================= -->
+
+    <div class="card-body-government">
+
+
+        <!-- =================================================
+             ERROR
+             ================================================= -->
+
+        {% if error %}
+
+            <div class="error-box">
+
+                <div class="error-box-title">
+                    Verification Error
+                </div>
+
+                <p>
+                    {{ error }}
+                </p>
+
+            </div>
+
+        {% endif %}
+
+
+        {% if applicant %}
+
+
+            <!-- =============================================
+                 EXISTING REGISTRATION NOTICE
+                 ============================================= -->
+
+            <div class="existing-box">
+
+                <h3>
+                    Existing Registration Found
+                </h3>
+
+                <p>
+                    A registration record matching the information
+                    you provided already exists. You should not
+                    submit another new registration.
+                </p>
+
+            </div>
+
+
+            <!-- =============================================
+                 APPLICANT INFORMATION
+                 ============================================= -->
+
+            <div class="form-section">
+
+                <h3 class="section-title">
+                    Registration Information
+                </h3>
+
+
+                <div class="info-card">
+
+                    <div class="row">
+
+                        <!-- NAME -->
+
+                        <div class="col-md-6 detail-item">
+
+                            <span class="detail-label">
+                                Name
+                            </span>
+
+                            <div class="detail-value">
+
+                                {{ applicant.lastname }},
+                                {{ applicant.firstname }}
+                                {{ applicant.middlename }}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- BIRTHDATE -->
+
+                        <div class="col-md-6 detail-item">
+
+                            <span class="detail-label">
+                                Birthdate
+                            </span>
+
+                            <div class="detail-value">
+
+                                {{ applicant.birthdate|date:"F d, Y" }}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- BARANGAY -->
+
+                        <div class="col-md-4 detail-item">
+
+                            <span class="detail-label">
+                                Barangay
+                            </span>
+
+                            <div class="detail-value">
+
+                                {% if applicant.brgy %}
+                                    {{ applicant.brgy.name }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- MUNICIPALITY -->
+
+                        <div class="col-md-4 detail-item">
+
+                            <span class="detail-label">
+                                Municipality
+                            </span>
+
+                            <div class="detail-value">
+
+                                {{ applicant.municipality }}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- PROVINCE -->
+
+                        <div class="col-md-4 detail-item">
+
+                            <span class="detail-label">
+                                Province
+                            </span>
+
+                            <div class="detail-value">
+
+                                {{ applicant.province }}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- STATUS -->
+
+                        <div class="col-md-6 detail-item">
+
+                            <span class="detail-label">
+                                Registration Status
+                            </span>
+
+                            <div class="detail-value">
+
+                                <span class="status-badge">
+                                    {{ applicant.get_status_display }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ACTIVE -->
+
+                        <div class="col-md-6 detail-item">
+
+                            <span class="detail-label">
+                                Registration Active
+                            </span>
+
+                            <div class="detail-value">
+
+                                {% if applicant.is_active %}
+
+                                    <span class="active-badge">
+                                        Yes
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="inactive-badge">
+                                        No
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 RECOMMENDED ACTIONS
+                 ============================================= -->
+
+            <div class="action-box">
+
+                <h3>
+                    Recommended Action
+                </h3>
+
+
+                {% if applicant.is_active %}
+
+                    <p>
+                        Your registration is already active.
+                        If your information needs to be changed,
+                        please use Update / Correction or Transfer.
+                    </p>
+
+
+                    <div class="action-buttons">
+
+                        <a
+                            href="{% url 'update-registration' %}"
+                            class="btn-government"
+                        >
+                            Update / Correction
+                        </a>
+
+
+                        <a
+                            href="{% url 'transfer-registration' %}"
+                            class="btn-secondary-government"
+                        >
+                            Transfer Registration
+                        </a>
+
+                    </div>
+
+                {% else %}
+
+                    <p>
+                        Your registration is currently inactive.
+                        You may request reactivation or reinstatement.
+                    </p>
+
+
+                    <div class="action-buttons">
+
+                        <a
+                            href="{% url 'reactivation-registration' %}"
+                            class="btn-government"
+                        >
+                            Reactivation
+                        </a>
+
+
+                        <a
+                            href="{% url 'reinstatement-registration' %}"
+                            class="btn-secondary-government"
+                        >
+                            Reinstatement
+                        </a>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =============================================
+                 BACK HOME
+                 ============================================= -->
+
+            <div class="bottom-action">
+
+                <a
+                    href="{% url 'home' %}"
+                    class="btn-secondary-government"
+                >
+                    Back to Home
+                </a>
+
+            </div>
+
+
+        {% else %}
+
+
+            <!-- =============================================
+                 VERIFICATION FORM
+                 ============================================= -->
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+
+                <div class="form-section">
+
+                    <h3 class="section-title">
+                        Applicant Information
+                    </h3>
+
+
+                    <div class="row">
+
+
+                        <!-- LAST NAME -->
+
+                        <div class="col-md-6 mb-3">
+
+                            <label
+                                for="lastname"
+                                class="form-label"
+                            >
+                                Last Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="lastname"
+                                name="lastname"
+                                class="form-control"
+                                value="{{ form_data.lastname|default:'' }}"
+                                autocomplete="family-name"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- FIRST NAME -->
+
+                        <div class="col-md-6 mb-3">
+
+                            <label
+                                for="firstname"
+                                class="form-label"
+                            >
+                                First Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="firstname"
+                                name="firstname"
+                                class="form-control"
+                                value="{{ form_data.firstname|default:'' }}"
+                                autocomplete="given-name"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- MIDDLE NAME -->
+
+                        <div class="col-md-6 mb-3">
+
+                            <label
+                                for="middlename"
+                                class="form-label"
+                            >
+                                Middle Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="middlename"
+                                name="middlename"
+                                class="form-control"
+                                value="{{ form_data.middlename|default:'' }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- BIRTHDATE -->
+
+                        <div class="col-md-6 mb-3">
+
+                            <label
+                                for="birthdate"
+                                class="form-label"
+                            >
+                                Birthdate
+                            </label>
+
+                            <input
+                                type="date"
+                                id="birthdate"
+                                name="birthdate"
+                                class="form-control"
+                                value="{{ form_data.birthdate|default:'' }}"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================================
+                     FORM ACTIONS
+                     ========================================= -->
+
+                <div class="d-flex flex-wrap gap-2">
+
+                    <button
+                        type="submit"
+                        class="btn-government"
+                    >
+                        Verify Registration
+                    </button>
+
+
+                    <a
+                        href="{% url 'home' %}"
+                        class="btn-secondary-government"
+                    >
+                        Back to Home
+                    </a>
+
+                </div>
+
+            </form>
+
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+</div>
+
+{% endblock %}

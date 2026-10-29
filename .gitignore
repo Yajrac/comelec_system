@@ -1,0 +1,59 @@
+# Secrets and local environment configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.jks
+*.keystore
+keystore.properties
+key.properties
+
+DJANGO_SECRET_KEY=django-insecure-7cfw9c5#!==edzcx5-)md-9*-mrp1n3wful@%v+%4ncodmdmns
+
+# Python environments and caches
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local database, database exports, and applicant uploads
+/db.sqlite3
+/db.sqlite3-*
+*.sql
+*.dump
+/media/
+
+# Generated Django static output (keep source static/ tracked)
+/staticfiles/
+
+# Logs
+*.log
+logs/
+
+# Frontend dependencies and generated bundles
+node_modules/
+dist/
+dist-ssr/
+
+# Android local configuration, caches, and build output
+.gradle/
+local.properties
+/mobile/**/build/
+*.apk
+*.aab
+.externalNativeBuild/
+.cxx/
+
+# Local editor and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

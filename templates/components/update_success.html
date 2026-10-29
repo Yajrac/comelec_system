@@ -1,0 +1,541 @@
+{% extends "base.html" %}
+
+{% block title %}
+Update Request Submitted
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.page-header {
+    margin-bottom: 28px;
+}
+
+.page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #002b7f;
+    margin-bottom: 6px;
+}
+
+.page-header p {
+    color: #6c757d;
+    margin: 0;
+}
+
+
+/* =========================================================
+   SUCCESS CARD
+   ========================================================= */
+
+.success-card {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-top: 5px solid #0038a8;
+    border-radius: 6px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.success-header {
+    background: #f4f8ff;
+    padding: 28px 30px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.success-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.success-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #0038a8;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.success-header h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #002b7f;
+}
+
+.success-header p {
+    margin: 5px 0 0;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+.success-body {
+    padding: 30px;
+}
+
+
+/* =========================================================
+   SECTION
+   ========================================================= */
+
+.info-section {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #002b7f;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+
+/* =========================================================
+   DETAIL CARD
+   ========================================================= */
+
+.detail-card {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    padding: 20px;
+}
+
+
+/* =========================================================
+   DETAIL ITEMS
+   ========================================================= */
+
+.detail-item {
+    margin-bottom: 16px;
+}
+
+.detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.detail-label {
+    display: block;
+    color: #6c757d;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 5px;
+}
+
+.detail-value {
+    color: #212529;
+    font-size: 15px;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   REQUEST ID
+   ========================================================= */
+
+.request-id {
+    display: inline-block;
+    padding: 7px 12px;
+    background: #f4f8ff;
+    border: 1px solid #b6d4fe;
+    color: #0038a8;
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 4px;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #fff3cd;
+    border: 1px solid #ffecb5;
+    color: #664d03;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   REASON
+   ========================================================= */
+
+.reason-box {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-left: 4px solid #0038a8;
+    padding: 18px;
+}
+
+.reason-text {
+    margin: 0;
+    color: #343a40;
+    line-height: 1.7;
+    white-space: pre-line;
+}
+
+
+/* =========================================================
+   IMPORTANT NOTICE
+   ========================================================= */
+
+.important-box {
+    background: #fff8e1;
+    border: 1px solid #ffe69c;
+    border-left: 5px solid #fcd116;
+    padding: 20px;
+    margin-bottom: 28px;
+}
+
+.important-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #664d03;
+    margin-bottom: 8px;
+}
+
+.important-box p {
+    margin: 0 0 8px;
+    color: #664d03;
+    line-height: 1.6;
+}
+
+.important-box p:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =========================================================
+   ACTION
+   ========================================================= */
+
+.action-area {
+    padding-top: 4px;
+}
+
+.btn-government {
+    display: inline-block;
+    background: #0038a8;
+    border: 1px solid #0038a8;
+    color: #ffffff;
+    padding: 11px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.btn-government:hover {
+    background: #002b7f;
+    border-color: #002b7f;
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 767.98px) {
+
+    .page-header h1 {
+        font-size: 24px;
+    }
+
+    .success-header {
+        padding: 22px;
+    }
+
+    .success-body {
+        padding: 22px;
+    }
+
+    .success-title {
+        align-items: flex-start;
+    }
+
+    .success-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .success-header h2 {
+        font-size: 19px;
+    }
+
+    .detail-card {
+        padding: 16px;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+<!-- =====================================================
+     PAGE HEADER
+     ===================================================== -->
+
+<div class="page-header">
+
+    <h1>
+        Update / Correction Request Submitted
+    </h1>
+
+    <p>
+        Your request to update or correct your registration
+        information has been successfully submitted.
+    </p>
+
+</div>
+
+
+<!-- =====================================================
+     SUCCESS CARD
+     ===================================================== -->
+
+<div class="success-card">
+
+
+    <!-- =================================================
+         HEADER
+         ================================================= -->
+
+    <div class="success-header">
+
+        <div class="success-title">
+
+            <div class="success-icon">
+                ✓
+            </div>
+
+            <div>
+
+                <h2>
+                    Request Successfully Submitted
+                </h2>
+
+                <p>
+                    Please keep your Request ID for future reference.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         BODY
+         ================================================= -->
+
+    <div class="success-body">
+
+
+        <!-- =================================================
+             REQUEST DETAILS
+             ================================================= -->
+
+        <div class="info-section">
+
+            <h3 class="section-title">
+                Request Details
+            </h3>
+
+
+            <div class="detail-card">
+
+                <div class="row">
+
+                    <!-- REQUEST ID -->
+
+                    <div class="col-md-6 detail-item">
+
+                        <span class="detail-label">
+                            Request ID
+                        </span>
+
+                        <div class="detail-value">
+
+                            <span class="request-id">
+                                {{ update_request.id }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div class="col-md-6 detail-item">
+
+                        <span class="detail-label">
+                            Request Status
+                        </span>
+
+                        <div class="detail-value">
+
+                            <span class="status-badge">
+                                {{ update_request.get_status_display }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- APPLICANT -->
+
+                    <div class="col-md-6 detail-item">
+
+                        <span class="detail-label">
+                            Applicant
+                        </span>
+
+                        <div class="detail-value">
+
+                            {{ update_request.applicant.lastname }},
+                            {{ update_request.applicant.firstname }}
+                            {{ update_request.applicant.middlename }}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DATE -->
+
+                    <div class="col-md-6 detail-item">
+
+                        <span class="detail-label">
+                            Date Requested
+                        </span>
+
+                        <div class="detail-value">
+
+                            {{ update_request.requested_at|date:"F d, Y h:i A" }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             REASON
+             ================================================= -->
+
+        {% if update_request.reason %}
+
+            <div class="info-section">
+
+                <h3 class="section-title">
+                    Reason for Update / Correction
+                </h3>
+
+
+                <div class="reason-box">
+
+                    <p class="reason-text">
+                        {{ update_request.reason }}
+                    </p>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- =================================================
+             IMPORTANT NOTICE
+             ================================================= -->
+
+        <div class="important-box">
+
+            <div class="important-title">
+                Important Notice
+            </div>
+
+            <p>
+                Your original registration information has not
+                been changed yet.
+            </p>
+
+            <p>
+                The requested changes will only be applied after
+                review and approval by the administrator.
+            </p>
+
+            <p>
+                Please keep your Request ID for reference.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             ACTION
+             ================================================= -->
+
+        <div class="action-area">
+
+            <a
+                href="{% url 'new-registration' %}"
+                class="btn-government"
+            >
+                Return to Registration
+            </a>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+</div>
+
+{% endblock %}

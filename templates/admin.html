@@ -1,0 +1,1217 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}Pio Duran Registration System{% endblock %}
+    </title>
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="{% static 'images/PIODURAN.png' %}"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="192x192"
+        href="{% static 'images/PIODURAN.png' %}"
+    >
+
+    <link
+        rel="apple-touch-icon"
+        sizes="180x180"
+        href="{% static 'images/PIODURAN.png' %}"
+    >
+
+    <!-- Bootstrap 5.3 -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
+    <style>
+
+        /* =========================================================
+           GLOBAL
+        ========================================================= */
+
+        :root {
+            --admin-navy: #071a3a;
+            --admin-navy-2: #0b234d;
+            --admin-blue: #0038a8;
+            --admin-blue-dark: #002b7f;
+            --admin-gold: #fcd116;
+            --admin-bg: #f4f6f9;
+            --admin-border: #dfe3e8;
+            --admin-text: #172033;
+            --admin-muted: #6c757d;
+            --sidebar-width: 270px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+        }
+
+        body {
+            margin: 0;
+            background: var(--admin-bg);
+            color: var(--admin-text);
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Arial,
+                sans-serif;
+            font-size: 14px;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        button,
+        .btn,
+        input,
+        select,
+        textarea,
+        .form-control,
+        .form-select {
+            border-radius: 0 !important;
+        }
+
+        /* =========================================================
+           DESKTOP SIDEBAR
+        ========================================================= */
+
+        .admin-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--admin-navy);
+            color: #ffffff;
+            z-index: 1040;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .admin-sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .admin-sidebar::-webkit-scrollbar-track {
+            background: var(--admin-navy);
+        }
+
+        .admin-sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,.18);
+        }
+
+        /* =========================================================
+           BRAND
+        ========================================================= */
+
+        .admin-brand {
+            min-height: 82px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,.10);
+        }
+
+        .admin-brand-mark {
+            width: 44px;
+            height: 44px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 44px;
+            overflow: hidden;
+            border-radius: 50%;
+        }
+
+        .admin-brand-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .admin-brand-text {
+            min-width: 0;
+        }
+
+        .admin-brand-title {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1.25;
+            color: #ffffff;
+        }
+
+        .admin-brand-subtitle {
+            margin: 3px 0 0;
+            font-size: 10px;
+            line-height: 1.3;
+            color: rgba(255,255,255,.62);
+            text-transform: uppercase;
+            letter-spacing: .7px;
+        }
+
+        /* =========================================================
+           SIDEBAR USER
+        ========================================================= */
+
+        .admin-user {
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(255,255,255,.10);
+        }
+
+        .admin-user-label {
+            margin-bottom: 5px;
+            font-size: 10px;
+            color: rgba(255,255,255,.55);
+            text-transform: uppercase;
+            letter-spacing: .8px;
+        }
+
+        .admin-user-name {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .admin-user-role {
+            margin-top: 3px;
+            color: rgba(255,255,255,.58);
+            font-size: 11px;
+        }
+
+        /* =========================================================
+           NAVIGATION
+        ========================================================= */
+
+        .admin-navigation {
+            padding: 18px 12px;
+            flex: 1;
+        }
+
+        .admin-nav-section {
+            padding: 0 10px;
+            margin: 13px 0 7px;
+            color: rgba(255,255,255,.40);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .admin-nav-section:first-child {
+            margin-top: 0;
+        }
+
+        .admin-nav-link {
+            min-height: 44px;
+            margin-bottom: 3px;
+            padding: 11px 12px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            color: rgba(255,255,255,.76);
+            border-left: 3px solid transparent;
+            transition:
+                background .15s ease,
+                color .15s ease,
+                border-color .15s ease;
+        }
+
+        .admin-nav-link:hover {
+            color: #ffffff;
+            background: rgba(255,255,255,.07);
+        }
+
+        .admin-nav-link.active {
+            color: #ffffff;
+            background: var(--admin-blue);
+            border-left-color: var(--admin-gold);
+        }
+
+        .admin-nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 17px;
+            flex: 0 0 20px;
+        }
+
+        .admin-nav-label {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .admin-nav-arrow {
+            font-size: 12px;
+            opacity: .45;
+        }
+
+        /* =========================================================
+           LOGOUT
+        ========================================================= */
+
+        .admin-logout-link {
+            color: rgba(255,255,255,.76);
+        }
+
+        .admin-logout-link:hover {
+            color: #ffffff;
+            background: #b42318;
+            border-left-color: #ffb4ab;
+        }
+
+        /* =========================================================
+           SIDEBAR FOOTER
+        ========================================================= */
+
+        .admin-sidebar-footer {
+            padding: 14px 20px;
+            border-top: 1px solid rgba(255,255,255,.10);
+            color: rgba(255,255,255,.42);
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        /* =========================================================
+           MAIN CONTENT
+        ========================================================= */
+
+        .admin-main {
+            min-height: 100vh;
+            margin-left: var(--sidebar-width);
+        }
+
+        /* =========================================================
+           TOP MOBILE BAR
+        ========================================================= */
+
+        .admin-mobile-header {
+            display: none;
+            min-height: 62px;
+            background: var(--admin-navy);
+            color: #ffffff;
+            padding: 10px 15px;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+        }
+
+        .admin-mobile-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-mobile-brand-mark {
+            width: 36px;
+            height: 36px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 36px;
+            overflow: hidden;
+            border-radius: 50%;
+        }
+
+        .admin-mobile-brand-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .admin-mobile-brand-text {
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .admin-mobile-brand-subtitle {
+            display: block;
+            margin-top: 2px;
+            color: rgba(255,255,255,.55);
+            font-size: 9px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .admin-mobile-menu {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255,255,255,.20);
+            background: transparent;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* =========================================================
+           PAGE HEADER
+        ========================================================= */
+
+        .admin-page-header {
+            background: #ffffff;
+            border-bottom: 1px solid var(--admin-border);
+            padding: 22px 28px;
+        }
+
+        .admin-page-header-inner {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .admin-page-title {
+            margin: 0;
+            color: #111827;
+            font-size: 23px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .admin-page-subtitle {
+            margin: 5px 0 0;
+            color: var(--admin-muted);
+            font-size: 13px;
+        }
+
+        /* =========================================================
+           CONTENT AREA
+        ========================================================= */
+
+        .admin-content {
+            padding: 25px 28px 35px;
+        }
+
+        .admin-content-inner {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* =========================================================
+           GLOBAL ADMIN CARD
+        ========================================================= */
+
+        .admin-card {
+            background: #ffffff;
+            border: 1px solid var(--admin-border);
+            box-shadow: 0 1px 2px rgba(0,0,0,.03);
+        }
+
+        .admin-card-header {
+            min-height: 58px;
+            padding: 15px 18px;
+            border-bottom: 1px solid var(--admin-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .admin-card-title {
+            margin: 0;
+            color: #172033;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .admin-card-subtitle {
+            margin: 3px 0 0;
+            color: var(--admin-muted);
+            font-size: 12px;
+        }
+
+        .admin-card-body {
+            padding: 20px;
+        }
+
+        /* =========================================================
+           BUTTONS
+        ========================================================= */
+
+        .btn {
+            font-weight: 600;
+            font-size: 13px;
+            padding: 9px 15px;
+            border-width: 1px;
+        }
+
+        .btn-primary {
+            background: var(--admin-blue);
+            border-color: var(--admin-blue);
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background: var(--admin-blue-dark);
+            border-color: var(--admin-blue-dark);
+        }
+
+        .btn-outline-primary {
+            color: var(--admin-blue);
+            border-color: var(--admin-blue);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--admin-blue);
+            border-color: var(--admin-blue);
+        }
+
+        /* =========================================================
+           FORMS
+        ========================================================= */
+
+        .form-label {
+            margin-bottom: 6px;
+            color: #344054;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 40px;
+            border-color: #cfd5dc;
+            font-size: 13px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--admin-blue);
+            box-shadow: 0 0 0 .15rem rgba(0,56,168,.10);
+        }
+
+        .form-text {
+            color: #7b8492;
+            font-size: 11px;
+        }
+
+        /* =========================================================
+           TABLE
+        ========================================================= */
+
+        .table {
+            margin-bottom: 0;
+            font-size: 13px;
+        }
+
+        .table thead th {
+            padding: 12px 14px;
+            background: #f8f9fb;
+            border-bottom: 1px solid var(--admin-border);
+            color: #4b5563;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .35px;
+            white-space: nowrap;
+        }
+
+        .table tbody td {
+            padding: 12px 14px;
+            border-color: #edf0f3;
+            vertical-align: middle;
+            color: #273142;
+        }
+
+        .table tbody tr:hover {
+            background: #fafbfc;
+        }
+
+        /* =========================================================
+           BADGES
+        ========================================================= */
+
+        .badge {
+            border-radius: 0 !important;
+            padding: 5px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .2px;
+        }
+
+        /* =========================================================
+           ALERTS
+        ========================================================= */
+
+        .alert {
+            border-radius: 0 !important;
+            font-size: 13px;
+        }
+
+        /* =========================================================
+           DROPDOWN
+        ========================================================= */
+
+        .dropdown-menu {
+            border-radius: 0 !important;
+            border: 1px solid var(--admin-border);
+            box-shadow: 0 8px 25px rgba(0,0,0,.08);
+        }
+
+        .dropdown-item {
+            font-size: 13px;
+            padding: 9px 13px;
+        }
+
+        .dropdown-item:hover {
+            background: #f3f6fb;
+        }
+
+        /* =========================================================
+           PAGINATION
+        ========================================================= */
+
+        .pagination {
+            margin-bottom: 0;
+        }
+
+        .page-link {
+            border-radius: 0 !important;
+            color: var(--admin-blue);
+            font-size: 12px;
+        }
+
+        .page-item.active .page-link {
+            background: var(--admin-blue);
+            border-color: var(--admin-blue);
+        }
+
+        /* =========================================================
+           MOBILE OFFCANVAS
+        ========================================================= */
+
+        .admin-offcanvas {
+            width: 270px !important;
+            background: var(--admin-navy);
+            color: #ffffff;
+        }
+
+        .admin-offcanvas .offcanvas-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(255,255,255,.10);
+        }
+
+        .admin-offcanvas .btn-close {
+            filter: invert(1);
+            opacity: .8;
+        }
+
+        .admin-offcanvas .offcanvas-body {
+            padding: 0;
+        }
+
+        /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+        @media (max-width: 991.98px) {
+
+            .admin-sidebar {
+                display: none;
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .admin-mobile-header {
+                display: flex;
+            }
+
+            .admin-page-header {
+                padding: 20px;
+            }
+
+            .admin-content {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+
+            .admin-page-title {
+                font-size: 20px;
+            }
+
+            .admin-page-subtitle {
+                font-size: 12px;
+            }
+
+            .admin-page-header {
+                padding: 17px 15px;
+            }
+
+            .admin-content {
+                padding: 15px;
+            }
+
+            .admin-card-body {
+                padding: 15px;
+            }
+
+            .admin-card-header {
+                padding: 13px 15px;
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .admin-mobile-brand-text {
+                font-size: 12px;
+            }
+
+            .table-responsive {
+                border: 1px solid var(--admin-border);
+            }
+
+        }
+
+    </style>
+
+    {% block extra_css %}{% endblock %}
+
+</head>
+
+<body>
+
+    <!-- =========================================================
+         DESKTOP SIDEBAR
+    ========================================================== -->
+
+    <aside class="admin-sidebar">
+
+        <!-- BRAND -->
+
+        <div class="admin-brand">
+
+            <div class="admin-brand-mark">
+
+                <img
+                    src="{% static 'images/PIODURAN.png' %}"
+                    alt="Pio Duran Logo"
+                    class="admin-brand-logo"
+                >
+
+            </div>
+
+            <div class="admin-brand-text">
+
+                <h1 class="admin-brand-title">
+                    Pio Duran Voters Registration
+                </h1>
+
+                <p class="admin-brand-subtitle">
+                    Administrator Portal
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- USER -->
+
+        <div class="admin-user">
+
+            <div class="admin-user-label">
+                Signed in as
+            </div>
+
+            <div class="admin-user-name">
+
+                {% if request.user.get_full_name %}
+                    {{ request.user.get_full_name }}
+                {% else %}
+                    {{ request.user.username }}
+                {% endif %}
+
+            </div>
+
+            <div class="admin-user-role">
+                System Administrator
+            </div>
+
+        </div>
+
+
+        <!-- NAVIGATION -->
+
+        <nav class="admin-navigation">
+
+            <!-- OVERVIEW -->
+
+            <div class="admin-nav-section">
+                Overview
+            </div>
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="admin-nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+            >
+
+                <span class="admin-nav-icon">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                </span>
+
+                <span class="admin-nav-label">
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <!-- APPLICATION MANAGEMENT -->
+
+            <div class="admin-nav-section">
+                Application Management
+            </div>
+
+            <a
+                href="{% url 'admin-applicants' %}"
+                class="admin-nav-link {% if request.resolver_match.url_name == 'admin-applicants' or request.resolver_match.url_name == 'admin-applicant-detail' %}active{% endif %}"
+            >
+
+                <span class="admin-nav-icon">
+                    <i class="bi bi-people"></i>
+                </span>
+
+                <span class="admin-nav-label">
+                    Applicants
+                </span>
+
+                <span class="admin-nav-arrow">
+                    <i class="bi bi-chevron-right"></i>
+                </span>
+
+            </a>
+
+
+            <a
+                href="{% url 'admin-applications' %}"
+                class="admin-nav-link {% if request.resolver_match.url_name == 'admin-applications' or 'admin-application-' in request.resolver_match.url_name %}active{% endif %}"
+            >
+
+                <span class="admin-nav-icon">
+                    <i class="bi bi-file-earmark-text"></i>
+                </span>
+
+                <span class="admin-nav-label">
+                    Applications
+                </span>
+
+            </a>
+
+
+            <!-- MASTER DATA -->
+
+            <div class="admin-nav-section">
+                Master Data
+            </div>
+
+            <a
+                href="{% url 'brgy_list' %}"
+                class="admin-nav-link {% if request.resolver_match.url_name == 'brgy_list' or request.resolver_match.url_name == 'add-brgy' or request.resolver_match.url_name == 'delete-brgy' %}active{% endif %}"
+            >
+
+                <span class="admin-nav-icon">
+                    <i class="bi bi-geo-alt"></i>
+                </span>
+
+                <span class="admin-nav-label">
+                    Barangay Management
+                </span>
+
+            </a>
+
+
+            <!-- REPORTS -->
+
+            <div class="admin-nav-section">
+                Reports
+            </div>
+
+            <a
+                href="{% url 'admin-reports' %}"
+                class="admin-nav-link {% if request.resolver_match.url_name == 'admin-reports' %}active{% endif %}"
+            >
+
+                <span class="admin-nav-icon">
+                    <i class="bi bi-bar-chart"></i>
+                </span>
+
+                <span class="admin-nav-label">
+                    Reports
+                </span>
+
+            </a>
+
+
+            <!-- ACCOUNT -->
+
+            <div class="admin-nav-section">
+                Account
+            </div>
+
+            <a
+                href="{% url 'admin-logout' %}"
+                class="admin-nav-link admin-logout-link"
+                onclick="return confirm('Are you sure you want to logout?');"
+            >
+
+                <span class="admin-nav-icon">
+                    <i class="bi bi-box-arrow-right"></i>
+                </span>
+
+                <span class="admin-nav-label">
+                    Logout
+                </span>
+
+            </a>
+
+        </nav>
+
+
+        <!-- SIDEBAR FOOTER -->
+
+        <div class="admin-sidebar-footer">
+
+            <div>
+                Pio Duran Registration System
+            </div>
+
+            <div>
+                Administrator Portal
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================================
+         MOBILE HEADER
+    ========================================================== -->
+
+    <header class="admin-mobile-header">
+
+        <div class="admin-mobile-brand">
+
+            <div class="admin-mobile-brand-mark">
+
+                <img
+                    src="{% static 'images/PIODURAN.png' %}"
+                    alt="Pio Duran Logo"
+                    class="admin-mobile-brand-logo"
+                >
+
+            </div>
+
+            <div class="admin-mobile-brand-text">
+
+                Pio Duran Voters Registration
+
+                <span class="admin-mobile-brand-subtitle">
+                    Administrator Portal
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="admin-mobile-menu"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#adminMobileSidebar"
+            aria-controls="adminMobileSidebar"
+            aria-label="Open navigation"
+        >
+
+            <i class="bi bi-list"></i>
+
+        </button>
+
+    </header>
+
+
+    <!-- =========================================================
+         MOBILE OFFCANVAS SIDEBAR
+    ========================================================== -->
+
+    <div
+        class="offcanvas offcanvas-start admin-offcanvas"
+        tabindex="-1"
+        id="adminMobileSidebar"
+        aria-labelledby="adminMobileSidebarLabel"
+    >
+
+        <div class="offcanvas-header">
+
+            <div>
+
+                <div
+                    id="adminMobileSidebarLabel"
+                    class="fw-bold"
+                >
+                    Pio Duran Voters Registration
+                </div>
+
+                <small class="text-white-50">
+                    Administrator Portal
+                </small>
+
+            </div>
+
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"
+            ></button>
+
+        </div>
+
+
+        <div class="offcanvas-body">
+
+            <nav class="admin-navigation">
+
+                <!-- OVERVIEW -->
+
+                <div class="admin-nav-section">
+                    Overview
+                </div>
+
+                <a
+                    href="{% url 'dashboard' %}"
+                    class="admin-nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                >
+
+                    <span class="admin-nav-icon">
+                        <i class="bi bi-grid-1x2-fill"></i>
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Dashboard
+                    </span>
+
+                </a>
+
+
+                <!-- APPLICATION MANAGEMENT -->
+
+                <div class="admin-nav-section">
+                    Application Management
+                </div>
+
+                <a
+                    href="{% url 'admin-applicants' %}"
+                    class="admin-nav-link {% if request.resolver_match.url_name == 'admin-applicants' or request.resolver_match.url_name == 'admin-applicant-detail' %}active{% endif %}"
+                >
+
+                    <span class="admin-nav-icon">
+                        <i class="bi bi-people"></i>
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Applicants
+                    </span>
+
+                    <span class="admin-nav-arrow">
+                        <i class="bi bi-chevron-right"></i>
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="{% url 'admin-applications' %}"
+                    class="admin-nav-link {% if request.resolver_match.url_name == 'admin-applications' or 'admin-application-' in request.resolver_match.url_name %}active{% endif %}"
+                >
+
+                    <span class="admin-nav-icon">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Applications
+                    </span>
+
+                </a>
+
+
+                <!-- MASTER DATA -->
+
+                <div class="admin-nav-section">
+                    Master Data
+                </div>
+
+                <a
+                    href="{% url 'brgy_list' %}"
+                    class="admin-nav-link {% if request.resolver_match.url_name == 'brgy_list' or request.resolver_match.url_name == 'add-brgy' or request.resolver_match.url_name == 'delete-brgy' %}active{% endif %}"
+                >
+
+                    <span class="admin-nav-icon">
+                        <i class="bi bi-geo-alt"></i>
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Barangay Management
+                    </span>
+
+                </a>
+
+
+                <!-- REPORTS -->
+
+                <div class="admin-nav-section">
+                    Reports
+                </div>
+
+                <a
+                    href="{% url 'admin-reports' %}"
+                    class="admin-nav-link {% if request.resolver_match.url_name == 'admin-reports' %}active{% endif %}"
+                >
+
+                    <span class="admin-nav-icon">
+                        <i class="bi bi-bar-chart"></i>
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Reports
+                    </span>
+
+                </a>
+
+
+                <!-- ACCOUNT -->
+
+                <div class="admin-nav-section">
+                    Account
+                </div>
+
+                <a
+                    href="{% url 'admin-logout' %}"
+                    class="admin-nav-link admin-logout-link"
+                    onclick="return confirm('Are you sure you want to logout?');"
+                >
+
+                    <span class="admin-nav-icon">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </span>
+
+                    <span class="admin-nav-label">
+                        Logout
+                    </span>
+
+                </a>
+
+            </nav>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         MAIN
+    ========================================================== -->
+
+    <main class="admin-main">
+
+        <!-- PAGE HEADER -->
+
+        <header class="admin-page-header">
+
+            <div class="admin-page-header-inner">
+
+                <h2 class="admin-page-title">
+
+                    {% block page_title %}
+                        Administrator Dashboard
+                    {% endblock %}
+
+                </h2>
+
+                <p class="admin-page-subtitle">
+
+                    {% block page_subtitle %}
+                        Manage voter registration applications and system records
+                    {% endblock %}
+
+                </p>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE CONTENT -->
+
+        <section class="admin-content">
+
+            <div class="admin-content-inner">
+
+                {% block content %}
+                {% endblock %}
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================================
+         BOOTSTRAP
+    ========================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

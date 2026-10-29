@@ -1,0 +1,745 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Reinstatement Request{% endblock %}
+
+{% block extra_css %}
+<style>
+    .registration-header {
+        background: #fff;
+        border: 1px solid #dbe3ef;
+        border-left: 5px solid #0038a8;
+        padding: 24px 28px;
+        margin-bottom: 24px;
+    }
+
+    .registration-header h1 {
+        margin: 0;
+        color: #002b7f;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .registration-header p {
+        margin: 7px 0 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .application-badge {
+        display: inline-block;
+        margin-top: 14px;
+        padding: 6px 12px;
+        background: #eaf2ff;
+        border: 1px solid #c9dcff;
+        color: #0038a8;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .step-wrapper {
+        display: flex;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .step {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .step:last-child {
+        flex: 0 0 auto;
+    }
+
+    .step-number {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .step.active .step-number {
+        background: #0038a8;
+        color: #fff;
+    }
+
+    .step.completed .step-number {
+        background: #198754;
+        color: #fff;
+    }
+
+    .step-label {
+        margin-left: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    .step.active .step-label {
+        color: #0038a8;
+    }
+
+    .step-line {
+        height: 2px;
+        background: #dbe3ef;
+        flex: 1;
+        margin: 0 14px;
+    }
+
+    .step-line.completed {
+        background: #198754;
+    }
+
+    .error-alert {
+        background: #fff1f2;
+        border: 1px solid #fecdd3;
+        border-left: 5px solid #ce1126;
+        color: #9f1239;
+        padding: 14px 18px;
+        margin-bottom: 24px;
+        font-size: 14px;
+    }
+
+    .form-card {
+        background: #fff;
+        border: 1px solid #dbe3ef;
+        margin-bottom: 24px;
+    }
+
+    .form-card-header {
+        padding: 18px 22px;
+        border-bottom: 1px solid #dbe3ef;
+        background: #f8fafc;
+    }
+
+    .form-card-header h2 {
+        margin: 0;
+        color: #1e3a8a;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .form-card-header p {
+        margin: 5px 0 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .form-card-body {
+        padding: 24px;
+    }
+
+    .form-label {
+        display: block;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 7px;
+    }
+
+    .required {
+        color: #ce1126;
+    }
+
+    .optional {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 400;
+    }
+
+    .form-control {
+        width: 100%;
+        min-height: 44px;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        color: #1e293b;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus {
+        border-color: #0038a8;
+        box-shadow: 0 0 0 3px rgba(0, 56, 168, .10);
+    }
+
+    textarea.form-control {
+        min-height: 150px;
+        resize: vertical;
+    }
+
+    .form-text {
+        color: #64748b;
+        font-size: 12px;
+        margin-top: 7px;
+    }
+
+    .record-found {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-left: 5px solid #198754;
+        padding: 14px 16px;
+        margin-bottom: 20px;
+        color: #166534;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .record-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #198754;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .applicant-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1px;
+        background: #dbe3ef;
+        border: 1px solid #dbe3ef;
+    }
+
+    .applicant-item {
+        background: #fff;
+        padding: 15px 17px;
+        min-width: 0;
+    }
+
+    .applicant-label {
+        display: block;
+        margin-bottom: 5px;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .applicant-value {
+        color: #1e293b;
+        font-size: 14px;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+
+    .status-active {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+
+    .status-inactive {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .upload-box {
+        border: 1px dashed #94a3b8;
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 4px;
+    }
+
+    .file-name {
+        display: block;
+        margin-top: 10px;
+        color: #1e3a8a;
+        font-size: 13px;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    .information-notice {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-left: 4px solid #0038a8;
+        padding: 14px 16px;
+        color: #1e3a8a;
+        font-size: 13px;
+        line-height: 1.6;
+        margin-top: 20px;
+    }
+
+    .information-notice strong {
+        display: block;
+        margin-bottom: 3px;
+    }
+
+    .button-row {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 22px;
+    }
+
+    .btn-government,
+    .btn-submit {
+        min-height: 44px;
+        padding: 10px 22px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .btn-government {
+        background: #0038a8;
+        border: 1px solid #0038a8;
+    }
+
+    .btn-government:hover {
+        background: #002b7f;
+        color: #fff;
+    }
+
+    .btn-submit {
+        background: #198754;
+        border: 1px solid #198754;
+    }
+
+    .btn-submit:hover {
+        background: #157347;
+        color: #fff;
+    }
+
+    .btn-submit:disabled {
+        opacity: .65;
+        cursor: not-allowed;
+    }
+
+    @media (max-width: 767px) {
+        .registration-header {
+            padding: 20px;
+        }
+
+        .registration-header h1 {
+            font-size: 23px;
+        }
+
+        .form-card-body {
+            padding: 18px;
+        }
+
+        .applicant-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .step-label {
+            display: none;
+        }
+
+        .step-line {
+            margin: 0 8px;
+        }
+
+        .button-row {
+            flex-direction: column;
+        }
+
+        .button-row .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="registration-header">
+    <h1>Request for Reinstatement</h1>
+    <p>Submit a request to reinstate your voter registration.</p>
+    <span class="application-badge">Reinstatement Application</span>
+</div>
+
+<div class="step-wrapper">
+    <div class="step {% if not applicant %}active{% else %}completed{% endif %}">
+        <div class="step-number">1</div>
+        <div class="step-label">Find Registration</div>
+    </div>
+
+    <div class="step-line {% if applicant %}completed{% endif %}"></div>
+
+    <div class="step {% if applicant %}active{% endif %}">
+        <div class="step-number">2</div>
+        <div class="step-label">Reinstatement Request</div>
+    </div>
+</div>
+
+{% if error %}
+<div class="error-alert" role="alert">
+    <strong>Unable to process your request.</strong>
+    <div>{{ error }}</div>
+</div>
+{% endif %}
+
+{% if not applicant %}
+
+<div class="form-card">
+    <div class="form-card-header">
+        <h2>Find Your Registration</h2>
+        <p>Enter your registered information to locate your existing record.</p>
+    </div>
+
+    <div class="form-card-body">
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="find_applicant">
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="lastname" class="form-label">
+                        Last Name <span class="required">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="lastname"
+                        name="lastname"
+                        class="form-control"
+                        value="{{ search_data.lastname|default:'' }}"
+                        autocomplete="family-name"
+                        maxlength="150"
+                        required
+                    >
+                </div>
+
+                <div class="col-md-4">
+                    <label for="firstname" class="form-label">
+                        First Name <span class="required">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="firstname"
+                        name="firstname"
+                        class="form-control"
+                        value="{{ search_data.firstname|default:'' }}"
+                        autocomplete="given-name"
+                        maxlength="150"
+                        required
+                    >
+                </div>
+
+                <!-- MIDDLE NAME IS OPTIONAL -->
+                <div class="col-md-4">
+                    <label for="middlename" class="form-label">
+                        Middle Name
+                        <span class="optional">(Optional)</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="middlename"
+                        name="middlename"
+                        class="form-control"
+                        value="{{ search_data.middlename|default:'' }}"
+                        autocomplete="additional-name"
+                        maxlength="150"
+                    >
+                    <div class="form-text">
+                        Leave blank if you do not have a middle name or it is
+                        not recorded in your registration details.
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="birthdate" class="form-label">
+                        Birthdate <span class="required">*</span>
+                    </label>
+                    <input
+                        type="date"
+                        id="birthdate"
+                        name="birthdate"
+                        class="form-control"
+                        value="{{ search_data.birthdate|default:'' }}"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div class="information-notice">
+                <strong>Important</strong>
+                Enter your information accurately as it appears in your
+                existing voter registration record. If you leave the middle
+                name blank, the system should search using your first name,
+                last name, and birthdate.
+            </div>
+
+            <div class="button-row">
+                <button type="submit" class="btn btn-government">
+                    Find Registration
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% else %}
+
+<div class="form-card">
+    <div class="form-card-header">
+        <h2>Applicant Information</h2>
+        <p>Review your registration details before submitting your request.</p>
+    </div>
+
+    <div class="form-card-body">
+        <div class="record-found">
+            <div class="record-icon" aria-hidden="true">✓</div>
+            <div>Registration record found.</div>
+        </div>
+
+        <div class="applicant-grid">
+            <div class="applicant-item">
+                <span class="applicant-label">Full Name</span>
+                <span class="applicant-value">
+                    {{ applicant.lastname }}, {{ applicant.firstname }}{% if applicant.middlename %} {{ applicant.middlename }}{% endif %}
+                </span>
+            </div>
+
+            <div class="applicant-item">
+                <span class="applicant-label">Birthdate</span>
+                <span class="applicant-value">
+                    {{ applicant.birthdate|date:"F d, Y" }}
+                </span>
+            </div>
+
+            <div class="applicant-item">
+                <span class="applicant-label">Registration Status</span>
+                <span class="applicant-value">
+                    {% if applicant.is_active %}
+                        <span class="status-badge status-active">Active</span>
+                    {% else %}
+                        <span class="status-badge status-inactive">Inactive</span>
+                    {% endif %}
+                </span>
+            </div>
+
+            {% if applicant.brgy %}
+            <div class="applicant-item">
+                <span class="applicant-label">Barangay</span>
+                <span class="applicant-value">{{ applicant.brgy.name }}</span>
+            </div>
+            {% endif %}
+
+            <div class="applicant-item">
+                <span class="applicant-label">Municipality</span>
+                <span class="applicant-value">{{ applicant.municipality|default:"Not specified" }}</span>
+            </div>
+
+            <div class="applicant-item">
+                <span class="applicant-label">Province</span>
+                <span class="applicant-value">{{ applicant.province|default:"Not specified" }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="form-card">
+    <div class="form-card-header">
+        <h2>Reinstatement Request</h2>
+        <p>Explain your request and upload a valid identification document.</p>
+    </div>
+
+    <div class="form-card-body">
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+            id="reinstatementForm"
+        >
+            {% csrf_token %}
+
+            <input type="hidden" name="action" value="submit_reinstatement">
+            <input type="hidden" name="applicant_id" value="{{ applicant.id }}">
+
+            <div class="mb-4">
+                <label for="reason" class="form-label">
+                    Reason for Reinstatement <span class="required">*</span>
+                </label>
+
+                <textarea
+                    id="reason"
+                    name="reason"
+                    class="form-control"
+                    rows="6"
+                    minlength="5"
+                    maxlength="2000"
+                    placeholder="Please explain why you are requesting reinstatement."
+                    required
+                >{{ form_data.reason|default:'' }}</textarea>
+
+                <div class="form-text">
+                    Provide a clear and accurate explanation (5–2,000 characters).
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="valid_id_document" class="form-label">
+                    Upload Valid ID <span class="required">*</span>
+                </label>
+
+                <div class="upload-box">
+                    <input
+                        type="file"
+                        id="valid_id_document"
+                        name="valid_id_document"
+                        class="form-control"
+                        accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                        required
+                    >
+
+                    <span id="selectedFileName" class="file-name" aria-live="polite">
+                        No file selected.
+                    </span>
+
+                    <div class="form-text">
+                        Accepted formats: PDF, JPG, JPEG, and PNG.
+                        Maximum file size: 5 MB.
+                    </div>
+                </div>
+            </div>
+
+            <div class="information-notice">
+                <strong>Before submitting</strong>
+                Make sure your identification document is clear and readable.
+                Your request will be marked as pending until it is reviewed by
+                the authorized registration personnel.
+            </div>
+
+            <div class="button-row">
+                <button
+                    type="submit"
+                    class="btn btn-submit"
+                    id="submitButton"
+                >
+                    Submit Reinstatement Request
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("reinstatementForm");
+    const fileInput = document.getElementById("valid_id_document");
+    const fileName = document.getElementById("selectedFileName");
+    const submitButton = document.getElementById("submitButton");
+
+    if (!form || !fileInput || !fileName || !submitButton) {
+        return;
+    }
+
+    const allowedExtensions = ["pdf", "jpg", "jpeg", "png"];
+    const maxFileSize = 5 * 1024 * 1024;
+
+    fileInput.addEventListener("change", function () {
+        const file = fileInput.files[0];
+
+        if (!file) {
+            fileName.textContent = "No file selected.";
+            return;
+        }
+
+        const extension = file.name.includes(".")
+            ? file.name.split(".").pop().toLowerCase()
+            : "";
+
+        if (!allowedExtensions.includes(extension)) {
+            alert("Invalid file format. Please select a PDF, JPG, JPEG, or PNG file.");
+            fileInput.value = "";
+            fileName.textContent = "No file selected.";
+            return;
+        }
+
+        if (file.size <= 0) {
+            alert("The selected file is empty. Please choose another file.");
+            fileInput.value = "";
+            fileName.textContent = "No file selected.";
+            return;
+        }
+
+        if (file.size > maxFileSize) {
+            alert("The selected file exceeds the 5 MB limit.");
+            fileInput.value = "";
+            fileName.textContent = "No file selected.";
+            return;
+        }
+
+        fileName.textContent =
+            "Selected file: " + file.name +
+            " (" + (file.size / (1024 * 1024)).toFixed(2) + " MB)";
+    });
+
+    form.addEventListener("submit", function (event) {
+        const reason = document.getElementById("reason").value.trim();
+        const file = fileInput.files[0];
+
+        if (reason.length < 5 || reason.length > 2000) {
+            event.preventDefault();
+            alert("Please enter a reason between 5 and 2,000 characters.");
+            document.getElementById("reason").focus();
+            return;
+        }
+
+        if (!file) {
+            event.preventDefault();
+            alert("Please upload a valid ID document.");
+            fileInput.focus();
+            return;
+        }
+
+        const extension = file.name.includes(".")
+            ? file.name.split(".").pop().toLowerCase()
+            : "";
+
+        if (!allowedExtensions.includes(extension)) {
+            event.preventDefault();
+            alert("Please upload a PDF, JPG, JPEG, or PNG file.");
+            fileInput.focus();
+            return;
+        }
+
+        if (file.size <= 0 || file.size > maxFileSize) {
+            event.preventDefault();
+            alert("Please select a non-empty ID document no larger than 5 MB.");
+            fileInput.focus();
+            return;
+        }
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Submitting Request...";
+    });
+});
+</script>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,993 @@
+{% extends "admin.html" %}
+
+{% block title %}
+{{ barangay.name }} Applicants
+{% endblock %}
+
+{% block page_title %}
+{{ barangay.name }}
+{% endblock %}
+
+{% block page_subtitle %}
+Verified applicants registered in this barangay
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+    /* =========================================================
+       PAGE
+    ========================================================= */
+
+    .barangay-applicants-page {
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 5px 0;
+    }
+
+
+    /* =========================================================
+       SUMMARY CARDS
+    ========================================================= */
+
+    .applicant-summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+
+    .summary-card {
+        min-height: 115px;
+        padding: 22px;
+
+        display: flex;
+        align-items: center;
+        gap: 16px;
+
+        border: 0;
+        border-radius: 14px;
+
+        box-shadow: 0 5px 15px rgba(15, 23, 42, 0.10);
+    }
+
+
+    /* =========================================================
+       SOLID CARD COLORS
+    ========================================================= */
+
+    .summary-card.blue-card {
+        background: #2563eb;
+        color: #ffffff;
+    }
+
+
+    .summary-card.green-card {
+        background: #059669;
+        color: #ffffff;
+    }
+
+
+    .summary-card.gray-card {
+        background: #374151;
+        color: #ffffff;
+    }
+
+
+    /* =========================================================
+       SUMMARY ICON
+    ========================================================= */
+
+    .summary-icon {
+        width: 52px;
+        height: 52px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        border-radius: 10px;
+
+        font-size: 21px;
+    }
+
+
+    .summary-card.blue-card .summary-icon {
+        background: rgba(255, 255, 255, 0.18);
+        color: #ffffff;
+    }
+
+
+    .summary-card.green-card .summary-icon {
+        background: rgba(255, 255, 255, 0.18);
+        color: #ffffff;
+    }
+
+
+    .summary-card.gray-card .summary-icon {
+        background: rgba(255, 255, 255, 0.14);
+        color: #ffffff;
+    }
+
+
+    .summary-content {
+        min-width: 0;
+    }
+
+
+    .summary-label {
+        font-size: 11px;
+        font-weight: 700;
+
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+
+        margin-bottom: 5px;
+
+        color: rgba(255, 255, 255, 0.78);
+    }
+
+
+    .summary-value {
+        font-size: 22px;
+        font-weight: 700;
+
+        line-height: 1.25;
+
+        color: #ffffff;
+
+        word-break: break-word;
+    }
+
+
+    /* =========================================================
+       MAIN CARD
+    ========================================================= */
+
+    .applicant-card {
+        background: #ffffff;
+
+        border: 1px solid #e5e7eb;
+
+        border-radius: 14px;
+
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+
+        overflow: hidden;
+    }
+
+
+    /* =========================================================
+       CARD HEADER
+    ========================================================= */
+
+    .applicant-card-header {
+        padding: 20px 22px;
+
+        border-bottom: 1px solid #e5e7eb;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 15px;
+
+        background: #ffffff;
+    }
+
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+
+    .header-icon {
+        width: 44px;
+        height: 44px;
+
+        background: #2563eb;
+        color: #ffffff;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 18px;
+
+        flex-shrink: 0;
+
+        border-radius: 10px;
+    }
+
+
+    .header-title {
+        margin: 0;
+
+        font-size: 17px;
+        font-weight: 700;
+
+        color: #111827;
+    }
+
+
+    .header-description {
+        margin: 3px 0 0;
+
+        color: #6b7280;
+
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+       BACK BUTTON
+    ========================================================= */
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 7px;
+
+        padding: 9px 14px;
+
+        background: #ffffff;
+
+        border: 1px solid #d1d5db;
+
+        border-radius: 8px;
+
+        color: #374151;
+
+        text-decoration: none;
+
+        font-size: 13px;
+        font-weight: 600;
+
+        transition: all 0.2s ease;
+
+        white-space: nowrap;
+    }
+
+
+    .back-btn:hover {
+        background: #f9fafb;
+
+        border-color: #9ca3af;
+
+        color: #111827;
+
+        text-decoration: none;
+    }
+
+
+    /* =========================================================
+       TABLE
+    ========================================================= */
+
+    .applicant-table {
+        margin: 0;
+        width: 100%;
+    }
+
+
+    .applicant-table thead th {
+        background: #f8fafc;
+
+        color: #4b5563;
+
+        border-bottom: 1px solid #e5e7eb;
+
+        border-top: 0;
+
+        padding: 13px 18px;
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        text-transform: uppercase;
+
+        letter-spacing: 0.04em;
+
+        white-space: nowrap;
+    }
+
+
+    .applicant-table tbody td {
+        padding: 15px 18px;
+
+        border-bottom: 1px solid #eef0f3;
+
+        color: #374151;
+
+        font-size: 13px;
+
+        vertical-align: middle;
+    }
+
+
+    .applicant-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+
+    .applicant-table tbody tr {
+        transition: background 0.15s ease;
+    }
+
+
+    .applicant-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+
+    /* =========================================================
+       ROW NUMBER
+    ========================================================= */
+
+    .row-number {
+        width: 30px;
+        height: 30px;
+
+        background: #f3f4f6;
+
+        color: #4b5563;
+
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        border-radius: 7px;
+    }
+
+
+    /* =========================================================
+       APPLICANT
+    ========================================================= */
+
+    .applicant-info {
+        display: flex;
+
+        align-items: center;
+
+        gap: 12px;
+
+        min-width: 250px;
+    }
+
+
+    .applicant-avatar {
+        width: 40px;
+        height: 40px;
+
+        background: #eff6ff;
+
+        color: #2563eb;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        font-size: 17px;
+
+        border-radius: 9px;
+    }
+
+
+    .applicant-name {
+        color: #111827;
+
+        font-weight: 700;
+
+        font-size: 14px;
+
+        line-height: 1.3;
+    }
+
+
+    .applicant-email {
+        margin-top: 3px;
+
+        color: #6b7280;
+
+        font-size: 12px;
+    }
+
+
+    .applicant-email i {
+        margin-right: 3px;
+    }
+
+
+    /* =========================================================
+       DETAILS
+    ========================================================= */
+
+    .detail-value {
+        color: #374151;
+
+        font-weight: 500;
+
+        white-space: nowrap;
+    }
+
+
+    .detail-muted {
+        color: #9ca3af;
+    }
+
+
+    /* =========================================================
+       STATUS
+    ========================================================= */
+
+    .status-badge {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 6px;
+
+        padding: 6px 10px;
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        white-space: nowrap;
+
+        border-radius: 7px;
+    }
+
+
+    .status-badge.verified {
+        background: #ecfdf5;
+
+        color: #047857;
+    }
+
+
+    .status-badge.approved {
+        background: #eff6ff;
+
+        color: #1d4ed8;
+    }
+
+
+    /* =========================================================
+       EMPTY STATE
+    ========================================================= */
+
+    .empty-state {
+        padding: 65px 20px;
+
+        text-align: center;
+    }
+
+
+    .empty-icon {
+        width: 64px;
+        height: 64px;
+
+        margin: 0 auto 16px;
+
+        background: #f3f4f6;
+
+        color: #6b7280;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        font-size: 26px;
+
+        border-radius: 12px;
+    }
+
+
+    .empty-title {
+        margin: 0 0 7px;
+
+        color: #111827;
+
+        font-size: 17px;
+
+        font-weight: 700;
+    }
+
+
+    .empty-description {
+        margin: 0;
+
+        color: #6b7280;
+
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (max-width: 992px) {
+
+        .applicant-summary {
+            grid-template-columns: 1fr;
+        }
+
+
+        .applicant-card-header {
+            align-items: flex-start;
+
+            flex-direction: column;
+        }
+
+
+        .back-btn {
+            width: 100%;
+        }
+
+    }
+
+
+    @media (max-width: 767px) {
+
+        .barangay-applicants-page {
+            padding: 0;
+        }
+
+
+        .summary-card {
+            min-height: 100px;
+
+            padding: 18px;
+        }
+
+
+        .summary-value {
+            font-size: 19px;
+        }
+
+
+        .summary-icon {
+            width: 46px;
+            height: 46px;
+
+            font-size: 19px;
+        }
+
+
+        .applicant-card {
+            overflow: hidden;
+        }
+
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+
+        .applicant-table {
+            min-width: 950px;
+        }
+
+
+        .applicant-card-header {
+            padding: 16px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="barangay-applicants-page">
+
+
+    <!-- =====================================================
+         SUMMARY CARDS
+    ====================================================== -->
+
+    <div class="applicant-summary">
+
+
+        <!-- Barangay -->
+
+        <div class="summary-card blue-card">
+
+            <div class="summary-icon">
+
+                <i class="bi bi-geo-alt"></i>
+
+            </div>
+
+
+            <div class="summary-content">
+
+                <div class="summary-label">
+                    Barangay
+                </div>
+
+                <div class="summary-value">
+                    {{ barangay.name }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Verified Applicants -->
+
+        <div class="summary-card green-card">
+
+            <div class="summary-icon">
+
+                <i class="bi bi-person-check"></i>
+
+            </div>
+
+
+            <div class="summary-content">
+
+                <div class="summary-label">
+                    Verified Applicants
+                </div>
+
+                <div class="summary-value">
+                    {{ applicants|length }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Municipality -->
+
+        <div class="summary-card gray-card">
+
+            <div class="summary-icon">
+
+                <i class="bi bi-building"></i>
+
+            </div>
+
+
+            <div class="summary-content">
+
+                <div class="summary-label">
+                    Municipality
+                </div>
+
+                <div class="summary-value">
+                    Pio Duran
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         APPLICANTS CARD
+    ====================================================== -->
+
+    <div class="applicant-card">
+
+
+        <!-- Card Header -->
+
+        <div class="applicant-card-header">
+
+
+            <div class="header-left">
+
+                <div class="header-icon">
+
+                    <i class="bi bi-people"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h2 class="header-title">
+                        Verified Applicants
+                    </h2>
+
+
+                    <p class="header-description">
+
+                        Applicants from
+                        <strong>{{ barangay.name }}</strong>
+                        with completed verification
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <a
+                href="{% url 'brgy_list' %}"
+                class="back-btn"
+            >
+
+                <i class="bi bi-arrow-left"></i>
+
+                Back to Barangays
+
+            </a>
+
+        </div>
+
+
+        <!-- Applicants Table -->
+
+        <div class="table-responsive">
+
+            <table class="table applicant-table align-middle">
+
+
+                <thead>
+
+                    <tr>
+
+                        <th style="width: 70px;">
+                            #
+                        </th>
+
+                        <th>
+                            Applicant
+                        </th>
+
+                        <th style="width: 100px;">
+                            Sex
+                        </th>
+
+                        <th style="width: 130px;">
+                            Birthdate
+                        </th>
+
+                        <th style="width: 170px;">
+                            Application
+                        </th>
+
+                        <th style="width: 140px;">
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                    {% for applicant in applicants %}
+
+                    <tr>
+
+
+                        <!-- Number -->
+
+                        <td>
+
+                            <span class="row-number">
+
+                                {{ forloop.counter }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- Applicant -->
+
+                        <td>
+
+                            <div class="applicant-info">
+
+
+                                <div class="applicant-avatar">
+
+                                    <i class="bi bi-person"></i>
+
+                                </div>
+
+
+                                <div>
+
+                                    <div class="applicant-name">
+
+                                        {{ applicant.lastname }},
+                                        {{ applicant.firstname }}
+
+                                        {% if applicant.middlename %}
+
+                                            {{ applicant.middlename }}
+
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    {% if applicant.email %}
+
+                                    <div class="applicant-email">
+
+                                        <i class="bi bi-envelope"></i>
+
+                                        {{ applicant.email }}
+
+                                    </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- Sex -->
+
+                        <td>
+
+                            {% if applicant.sex %}
+
+                                <span class="detail-value">
+
+                                    {{ applicant.sex }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="detail-muted">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- Birthdate -->
+
+                        <td>
+
+                            {% if applicant.birthdate %}
+
+                                <span class="detail-value">
+
+                                    {{ applicant.birthdate|date:"M d, Y" }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="detail-muted">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- Application -->
+
+                        <td>
+
+                            <span class="detail-value">
+
+                                {{ applicant.get_application_type_display }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- Status -->
+
+                        <td>
+
+                            <span class="status-badge verified">
+
+                                <i class="bi bi-check-circle"></i>
+
+                                Verified
+
+                            </span>
+
+                        </td>
+
+
+                    </tr>
+
+
+                    {% empty %}
+
+
+                    <!-- Empty State -->
+
+                    <tr>
+
+                        <td colspan="6" class="p-0">
+
+                            <div class="empty-state">
+
+
+                                <div class="empty-icon">
+
+                                    <i class="bi bi-person-x"></i>
+
+                                </div>
+
+
+                                <h3 class="empty-title">
+
+                                    No Verified Applicants
+
+                                </h3>
+
+
+                                <p class="empty-description">
+
+                                    There are currently no verified applicants
+                                    registered under
+                                    <strong>{{ barangay.name }}</strong>.
+
+                                </p>
+
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    {% endfor %}
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,1211 @@
+
+{% extends "admin.html" %}
+
+
+{% block title %}
+Barangay Management
+{% endblock %}
+
+
+{% block page_title %}
+Barangay Management
+{% endblock %}
+
+
+{% block page_subtitle %}
+Manage registered barangays in the municipality
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+/* =====================================================
+   BARANGAY PAGE
+===================================================== */
+
+.barangay-page {
+
+    width: 100%;
+}
+
+
+/* =====================================================
+   SUMMARY
+===================================================== */
+
+.barangay-summary {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 16px;
+
+    margin-bottom: 20px;
+}
+
+
+/* =====================================================
+   SUMMARY CARDS
+===================================================== */
+
+.summary-card {
+
+    padding: 18px 20px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    color: #ffffff;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+
+    overflow: hidden;
+}
+
+
+.summary-card:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0.6rem 1.2rem rgba(0, 0, 0, 0.15);
+}
+
+
+/* =====================================================
+   SUMMARY CARD COLORS
+===================================================== */
+
+.summary-card-total {
+
+    background: #0d6efd;
+}
+
+
+.summary-card-municipality {
+
+    background: #198754;
+}
+
+
+.summary-card-record {
+
+    background: #343a40;
+}
+
+
+/* =====================================================
+   SUMMARY ICON
+===================================================== */
+
+.summary-icon {
+
+    width: 46px;
+
+    height: 46px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: rgba(255, 255, 255, 0.18);
+
+    color: #ffffff;
+
+    border: 1px solid rgba(255, 255, 255, 0.20);
+
+    border-radius: 6px;
+
+    flex-shrink: 0;
+}
+
+
+.summary-icon i {
+
+    font-size: 20px;
+}
+
+
+/* =====================================================
+   SUMMARY TEXT
+===================================================== */
+
+.summary-label {
+
+    color: rgba(255, 255, 255, 0.82);
+
+    font-size: 12px;
+
+    margin-bottom: 2px;
+}
+
+
+.summary-value {
+
+    color: #ffffff;
+
+    font-size: 21px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+
+/* =====================================================
+   MAIN CARD
+===================================================== */
+
+.barangay-card {
+
+    background: #ffffff;
+
+    border: 1px solid #e1e5eb;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.04);
+}
+
+
+/* =====================================================
+   CARD HEADER
+===================================================== */
+
+.barangay-card-header {
+
+    padding: 19px 22px;
+
+    border-bottom: 1px solid #e1e5eb;
+}
+
+
+.barangay-title {
+
+    margin: 0;
+
+    color: #172033;
+
+    font-size: 17px;
+
+    font-weight: 700;
+}
+
+
+.barangay-description {
+
+    margin: 4px 0 0;
+
+    color: #6b7280;
+
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   ADD BUTTON
+===================================================== */
+
+.add-barangay-btn {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    min-height: 40px;
+
+    padding:
+        9px 15px;
+
+    background: #0038a8;
+
+    border: 1px solid #0038a8;
+
+    border-radius: 6px;
+
+    color: #ffffff;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: 0.15s ease;
+}
+
+
+.add-barangay-btn:hover {
+
+    background: #002b7f;
+
+    border-color: #002b7f;
+
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.barangay-table {
+
+    margin: 0;
+
+    width: 100%;
+}
+
+
+.barangay-table thead th {
+
+    padding:
+        13px 20px;
+
+    background: #f8f9fb;
+
+    border-bottom:
+        1px solid #dfe3e8;
+
+    color: #5d6675;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.04em;
+
+    white-space: nowrap;
+}
+
+
+.barangay-table tbody td {
+
+    padding:
+        14px 20px;
+
+    border-bottom:
+        1px solid #edf0f3;
+
+    color: #374151;
+
+    vertical-align: middle;
+}
+
+
+.barangay-table tbody tr:last-child td {
+
+    border-bottom: none;
+}
+
+
+.barangay-table tbody tr {
+
+    transition:
+        background 0.12s ease;
+}
+
+
+.barangay-table tbody tr:hover {
+
+    background: #f8faff;
+}
+
+
+/* =====================================================
+   NUMBER
+===================================================== */
+
+.row-number {
+
+    color: #9ca3af;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+/* =====================================================
+   BARANGAY ICON
+===================================================== */
+
+.barangay-icon {
+
+    width: 40px;
+
+    height: 40px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #eaf1ff;
+
+    color: #0038a8;
+
+    border: 1px solid #d8e4f8;
+
+    border-radius: 6px;
+
+    flex-shrink: 0;
+}
+
+
+.barangay-icon i {
+
+    font-size: 17px;
+}
+
+
+/* =====================================================
+   BARANGAY NAME
+===================================================== */
+
+.barangay-name {
+
+    color: #172033;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    line-height: 1.3;
+}
+
+
+.barangay-type {
+
+    margin-top: 2px;
+
+    color: #9ca3af;
+
+    font-size: 11px;
+}
+
+
+/* =====================================================
+   VERIFIED APPLICANT COUNT
+===================================================== */
+
+.applicant-count-link {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    color: #0038a8;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    text-decoration: none;
+
+    transition: 0.15s ease;
+}
+
+
+.applicant-count-link:hover {
+
+    color: #002b7f;
+
+    text-decoration: underline;
+}
+
+
+.applicant-count-link i {
+
+    font-size: 15px;
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.barangay-status {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding:
+        5px 9px;
+
+    background: #eef8f1;
+
+    border: 1px solid #d6ebdc;
+
+    border-radius: 5px;
+
+    color: #237a3b;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+.status-dot {
+
+    width: 6px;
+
+    height: 6px;
+
+    background: #2e8b46;
+
+    border-radius: 50%;
+}
+
+
+/* =====================================================
+   ACTION CONTAINER
+===================================================== */
+
+.barangay-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 7px;
+
+    flex-wrap: wrap;
+}
+
+
+/* =====================================================
+   VIEW APPLICANTS BUTTON
+===================================================== */
+
+.view-applicants-btn {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    min-height: 34px;
+
+    padding:
+        6px 11px;
+
+    background: #ffffff;
+
+    border: 1px solid #0038a8;
+
+    border-radius: 6px;
+
+    color: #0038a8;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: 0.15s ease;
+}
+
+
+.view-applicants-btn:hover {
+
+    background: #0038a8;
+
+    border-color: #0038a8;
+
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   DELETE BUTTON
+===================================================== */
+
+.delete-btn {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    min-height: 34px;
+
+    padding:
+        6px 11px;
+
+    background: #ffffff;
+
+    border: 1px solid #dc3545;
+
+    border-radius: 6px;
+
+    color: #dc3545;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: 0.15s ease;
+}
+
+
+.delete-btn:hover {
+
+    background: #dc3545;
+
+    border-color: #dc3545;
+
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.empty-state {
+
+    padding:
+        65px 25px;
+
+    text-align: center;
+}
+
+
+.empty-icon {
+
+    width: 62px;
+
+    height: 62px;
+
+    margin:
+        0 auto 17px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #f0f3f8;
+
+    border: 1px solid #dfe4eb;
+
+    border-radius: 7px;
+
+    color: #7b8493;
+}
+
+
+.empty-icon i {
+
+    font-size: 26px;
+}
+
+
+.empty-title {
+
+    margin-bottom: 5px;
+
+    color: #374151;
+
+    font-size: 15px;
+
+    font-weight: 700;
+}
+
+
+.empty-description {
+
+    margin-bottom: 20px;
+
+    color: #8a929e;
+
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1100px) {
+
+    .barangay-actions {
+
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
+    .view-applicants-btn,
+    .delete-btn {
+
+        width: 100%;
+    }
+
+}
+
+
+@media (max-width: 991px) {
+
+    .barangay-summary {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 767px) {
+
+    .barangay-table {
+
+        min-width: 850px;
+    }
+
+}
+
+
+@media (max-width: 575px) {
+
+    .barangay-summary {
+
+        grid-template-columns: 1fr;
+    }
+
+
+    .barangay-card-header {
+
+        padding: 17px;
+    }
+
+
+    .barangay-card-header
+    .d-flex {
+
+        align-items: flex-start !important;
+
+        flex-direction: column;
+    }
+
+
+    .add-barangay-btn {
+
+        width: 100%;
+    }
+
+
+    .barangay-table thead th {
+
+        padding:
+            12px 15px;
+    }
+
+
+    .barangay-table tbody td {
+
+        padding:
+            12px 15px;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="barangay-page">
+
+
+    <!-- =====================================================
+         SUMMARY CARDS
+    ====================================================== -->
+
+    <div class="barangay-summary">
+
+
+        <!-- =================================================
+             TOTAL BARANGAYS
+        ================================================== -->
+
+        <div class="
+            summary-card
+            summary-card-total
+        ">
+
+            <div class="summary-icon">
+
+                <i class="bi bi-buildings-fill"></i>
+
+            </div>
+
+
+            <div>
+
+                <div class="summary-label">
+
+                    Registered Barangays
+
+                </div>
+
+
+                <div class="summary-value">
+
+                    {{ barangays|length }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             MUNICIPALITY
+        ================================================== -->
+
+        <div class="
+            summary-card
+            summary-card-municipality
+        ">
+
+            <div class="summary-icon">
+
+                <i class="bi bi-geo-alt-fill"></i>
+
+            </div>
+
+
+            <div>
+
+                <div class="summary-label">
+
+                    Municipality
+
+                </div>
+
+
+                <div class="summary-value">
+
+                    Pio Duran
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             RECORD TYPE
+        ================================================== -->
+
+        <div class="
+            summary-card
+            summary-card-record
+        ">
+
+            <div class="summary-icon">
+
+                <i class="bi bi-database-fill"></i>
+
+            </div>
+
+
+            <div>
+
+                <div class="summary-label">
+
+                    Record Type
+
+                </div>
+
+
+                <div class="summary-value">
+
+                    Barangay
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         BARANGAY TABLE
+    ====================================================== -->
+
+    <div class="barangay-card">
+
+
+        <!-- =================================================
+             CARD HEADER
+        ================================================== -->
+
+        <div class="barangay-card-header">
+
+            <div
+                class="
+                    d-flex
+                    justify-content-between
+                    align-items-center
+                    gap-3
+                "
+            >
+
+                <div>
+
+                    <h2 class="barangay-title">
+
+                        Barangay List
+
+                    </h2>
+
+
+                    <p class="barangay-description">
+
+                        Registered barangays under the municipality
+
+                    </p>
+
+                </div>
+
+
+                <!-- ADD -->
+
+                <a
+                    href="{% url 'add_brgy' %}"
+                    class="add-barangay-btn"
+                >
+
+                    <i class="bi bi-plus-lg"></i>
+
+                    Add New Barangay
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TABLE
+        ================================================== -->
+
+        <div class="table-responsive">
+
+            <table class="
+                table
+                barangay-table
+                align-middle
+            ">
+
+
+                <thead>
+
+                    <tr>
+
+                        <th
+                            style="width: 70px;"
+                        >
+
+                            #
+
+                        </th>
+
+
+                        <th>
+
+                            Barangay
+
+                        </th>
+
+
+                        <th
+                            style="width: 170px;"
+                        >
+
+                            Verified Applicants
+
+                        </th>
+
+
+                        <th
+                            style="width: 150px;"
+                        >
+
+                            Status
+
+                        </th>
+
+
+                        <th
+                            class="text-end"
+                            style="width: 210px;"
+                        >
+
+                            Action
+
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                    {% for brgy in barangays %}
+
+                    <tr>
+
+
+                        <!-- NUMBER -->
+
+                        <td>
+
+                            <span class="row-number">
+
+                                {{ forloop.counter }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- BARANGAY -->
+
+                        <td>
+
+                            <div
+                                class="
+                                    d-flex
+                                    align-items-center
+                                    gap-3
+                                "
+                            >
+
+                                <div class="barangay-icon">
+
+                                    <i class="bi bi-building"></i>
+
+                                </div>
+
+
+                                <div>
+
+                                    <div class="barangay-name">
+
+                                        {{ brgy.name }}
+
+                                    </div>
+
+
+                                    <div class="barangay-type">
+
+                                        Municipality of Pio Duran
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- VERIFIED APPLICANTS -->
+
+                        <td>
+
+                            <a
+                                href="{% url 'barangay_applicants' brgy.pk %}"
+                                class="applicant-count-link"
+                            >
+
+                                <i class="bi bi-person-check"></i>
+
+                                {{ brgy.verified_applicant_count }}
+
+                            </a>
+
+                        </td>
+
+
+                        <!-- STATUS -->
+
+                        <td>
+
+                            <span class="barangay-status">
+
+                                <span class="status-dot"></span>
+
+                                Registered
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- ACTION -->
+
+                        <td class="text-end">
+
+                            <div class="barangay-actions">
+
+                                <a
+                                    href="{% url 'barangay_applicants' brgy.pk %}"
+                                    class="view-applicants-btn"
+                                >
+
+                                    <i class="bi bi-people"></i>
+
+                                    View Applicants
+
+                                </a>
+
+
+                                <a
+                                    href="{% url 'delete-brgy' brgy.pk %}"
+                                    class="delete-btn"
+                                >
+
+                                    <i class="bi bi-trash"></i>
+
+                                    Delete
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+
+                    </tr>
+
+
+                    {% empty %}
+
+
+                    <!-- =================================================
+                         EMPTY STATE
+                    ================================================== -->
+
+                    <tr>
+
+                        <td
+                            colspan="5"
+                            class="p-0"
+                        >
+
+                            <div class="empty-state">
+
+
+                                <div class="empty-icon">
+
+                                    <i class="bi bi-buildings"></i>
+
+                                </div>
+
+
+                                <div class="empty-title">
+
+                                    No Barangay Data Found
+
+                                </div>
+
+
+                                <div class="empty-description">
+
+                                    There are currently no barangays
+                                    registered in the system.
+
+                                </div>
+
+
+                                <a
+                                    href="{% url 'add_brgy' %}"
+                                    class="add-barangay-btn"
+                                >
+
+                                    <i class="bi bi-plus-lg"></i>
+
+                                    Add New Barangay
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    {% endfor %}
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
