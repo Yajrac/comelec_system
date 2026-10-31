@@ -1,1355 +1,634 @@
 {% extends "admin.html" %}
+{% load static %}
 
 {% block title %}
-Applications - Pio Duran Registration System
+    Applications - Pio Duran Registration System
 {% endblock %}
 
 {% block page_title %}
-Applications
+    Applications
 {% endblock %}
 
 {% block page_subtitle %}
-Review and manage all applicant applications
+    Review and manage all applicant applications
 {% endblock %}
 
 {% block extra_css %}
 
-<style>
-
-/* =========================================================
-   APPLICATIONS PAGE
-========================================================= */
-
-.applications-page {
-    width: 100%;
-}
-
-
-/* =========================================================
-   FILTER CARD
-========================================================= */
-
-.application-filter-card {
-    background: #ffffff;
-    border: 1px solid #d9e1ec;
-    border-radius: 14px;
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
-    overflow: hidden;
-}
-
-.application-filter-header {
-    padding: 18px 22px;
-    border-bottom: 1px solid #e2e7ef;
-    background: #ffffff;
-}
-
-.application-filter-header-inner {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.application-filter-icon {
-    width: 40px;
-    height: 40px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #0038a8;
-    border: 0;
-    border-radius: 9px;
-
-    color: #ffffff;
-    font-size: 17px;
-}
-
-.application-filter-title {
-    margin: 0;
-    color: #172033;
-    font-size: 15px;
-    font-weight: 700;
-}
-
-.application-filter-subtitle {
-    margin: 2px 0 0;
-    color: #6b7280;
-    font-size: 12px;
-}
-
-.application-filter-body {
-    padding: 22px;
-}
-
-.application-filter-body .form-label {
-    color: #374151;
-    font-size: 13px;
-    margin-bottom: 7px;
-}
-
-.application-filter-body .form-control,
-.application-filter-body .form-select {
-    min-height: 42px;
-
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-
-    font-size: 13px;
-    box-shadow: none;
-}
-
-.application-filter-body .form-control:focus,
-.application-filter-body .form-select:focus {
-    border-color: #0038a8;
-    box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.09);
-}
-
-.application-filter-actions {
-    display: flex;
-    gap: 8px;
-    padding-top: 2px;
-}
-
-.application-filter-actions .btn {
-    min-height: 42px;
-    padding: 8px 17px;
-
-    border-radius: 8px;
-
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.application-filter-actions .btn-primary {
-    background: #0038a8;
-    border-color: #0038a8;
-}
-
-.application-filter-actions .btn-primary:hover {
-    background: #002b7f;
-    border-color: #002b7f;
-}
-
-.application-filter-actions .btn-outline-secondary {
-    background: #ffffff;
-    border-color: #cbd5e1;
-    color: #374151;
-}
-
-.application-filter-actions .btn-outline-secondary:hover {
-    background: #f3f4f6;
-    border-color: #9ca3af;
-}
-
-
-/* =========================================================
-   APPLICATION LIST CARD
-========================================================= */
-
-.application-list-card {
-    background: #ffffff;
-    border: 1px solid #d9e1ec;
-    border-radius: 14px;
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
-    overflow: hidden;
-}
-
-.application-list-header {
-    padding: 18px 22px;
-    border-bottom: 1px solid #e2e7ef;
-    background: #ffffff;
-}
-
-.application-list-header-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-}
-
-.application-list-title {
-    margin: 0;
-    color: #172033;
-    font-size: 16px;
-    font-weight: 700;
-}
-
-.application-list-count {
-    display: block;
-    margin-top: 3px;
-    color: #6b7280;
-    font-size: 12px;
-}
-
-
-/* =========================================================
-   TABLE
-========================================================= */
-
-.application-table {
-    margin: 0;
-}
-
-.application-table thead th {
-    padding: 13px 16px;
-
-    background: #f4f7fb;
-    border-bottom: 1px solid #d9e1ec;
-
-    color: #4b5563;
-
-    font-size: 11px;
-    font-weight: 700;
-
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-
-    white-space: nowrap;
-}
-
-.application-table tbody td {
-    padding: 15px 16px;
-
-    border-bottom: 1px solid #edf0f4;
-
-    color: #374151;
-    font-size: 13px;
-}
-
-.application-table tbody tr:last-child td {
-    border-bottom: 0;
-}
-
-.application-table tbody tr {
-    transition: background 0.15s ease;
-}
-
-.application-table tbody tr:hover {
-    background: #f8fafc;
-}
-
-
-/* =========================================================
-   APPLICANT
-========================================================= */
-
-.applicant-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-
-    min-width: 210px;
-}
-
-.applicant-icon {
-    width: 40px;
-    height: 40px;
-
-    flex-shrink: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #0038a8;
-
-    border: 0;
-    border-radius: 9px;
-
-    color: #ffffff;
-    font-size: 15px;
-}
-
-.applicant-name {
-    color: #172033;
-    font-weight: 700;
-    line-height: 1.3;
-}
-
-.applicant-email {
-    display: block;
-
-    margin-top: 3px;
-
-    color: #6b7280;
-    font-size: 11px;
-}
-
-
-/* =========================================================
-   BADGES
-========================================================= */
-
-.application-badge,
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-
-    min-height: 27px;
-    padding: 4px 10px;
-
-    border: 1px solid transparent;
-    border-radius: 7px;
-
-    font-size: 11px;
-    font-weight: 600;
-
-    white-space: nowrap;
-}
-
-
-/* =========================================================
-   APPLICATION TYPES
-========================================================= */
-
-.application-new {
-    background: #eaf2ff;
-    border-color: #cfe0ff;
-    color: #0038a8;
-}
-
-.application-update {
-    background: #e9f7fb;
-    border-color: #c9e9f0;
-    color: #176477;
-}
-
-.application-transfer {
-    background: #fff6df;
-    border-color: #f0d996;
-    color: #795700;
-}
-
-.application-reactivation {
-    background: #f0f1f3;
-    border-color: #d9dce1;
-    color: #4b5563;
-}
-
-.application-reinstatement {
-    background: #e9ebee;
-    border-color: #d2d6dc;
-    color: #1f2937;
-}
-
-
-/* =========================================================
-   STATUS
-========================================================= */
-
-.status-pending {
-    background: #fff6df;
-    border-color: #f0d996;
-    color: #795700;
-}
-
-.status-review {
-    background: #e9f7fb;
-    border-color: #c9e9f0;
-    color: #176477;
-}
-
-.status-approved {
-    background: #eaf7ef;
-    border-color: #c8e6d2;
-    color: #176b39;
-}
-
-.status-disapproved {
-    background: #fff0f0;
-    border-color: #f0caca;
-    color: #a61b1b;
-}
-
-.status-default {
-    background: #f0f1f3;
-    border-color: #d9dce1;
-    color: #4b5563;
-}
-
-
-/* =========================================================
-   DATE
-========================================================= */
-
-.application-date {
-    color: #374151;
-    white-space: nowrap;
-}
-
-.application-time {
-    display: block;
-
-    margin-top: 3px;
-
-    color: #8a94a3;
-    font-size: 11px;
-}
-
-
-/* =========================================================
-   ACTION
-========================================================= */
-
-.application-action-group {
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-end;
-
-    gap: 6px;
-
-    white-space: nowrap;
-}
-
-.application-view-btn {
-    min-width: 76px;
-
-    border-radius: 7px;
-    border-color: #b9c9df;
-
-    color: #0038a8;
-    background: #ffffff;
-
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.application-view-btn:hover {
-    background: #0038a8;
-    border-color: #0038a8;
-    color: #ffffff;
-}
-
-.application-delete-btn {
-    min-width: 76px;
-
-    border-radius: 7px;
-
-    border-color: #e0b4b4;
-
-    color: #a61b1b;
-    background: #ffffff;
-
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.application-delete-btn:hover {
-    background: #a61b1b;
-    border-color: #a61b1b;
-    color: #ffffff;
-}
-
-.application-disabled-btn {
-    min-width: 76px;
-
-    border-radius: 7px;
-
-    font-size: 12px;
-    font-weight: 600;
-}
-
-
-/* =========================================================
-   EMPTY STATE
-========================================================= */
-
-.application-empty {
-    padding: 65px 20px;
-    text-align: center;
-}
-
-.application-empty-icon {
-    width: 60px;
-    height: 60px;
-
-    margin: 0 auto 16px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #f1f4f8;
-    border: 1px solid #dce2ea;
-
-    border-radius: 12px;
-
-    color: #8a94a3;
-    font-size: 23px;
-}
-
-.application-empty-title {
-    margin-bottom: 5px;
-
-    color: #374151;
-    font-size: 14px;
-    font-weight: 700;
-}
-
-.application-empty-text {
-    margin: 0;
-
-    color: #8a94a3;
-    font-size: 12px;
-}
-
-
-/* =========================================================
-   PAGINATION
-========================================================= */
-
-.application-pagination {
-    padding: 17px 22px;
-
-    border-top: 1px solid #e2e7ef;
-
-    background: #ffffff;
-}
-
-.application-pagination-info {
-    color: #6b7280;
-    font-size: 12px;
-}
-
-.application-pagination .pagination {
-    margin: 0;
-}
-
-.application-pagination .page-link {
-    min-width: 34px;
-    min-height: 34px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 7px !important;
-    border-color: #d5dce6;
-
-    color: #374151;
-    font-size: 12px;
-
-    margin-left: 3px;
-}
-
-.application-pagination .page-link:hover {
-    background: #f1f5fa;
-    color: #0038a8;
-}
-
-.application-pagination .page-item.active .page-link {
-    background: #0038a8;
-    border-color: #0038a8;
-    color: #ffffff;
-}
-
-.application-pagination .page-item.disabled .page-link {
-    color: #a0a7b2;
-    background: #f8f9fb;
-}
-
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media (max-width: 991.98px) {
-
-    .application-filter-actions {
-        padding-top: 5px;
-    }
-
-}
-
-
-@media (max-width: 767.98px) {
-
-    .application-filter-header {
-        padding: 16px 18px;
-    }
-
-    .application-filter-body {
-        padding: 18px;
-    }
-
-    .application-list-header {
-        padding: 16px 18px;
-    }
-
-    .application-list-header-inner {
-        align-items: flex-start;
-    }
-
-    .application-table thead th,
-    .application-table tbody td {
-        padding-left: 13px;
-        padding-right: 13px;
-    }
-
-    .application-pagination {
-        padding: 15px 18px;
-    }
-
-    .application-pagination > div {
-        flex-direction: column;
-        align-items: flex-start !important;
-    }
-
-    .application-action-group {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .application-view-btn,
-    .application-delete-btn {
-        width: 100%;
-    }
-
-}
-
-</style>
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/comelec-applications-list.css' %}?v=unified-card-5"
+    >
 
 {% endblock %}
 
-
 {% block content %}
 
-<div class="container-fluid px-0">
+    <div class="container-fluid px-0">
 
-    <div class="applications-page">
+        <div class="applications-page applications-workspace">
 
-
-        <!-- =====================================================
+            <!-- =====================================================
              FILTER CARD
         ====================================================== -->
 
-        <div class="application-filter-card mb-4">
+            <div class="application-filter-card">
 
-            <div class="application-filter-header">
+                <div class="application-filter-header">
 
-                <div class="application-filter-header-inner">
+                    <div class="application-filter-header-inner">
 
-                    <div class="application-filter-icon">
+                        <div class="application-filter-icon">
 
-                        <i class="bi bi-funnel"></i>
+                            <i class="bi bi-funnel">
+                            </i>
 
-                    </div>
+                        </div>
 
-                    <div>
+                        <div>
 
-                        <h6 class="application-filter-title">
-                            Application Filters
-                        </h6>
+                            <h6 class="application-filter-title">Application Filters</h6>
 
-                        <p class="application-filter-subtitle">
-                            Search and filter submitted applications
-                        </p>
+                            <p class="application-filter-subtitle">Search and filter submitted applications</p>
+
+                        </div>
 
                     </div>
 
                 </div>
 
-            </div>
+                <div class="application-filter-body">
 
+                    <form method="get" id="applicationFilters">
 
-            <div class="application-filter-body">
+                        <div class="row g-3">
 
-                <form method="GET">
+                            <!-- SEARCH -->
 
-                    <div class="row g-3">
+                            <div class="col-12 col-lg-4">
 
+                                <label for="applicationSearchInput" class="form-label fw-semibold">Search</label>
 
-                        <!-- SEARCH -->
-
-                        <div class="col-12 col-lg-4">
-
-                            <label class="form-label fw-semibold">
-                                Search
-                            </label>
-
-                            <input
-                                type="text"
-                                name="search"
-                                class="form-control"
-                                placeholder="Name, email or phone"
-                                value="{{ search }}"
-                            >
-
-                        </div>
-
-
-                        <!-- APPLICATION TYPE -->
-
-                        <div class="col-12 col-md-6 col-lg-2">
-
-                            <label class="form-label fw-semibold">
-                                Application
-                            </label>
-
-                            <select
-                                name="application_type"
-                                class="form-select"
-                            >
-
-                                <option value="">
-                                    All
-                                </option>
-
-                                <option
-                                    value="NEW"
-                                    {% if application_type == "NEW" %}
-                                        selected
-                                    {% endif %}
+                                <div class="input-group admin-search-field">
+                                    <span class="input-group-text bg-white"><i class="bi bi-search" aria-hidden="true"></i></span>
+                                <input
+                                    type="text"
+                                    name="search"
+                                    id="applicationSearchInput"
+                                    class="form-control"
+                                    placeholder="Name, email or phone"
+                                    value="{{ search }}"
                                 >
-                                    New Registration
-                                </option>
+                                </div>
 
-                                <option
-                                    value="UPDATE"
-                                    {% if application_type == "UPDATE" %}
-                                        selected
-                                    {% endif %}
-                                >
-                                    Update / Correction
-                                </option>
+                            </div>
 
-                                <option
-                                    value="TRANSFER"
-                                    {% if application_type == "TRANSFER" %}
-                                        selected
-                                    {% endif %}
-                                >
-                                    Transfer
-                                </option>
+                            <!-- APPLICATION TYPE -->
 
-                                <option
-                                    value="REACTIVATION"
-                                    {% if application_type == "REACTIVATION" %}
-                                        selected
-                                    {% endif %}
-                                >
-                                    Reactivation
-                                </option>
+                            <div class="col-12 col-md-6 col-lg-2">
 
-                                <option
-                                    value="REINSTATEMENT"
-                                    {% if application_type == "REINSTATEMENT" %}
-                                        selected
-                                    {% endif %}
-                                >
-                                    Reinstatement
-                                </option>
+                                <label class="form-label fw-semibold">Application</label>
 
-                            </select>
+                                <select name="application_type" class="form-select">
 
-                        </div>
+                                    <option value="">All</option>
 
+                                    <option
+                                        value="NEW"
+                                        {% if application_type == "NEW" %} selected {% endif %}
+                                    >New Registration</option>
 
-                        <!-- STATUS -->
+                                    <option
+                                        value="UPDATE"
+                                        {% if application_type == "UPDATE" %} selected {% endif %}
+                                    >Change of Name / Correction</option>
 
-                        <div class="col-12 col-md-6 col-lg-2">
+                                    <option
+                                        value="TRANSFER"
+                                        {% if application_type == "TRANSFER" %} selected {% endif %}
+                                    >Transfer</option>
 
-                            <label class="form-label fw-semibold">
-                                Status
-                            </label>
+                                    <option
+                                        value="REACTIVATION"
+                                        {% if application_type == "REACTIVATION" %} selected {% endif %}
+                                    >Reactivation</option>
 
-                            <select
-                                name="status"
-                                class="form-select"
-                            >
+                                    <option
+                                        value="REINSTATEMENT"
+                                        {% if application_type == "REINSTATEMENT" %} selected {% endif %}
+                                    >Inclusion / Reinstatement</option>
 
-                                <option value="">
-                                    All
-                                </option>
+                                </select>
 
-                                <option
-                                    value="PENDING"
-                                    {% if status == "PENDING" %}
-                                        selected
-                                    {% endif %}
-                                >
-                                    Pending
-                                </option>
+                            </div>
 
-                                <option
-                                    value="REVIEW"
-                                    {% if status == "REVIEW" %}
-                                        selected
-                                    {% endif %}
-                                >
-                                    Review
-                                </option>
+                            <!-- STATUS -->
 
-                                <option
-                                    value="APPROVED"
-                                    {% if status == "APPROVED" %}
-                                        selected
-                                    {% endif %}
-                                >
-                                    Approved
-                                </option>
+                            <div class="col-12 col-md-6 col-lg-2">
 
-                                <option
-                                    value="DISAPPROVED"
-                                    {% if status == "DISAPPROVED" %}
-                                        selected
-                                    {% endif %}
-                                >
-                                    Disapproved
-                                </option>
+                                <label class="form-label fw-semibold">Status</label>
 
-                            </select>
+                                <select name="status" class="form-select">
 
-                        </div>
+                                    <option value="">All</option>
 
+                                    <option
+                                        value="PENDING"
+                                        {% if status == "PENDING" %} selected {% endif %}
+                                    >Pending</option>
 
-                        <!-- DATE FROM -->
+                                    <option
+                                        value="REVIEW"
+                                        {% if status == "REVIEW" %} selected {% endif %}
+                                    >Review</option>
 
-                        <div class="col-12 col-md-6 col-lg-2">
+                                    <option
+                                        value="APPROVED"
+                                        {% if status == "APPROVED" %} selected {% endif %}
+                                    >Approved</option>
 
-                            <label class="form-label fw-semibold">
-                                From
-                            </label>
+                                    <option
+                                        value="DISAPPROVED"
+                                        {% if status == "DISAPPROVED" %} selected {% endif %}
+                                    >Disapproved</option>
 
-                            <input
-                                type="date"
-                                name="date_from"
-                                class="form-control"
-                                value="{{ date_from }}"
-                            >
+                                </select>
 
-                        </div>
+                            </div>
 
+                            <!-- DATE FROM -->
 
-                        <!-- DATE TO -->
+                            <div class="col-12 col-md-6 col-lg-2">
 
-                        <div class="col-12 col-md-6 col-lg-2">
+                                <label class="form-label fw-semibold">From</label>
 
-                            <label class="form-label fw-semibold">
-                                To
-                            </label>
-
-                            <input
-                                type="date"
-                                name="date_to"
-                                class="form-control"
-                                value="{{ date_to }}"
-                            >
-
-                        </div>
-
-
-                        <!-- BUTTONS -->
-
-                        <div class="col-12">
-
-                            <div class="application-filter-actions">
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-primary"
+                                <input
+                                    type="date"
+                                    name="date_from"
+                                    class="form-control"
+                                    value="{{ date_from }}"
                                 >
 
-                                    <i class="bi bi-search me-1"></i>
+                            </div>
 
-                                    Search
+                            <!-- DATE TO -->
 
-                                </button>
+                            <div class="col-12 col-md-6 col-lg-2">
 
+                                <label class="form-label fw-semibold">To</label>
 
-                                <a
-                                    href="{% url 'admin-applications' %}"
-                                    class="btn btn-outline-secondary"
-                                >
+                                <input type="date" name="date_to" class="form-control" value="{{ date_to }}">
 
-                                    <i class="bi bi-arrow-counterclockwise me-1"></i>
+                            </div>
 
-                                    Reset
+                            <!-- BUTTONS -->
 
-                                </a>
+                            <div class="col-12">
+
+                                <div class="application-filter-actions">
+
+                                    <a
+                                        href="{% url 'admin-applications' %}"
+                                        class="btn btn-outline-secondary"
+                                    >
+
+                                        <i class="bi bi-arrow-counterclockwise me-1">
+                                        </i>
+
+                                        Reset
+
+                                    </a>
+
+                                </div>
 
                             </div>
 
                         </div>
 
-                    </div>
+                    </form>
 
-                </form>
+                </div>
 
             </div>
 
-        </div>
-
-
-        <!-- =====================================================
+            <!-- =====================================================
              APPLICATION LIST
         ====================================================== -->
 
-        <div class="application-list-card">
+            <p
+                id="applicationSearchStatus"
+                class="small text-muted"
+                role="status"
+                aria-live="polite"
+            ></p>
+            <div class="application-list-card" id="applicationResults">
 
+                <!-- HEADER -->
 
-            <!-- HEADER -->
+                <div class="application-list-header">
 
-            <div class="application-list-header">
+                    <div class="application-list-header-inner">
 
-                <div class="application-list-header-inner">
+                        <div>
 
-                    <div>
+                            <h5 class="application-list-title">Applications</h5>
 
-                        <h5 class="application-list-title">
-                            Applications
-                        </h5>
+                            <span class="application-list-count">
 
-                        <span class="application-list-count">
+                                {{ page_obj.paginator.count }}
 
-                            {{ page_obj.paginator.count }}
+                                application{{ page_obj.paginator.count|pluralize }}
 
-                            application{{ page_obj.paginator.count|pluralize }}
+                            </span>
 
-                        </span>
+                        </div>
 
+                        <a href="{{ request.get_full_path }}" id="applicationRefresh" class="application-refresh-button">
+                            <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Refresh
+                        </a>
                     </div>
 
                 </div>
 
-            </div>
+                <!-- TABLE -->
 
+                <div class="table-responsive">
 
-            <!-- TABLE -->
+                    <table class="table application-table align-middle">
 
-            <div class="table-responsive">
+                        <thead>
 
-                <table class="table application-table align-middle">
+                            <tr>
 
-                    <thead>
+                                <th scope="col" class="ps-4 application-row-number">No.</th>
+                                <th>Applicant</th>
 
-                        <tr>
+                                <th>Application</th>
 
-                            <th class="ps-4">
-                                Applicant
-                            </th>
+                                <th>Status</th>
 
-                            <th>
-                                Application
-                            </th>
+                                <th>Date Submitted</th>
 
-                            <th>
-                                Status
-                            </th>
+                                <th class="text-end pe-4">Action</th>
 
-                            <th>
-                                Date Submitted
-                            </th>
+                            </tr>
 
-                            <th class="text-end pe-4">
-                                Action
-                            </th>
+                        </thead>
 
-                        </tr>
+                        <tbody>
 
-                    </thead>
+                            {% for application in page_obj %}
 
+                                <tr>
 
-                    <tbody>
+                                    <!-- APPLICANT -->
 
-                        {% for application in page_obj %}
+                                    <td class="ps-4 text-muted application-row-number">{{ page_obj.start_index|add:forloop.counter0 }}</td>
+                                    <td>
 
-                        <tr>
+                                        <div class="applicant-wrapper">
 
+                                            <div class="applicant-icon">
 
-                            <!-- APPLICANT -->
+                                                <i class="bi bi-person">
+                                                </i>
 
-                            <td class="ps-4">
+                                            </div>
 
-                                <div class="applicant-wrapper">
+                                            <div>
 
-                                    <div class="applicant-icon">
+                                                <div class="applicant-name">{{ application.applicant_name }}</div>
 
-                                        <i class="bi bi-person"></i>
+                                                {% if application.applicant.email %}
 
-                                    </div>
+                                                    <span
+                                                        class="applicant-email"
+                                                    >{{ application.applicant.email }}</span>
 
-                                    <div>
+                                                {% endif %}
 
-                                        <div class="applicant-name">
-
-                                            {{ application.applicant_name }}
+                                            </div>
 
                                         </div>
 
-                                        {% if application.applicant.email %}
+                                    </td>
 
-                                        <span class="applicant-email">
+                                    <!-- APPLICATION TYPE -->
 
-                                            {{ application.applicant.email }}
+                                    <td>
 
-                                        </span>
+                                        {% if application.type == "NEW" %}
+
+                                            <span class="application-type-summary">
+                                                <span class="application-badge application-new" tabindex="0" aria-label="{{ application.type_display }}"><span class="application-badge-text">{{ application.type_display }}</span></span>
+                                                <span class="application-type-tooltip" aria-hidden="true">{{ application.type_display }}</span>
+                                            </span>
+
+                                        {% elif application.type == "UPDATE" %}
+
+                                            <span class="application-type-summary">
+                                                <span class="application-badge application-update" tabindex="0" aria-label="{{ application.type_display }}"><span class="application-badge-text">{{ application.type_display }}</span></span>
+                                                <span class="application-type-tooltip" aria-hidden="true">{{ application.type_display }}</span>
+                                            </span>
+
+                                        {% elif application.type == "TRANSFER" %}
+
+                                            <span class="application-type-summary">
+                                                <span class="application-badge application-transfer" tabindex="0" aria-label="{{ application.type_display }}"><span class="application-badge-text">{{ application.type_display }}</span></span>
+                                                <span class="application-type-tooltip" aria-hidden="true">{{ application.type_display }}</span>
+                                            </span>
+
+                                        {% elif application.type == "REACTIVATION" %}
+
+                                            <span class="application-type-summary">
+                                                <span class="application-badge application-reactivation" tabindex="0" aria-label="{{ application.type_display }}"><span class="application-badge-text">{{ application.type_display }}</span></span>
+                                                <span class="application-type-tooltip" aria-hidden="true">{{ application.type_display }}</span>
+                                            </span>
+
+                                        {% elif application.type == "REINSTATEMENT" %}
+
+                                            <span class="application-type-summary">
+                                                <span class="application-badge application-reinstatement" tabindex="0" aria-label="{{ application.type_display }}"><span class="application-badge-text">{{ application.type_display }}</span></span>
+                                                <span class="application-type-tooltip" aria-hidden="true">{{ application.type_display }}</span>
+                                            </span>
 
                                         {% endif %}
 
-                                    </div>
+                                    </td>
 
-                                </div>
+                                    <!-- STATUS -->
 
-                            </td>
+                                    <td>
 
+                                        {% if application.status == "PENDING" %}
 
-                            <!-- APPLICATION TYPE -->
+                                            <span class="status-badge status-pending">Pending</span>
 
-                            <td>
+                                        {% elif application.status == "REVIEW" %}
 
-                                {% if application.type == "NEW" %}
+                                            <span class="status-badge status-review">Review</span>
 
-                                    <span class="application-badge application-new">
-                                        New Registration
-                                    </span>
+                                        {% elif application.status == "APPROVED" %}
 
-                                {% elif application.type == "UPDATE" %}
+                                            <span class="status-badge status-approved">Approved</span>
 
-                                    <span class="application-badge application-update">
-                                        Update / Correction
-                                    </span>
+                                        {% elif application.status == "DISAPPROVED" %}
 
-                                {% elif application.type == "TRANSFER" %}
+                                            <span class="status-badge status-disapproved">Disapproved</span>
 
-                                    <span class="application-badge application-transfer">
-                                        Transfer
-                                    </span>
+                                        {% else %}
 
-                                {% elif application.type == "REACTIVATION" %}
+                                            <span
+                                                class="status-badge status-default"
+                                            >{{ application.status_display }}</span>
 
-                                    <span class="application-badge application-reactivation">
-                                        Reactivation
-                                    </span>
+                                        {% endif %}
 
-                                {% elif application.type == "REINSTATEMENT" %}
+                                    </td>
 
-                                    <span class="application-badge application-reinstatement">
-                                        Reinstatement
-                                    </span>
+                                    <!-- DATE -->
 
-                                {% endif %}
+                                    <td>
 
-                            </td>
+                                        {% if application.date %}
 
+                                            <span class="application-date">{{ application.date|date:"M d, Y" }}</span>
 
-                            <!-- STATUS -->
+                                            <span class="application-time">{{ application.date|date:"M d, Y" }}</span>
 
-                            <td>
+                                        {% else %}
 
-                                {% if application.status == "PENDING" %}
+                                            <span class="text-muted">â€”</span>
 
-                                    <span class="status-badge status-pending">
-                                        Pending
-                                    </span>
+                                        {% endif %}
 
-                                {% elif application.status == "REVIEW" %}
+                                    </td>
 
-                                    <span class="status-badge status-review">
-                                        Review
-                                    </span>
+                                    <!-- ACTION -->
 
-                                {% elif application.status == "APPROVED" %}
+                                    <td class="text-end pe-4">
 
-                                    <span class="status-badge status-approved">
-                                        Approved
-                                    </span>
+                                        <div class="application-action-group">
 
-                                {% elif application.status == "DISAPPROVED" %}
+                                            <!-- VIEW -->
 
-                                    <span class="status-badge status-disapproved">
-                                        Disapproved
-                                    </span>
+                                            {% if application.url_name %}
 
-                                {% else %}
+                                                <a
+                                                    href="{% url application.url_name application.id %}"
+                                                    class="btn btn-sm application-view-btn admin-icon-action"
+                                                    aria-label="View application"
+                                                    title="View application"
+                                                >
 
-                                    <span class="status-badge status-default">
-                                        {{ application.status_display }}
-                                    </span>
+                                                    <i class="bi bi-eye me-1">
+                                                    </i>
 
-                                {% endif %}
+                                                    <span class="visually-hidden">View</span>
 
-                            </td>
+                                                </a>
 
+                                            {% else %}
 
-                            <!-- DATE -->
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-sm btn-outline-secondary application-disabled-btn admin-icon-action"
+                                                    aria-label="View unavailable"
+                                                    title="View unavailable"
+                                                    disabled
+                                                >
 
-                            <td>
+                                                    <i class="bi bi-eye me-1">
+                                                    </i>
 
-                                {% if application.date %}
+                                                    <span class="visually-hidden">View</span>
 
-                                    <span class="application-date">
+                                                </button>
 
-                                        {{ application.date|date:"M d, Y" }}
+                                            {% endif %}
 
-                                    </span>
+                                            <!-- DELETE -->
 
-                                    <span class="application-time">
+                                            <form
+                                                method="post"
+                                                action="{% url 'delete-application' application.id %}"
+                                                class="d-inline"
+                                                data-confirm-submit="Are you sure you want to delete this application? This action cannot be undone."
+                                            >
 
-                                        {{ application.date|date:"M d, Y" }}
+                                                {% csrf_token %}
 
-                                    </span>
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-sm application-delete-btn admin-icon-action admin-icon-danger"
+                                                    aria-label="Delete application"
+                                                    title="Delete application"
+                                                >
 
-                                {% else %}
+                                                    <i class="bi bi-trash me-1">
+                                                    </i>
 
-                                    <span class="text-muted">
-                                        —
-                                    </span>
+                                                    <span class="visually-hidden">Delete</span>
 
-                                {% endif %}
+                                                </button>
 
-                            </td>
+                                            </form>
 
+                                        </div>
 
-                            <!-- ACTION -->
+                                    </td>
 
-                            <td class="text-end pe-4">
+                                </tr>
 
-                                <div class="application-action-group">
+                            {% empty %}
 
+                                <tr>
 
-                                    <!-- VIEW -->
+                                    <td colspan="6" class="p-0">
 
-                                    {% if application.url_name %}
+                                        <div class="application-empty">
 
-                                        <a
-                                            href="{% url application.url_name application.id %}"
-                                            class="btn btn-sm application-view-btn"
-                                        >
+                                            <div class="application-empty-icon">
 
-                                            <i class="bi bi-eye me-1"></i>
+                                                <i class="bi bi-file-earmark-x">
+                                                </i>
 
-                                            View
+                                            </div>
 
-                                        </a>
+                                            <div class="application-empty-title">No applications found</div>
 
-                                    {% else %}
+                                            <p class="application-empty-text">Try changing your search or filters.</p>
 
-                                        <button
-                                            type="button"
-                                            class="btn btn-sm btn-outline-secondary application-disabled-btn"
-                                            disabled
-                                        >
+                                        </div>
 
-                                            <i class="bi bi-eye me-1"></i>
+                                    </td>
 
-                                            View
+                                </tr>
 
-                                        </button>
+                            {% endfor %}
 
-                                    {% endif %}
+                        </tbody>
 
+                    </table>
 
-                                    <!-- DELETE -->
+                </div>
 
-                                    <form
-                                        method="POST"
-                                        action="{% url 'delete-application' application.id %}"
-                                        class="d-inline"
-                                        onsubmit="return confirm('Are you sure you want to delete this application? This action cannot be undone.');"
-                                    >
-
-                                        {% csrf_token %}
-
-                                        <button
-                                            type="submit"
-                                            class="btn btn-sm application-delete-btn"
-                                        >
-
-                                            <i class="bi bi-trash me-1"></i>
-
-                                            Delete
-
-                                        </button>
-
-                                    </form>
-
-
-                                </div>
-
-                            </td>
-
-                        </tr>
-
-                        {% empty %}
-
-                        <tr>
-
-                            <td
-                                colspan="5"
-                                class="p-0"
-                            >
-
-                                <div class="application-empty">
-
-                                    <div class="application-empty-icon">
-
-                                        <i class="bi bi-file-earmark-x"></i>
-
-                                    </div>
-
-
-                                    <div class="application-empty-title">
-
-                                        No applications found
-
-                                    </div>
-
-
-                                    <p class="application-empty-text">
-
-                                        Try changing your search or filters.
-
-                                    </p>
-
-                                </div>
-
-                            </td>
-
-                        </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-
-            <!-- =====================================================
+                <!-- =====================================================
                  PAGINATION
             ====================================================== -->
 
-            {% if page_obj.paginator.num_pages > 1 %}
-
-            <div class="application-pagination">
-
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
 
-                    <!-- PAGE INFORMATION -->
+                    <div class="application-pagination">
 
-                    <div class="application-pagination-info">
+                        <div
+                            class="d-flex justify-content-between align-items-center flex-wrap gap-3"
+                        >
 
-                        Page
-                        {{ page_obj.number }}
-                        of
-                        {{ page_obj.paginator.num_pages }}
+                            <!-- PAGE INFORMATION -->
+
+                            <div class="application-pagination-info">
+
+                                Showing {{ page_obj.start_index }}?{{ page_obj.end_index }} of {{ page_obj.paginator.count }} applications
+
+                            </div>
+
+                            <!-- PAGINATION -->
+
+                            <nav aria-label="Application pagination">
+
+                                <ul class="pagination mb-0">
+
+                                    <!-- PREVIOUS -->
+
+                                    {% if page_obj.has_previous %}
+
+                                        <li class="page-item">
+
+                                            <a
+                                                class="page-link"
+                                                href="?page={{ page_obj.previous_page_number }}{% if search %}&amp;search={{ search|urlencode }}{% endif %}{% if application_type %}&amp;application_type={{ application_type|urlencode }}{% endif %}{% if status %}&amp;status={{ status|urlencode }}{% endif %}{% if date_from %}&amp;date_from={{ date_from|urlencode }}{% endif %}{% if date_to %}&amp;date_to={{ date_to|urlencode }}{% endif %}"
+                                            >Previous</a>
+
+                                        </li>
+
+                                    {% else %}
+
+                                        <li class="page-item disabled">
+
+                                            <span class="page-link">Previous</span>
+
+                                        </li>
+
+                                    {% endif %}
+
+                                    <!-- PAGE NUMBERS -->
+
+                                    {% for page_number in page_obj.paginator.page_range %}
+
+                                        {% if page_number == page_obj.number %}
+
+                                            <li class="page-item active">
+
+                                                <span class="page-link" aria-current="page">{{ page_number }}</span>
+
+                                            </li>
+
+                                        {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
+
+                                            <li class="page-item">
+
+                                                <a
+                                                    class="page-link"
+                                                    href="?page={{ page_number }}{% if search %}&amp;search={{ search|urlencode }}{% endif %}{% if application_type %}&amp;application_type={{ application_type|urlencode }}{% endif %}{% if status %}&amp;status={{ status|urlencode }}{% endif %}{% if date_from %}&amp;date_from={{ date_from|urlencode }}{% endif %}{% if date_to %}&amp;date_to={{ date_to|urlencode }}{% endif %}"
+                                                >{{ page_number }}</a>
+
+                                            </li>
+
+                                        {% endif %}
+
+                                    {% endfor %}
+
+                                    <!-- NEXT -->
+
+                                    {% if page_obj.has_next %}
+
+                                        <li class="page-item">
+
+                                            <a
+                                                class="page-link"
+                                                href="?page={{ page_obj.next_page_number }}{% if search %}&amp;search={{ search|urlencode }}{% endif %}{% if application_type %}&amp;application_type={{ application_type|urlencode }}{% endif %}{% if status %}&amp;status={{ status|urlencode }}{% endif %}{% if date_from %}&amp;date_from={{ date_from|urlencode }}{% endif %}{% if date_to %}&amp;date_to={{ date_to|urlencode }}{% endif %}"
+                                            >Next</a>
+
+                                        </li>
+
+                                    {% else %}
+
+                                        <li class="page-item disabled">
+
+                                            <span class="page-link">Next</span>
+
+                                        </li>
+
+                                    {% endif %}
+
+                                </ul>
+
+                            </nav>
+
+                        </div>
 
                     </div>
 
 
-                    <!-- PAGINATION -->
-
-                    <nav aria-label="Application pagination">
-
-                        <ul class="pagination mb-0">
-
-
-                            <!-- PREVIOUS -->
-
-                            {% if page_obj.has_previous %}
-
-                            <li class="page-item">
-
-                                <a
-                                    class="page-link"
-                                    href="?page={{ page_obj.previous_page_number }}{% if search %}&amp;search={{ search|urlencode }}{% endif %}{% if application_type %}&amp;application_type={{ application_type|urlencode }}{% endif %}{% if status %}&amp;status={{ status|urlencode }}{% endif %}{% if date_from %}&amp;date_from={{ date_from|urlencode }}{% endif %}{% if date_to %}&amp;date_to={{ date_to|urlencode }}{% endif %}"
-                                >
-                                    Previous
-                                </a>
-
-                            </li>
-
-                            {% else %}
-
-                            <li class="page-item disabled">
-
-                                <span class="page-link">
-                                    Previous
-                                </span>
-
-                            </li>
-
-                            {% endif %}
-
-
-                            <!-- PAGE NUMBERS -->
-
-                            {% for page_number in page_obj.paginator.page_range %}
-
-                                {% if page_number == page_obj.number %}
-
-                                <li class="page-item active">
-
-                                    <span class="page-link">
-                                        {{ page_number }}
-                                    </span>
-
-                                </li>
-
-                                {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
-
-                                <li class="page-item">
-
-                                    <a
-                                        class="page-link"
-                                        href="?page={{ page_number }}{% if search %}&amp;search={{ search|urlencode }}{% endif %}{% if application_type %}&amp;application_type={{ application_type|urlencode }}{% endif %}{% if status %}&amp;status={{ status|urlencode }}{% endif %}{% if date_from %}&amp;date_from={{ date_from|urlencode }}{% endif %}{% if date_to %}&amp;date_to={{ date_to|urlencode }}{% endif %}"
-                                    >
-                                        {{ page_number }}
-                                    </a>
-
-                                </li>
-
-                                {% endif %}
-
-                            {% endfor %}
-
-
-                            <!-- NEXT -->
-
-                            {% if page_obj.has_next %}
-
-                            <li class="page-item">
-
-                                <a
-                                    class="page-link"
-                                    href="?page={{ page_obj.next_page_number }}{% if search %}&amp;search={{ search|urlencode }}{% endif %}{% if application_type %}&amp;application_type={{ application_type|urlencode }}{% endif %}{% if status %}&amp;status={{ status|urlencode }}{% endif %}{% if date_from %}&amp;date_from={{ date_from|urlencode }}{% endif %}{% if date_to %}&amp;date_to={{ date_to|urlencode }}{% endif %}"
-                                >
-                                    Next
-                                </a>
-
-                            </li>
-
-                            {% else %}
-
-                            <li class="page-item disabled">
-
-                                <span class="page-link">
-                                    Next
-                                </span>
-
-                            </li>
-
-                            {% endif %}
-
-                        </ul>
-
-                    </nav>
-
-                </div>
 
             </div>
-
-            {% endif %}
-
 
         </div>
 
     </div>
 
-</div>
-
+{% endblock %}
+{% block extra_js %}
+    <script src="{% static 'js/application-search.js' %}" defer></script>
 {% endblock %}

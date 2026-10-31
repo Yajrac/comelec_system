@@ -1,0 +1,12 @@
+/* Shared scrollbars: supported in Firefox, Chromium, and Safari. */
+:root { --scrollbar-thumb: #afbdd2; --scrollbar-hover: #718db8; --scrollbar-track: #f1f4f9; }
+* { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track); }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border: 2px solid var(--scrollbar-track); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+::-webkit-scrollbar-corner { background: var(--scrollbar-track); }
+.admin-sidebar::-webkit-scrollbar { width: 6px; }
+.admin-sidebar::-webkit-scrollbar-thumb { background: #bdcadd; border-radius: 10px; }
+.admin-sidebar::-webkit-scrollbar-thumb:hover { background: #718db8; }
+@media (forced-colors: active) { * { scrollbar-color: auto; } }

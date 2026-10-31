@@ -22,10 +22,9 @@ load_dotenv(
 )
 
 
-IPROG_SMS_API_TOKEN = os.environ.get(
-    "IPROG_SMS_API_TOKEN",
-    ""
-)
+SEMAPHORE_API_KEY = os.environ.get("SEMAPHORE_API_KEY", "")
+SEMAPHORE_SENDER_NAME = os.environ.get("SEMAPHORE_SENDER_NAME", "")
+IPROG_SMS_API_TOKEN = os.environ.get("IPROG_SMS_API_TOKEN", "")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
@@ -34,7 +33,7 @@ IPROG_SMS_API_TOKEN = os.environ.get(
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG", "True").strip().lower() in {"true", "1", "yes"}
 
 ALLOWED_HOSTS = ['*']
 
@@ -59,9 +58,12 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    'core.page_rate_limit.PageRateLimitMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'core.error_pages.FriendlyNotFoundMiddleware',
+    'core.admin_security.RequireAdminPasswordChangeMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -76,6 +78,7 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
+                'Applicants.context_processors.election_settings',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -180,3 +183,10 @@ FINGERPRINT_DEVICE_TOKEN = os.environ.get(
     "FINGERPRINT_DEVICE_TOKEN",
     "",
 )
+
+# Browser page burst protection. Configure a shared cache on multi-worker deployments.
+PAGE_RATE_LIMIT_REQUESTS = 30
+PAGE_RATE_LIMIT_SECONDS = 10
+
+# Age qualification date for the configured Barangay and SK election.
+VOTER_ELECTION_DATE = os.environ.get("VOTER_ELECTION_DATE", "2028-11-13")

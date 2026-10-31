@@ -15,11 +15,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from core.views import admin_login
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('developer/login/', admin_login),
     path('developer/', admin.site.urls),
     path('comelec/', include('core.urls')),
     path('', include('Applicants.urls')),
@@ -29,3 +31,4 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+handler404 = "core.error_pages.page_not_found"

@@ -2,6 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.db import models
+from .application_types import APPLICATION_TYPE_CHOICES
 
 class Barangay(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -9,15 +10,18 @@ class Barangay(models.Model):
     def __str__(self):
         return self.name
 
-class Applicant(models.Model):
+def generate_registration_reference():
+    return "PD-" + uuid.uuid4().hex.upper()
 
-    APPLICATION_CHOICES = [
-        ("NEW", "New Registration"),
-        ("UPDATE", "Update Information"),
-        ("TRANSFER", "Transfer"),
-        ("REACTIVATION", "Reactivation"),
-        ("REINSTATEMENT", "Reinstatement"),
-    ]
+
+class Applicant(models.Model):
+    registration_reference = models.CharField(
+        max_length=35, unique=True, default=generate_registration_reference,
+        editable=False,
+    )
+
+
+    APPLICATION_CHOICES = APPLICATION_TYPE_CHOICES
 
     APPLICATION_STATUS = [
         ("APPROVED", "Approved"),
@@ -74,7 +78,7 @@ class Applicant(models.Model):
     # Address
     brgy = models.ForeignKey(
         Barangay,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
     )
@@ -91,7 +95,7 @@ class Applicant(models.Model):
 
     # Contact Information
     phone = models.CharField(max_length=11)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, blank=True, null=True)
 
     # Application Information
     application_type = models.CharField(
@@ -150,11 +154,20 @@ class Applicant(models.Model):
         blank=True,
     )
 
+    @property
+    def current_age(self):
+        from django.utils import timezone
+        today = timezone.localdate()
+        return today.year - self.birthdate.year - ((today.month, today.day) < (self.birthdate.month, self.birthdate.day))
+
     def __str__(self):
         return f"{self.lastname}, {self.firstname} {self.middlename}"
 
 
 class ApplicantUpdateRequest(models.Model):
+    def get_application_type_display(self):
+        return dict(APPLICATION_TYPE_CHOICES)["UPDATE"]
+
 
     REQUEST_STATUS = [
         ("PENDING", "Pending"),
@@ -181,6 +194,10 @@ class ApplicantUpdateRequest(models.Model):
         max_length=255
     )
 
+    civil_status = models.CharField(
+        max_length=20, choices=Applicant.CIVIL_STATUS_CHOICES, blank=True, default=""
+    )
+
     age = models.IntegerField()
 
     sex = models.CharField(
@@ -195,7 +212,7 @@ class ApplicantUpdateRequest(models.Model):
 
     brgy = models.ForeignKey(
         "Barangay",
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         null=True,
         blank=True
     )
@@ -214,7 +231,7 @@ class ApplicantUpdateRequest(models.Model):
         max_length=11
     )
 
-    email = models.EmailField()
+    email = models.EmailField(blank=True)
 
     pwd_status = models.CharField(
         max_length=20
@@ -266,6 +283,9 @@ class ApplicantUpdateRequest(models.Model):
 
 
 class ApplicantTransferRequest(models.Model):
+    def get_application_type_display(self):
+        return dict(APPLICATION_TYPE_CHOICES)["TRANSFER"]
+
 
     REQUEST_STATUS = [
         ("PENDING", "Pending"),
@@ -282,7 +302,7 @@ class ApplicantTransferRequest(models.Model):
 
     current_brgy = models.ForeignKey(
         "Barangay",
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="current_transfer_requests"
@@ -290,7 +310,7 @@ class ApplicantTransferRequest(models.Model):
 
     new_brgy = models.ForeignKey(
         "Barangay",
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="new_transfer_requests"
@@ -351,6 +371,9 @@ class ApplicantTransferRequest(models.Model):
 
 
 class ApplicantReactivationRequest(models.Model):
+    def get_application_type_display(self):
+        return dict(APPLICATION_TYPE_CHOICES)["REACTIVATION"]
+
 
     REQUEST_STATUS = [
         ("PENDING", "Pending"),
@@ -397,6 +420,9 @@ class ApplicantReactivationRequest(models.Model):
 
 
 class ApplicantReinstatementRequest(models.Model):
+    def get_application_type_display(self):
+        return dict(APPLICATION_TYPE_CHOICES)["REINSTATEMENT"]
+
     REQUEST_STATUS = [
         ("PENDING", "Pending"),
         ("REVIEW", "Review"),
@@ -486,6 +512,9 @@ class ApplicantBiometric(models.Model):
         blank=True
     )
 
+    applicant_signature_2 = models.FileField(upload_to="biometrics/signatures/", null=True, blank=True)
+    applicant_signature_3 = models.FileField(upload_to="biometrics/signatures/", null=True, blank=True)
+
     # =========================================================
     # CAPTURE STATUS
     # =========================================================
@@ -562,6 +591,8 @@ class SignatureSession(models.Model):
         (STATUS_CANCELLED, "Cancelled"),
         (STATUS_EXPIRED, "Expired"),
     ]
+
+    signature_slot = models.PositiveSmallIntegerField(default=1, choices=[(1, "Signature 1"), (2, "Signature 2"), (3, "Signature 3")])
 
     session_id = models.UUIDField(
         default=uuid.uuid4,

@@ -1,403 +1,153 @@
-```django
 {% extends "admin.html" %}
+{% load static %}
 
 {% block title %}
-Delete Barangay
+    Delete Barangay
 {% endblock %}
 
 {% block page_title %}
-Delete Barangay
+    Delete Barangay
 {% endblock %}
 
 {% block page_subtitle %}
-Confirm barangay deletion
+    Confirm barangay deletion
 {% endblock %}
-
 
 {% block extra_css %}
 
-<style>
-
-/* =========================================================
-   DELETE BARANGAY PAGE
-   ========================================================= */
-
-.delete-barangay-page {
-    width: 100%;
-}
-
-/* MAIN CARD */
-
-.delete-form-card {
-    background: #ffffff;
-    border: 1px solid #d9e1ec;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
-}
-
-/* HEADER */
-
-.delete-form-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 22px 26px;
-    background: #ffffff;
-    border-bottom: 1px solid #e1e6ed;
-}
-
-.delete-form-icon {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #fff1f1;
-    border: 1px solid #f3cccc;
-
-    color: #b42318;
-    font-size: 20px;
-}
-
-.delete-form-title {
-    margin: 0;
-    color: #172033;
-    font-size: 18px;
-    font-weight: 700;
-}
-
-.delete-form-subtitle {
-    margin: 3px 0 0;
-    color: #6b7280;
-    font-size: 13px;
-}
-
-/* BODY */
-
-.delete-form-body {
-    padding: 30px 28px;
-}
-
-/* WARNING */
-
-.delete-warning {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-
-    padding: 15px 16px;
-    margin-bottom: 25px;
-
-    background: #fff8e6;
-    border: 1px solid #f1d58a;
-
-    color: #7a5200;
-}
-
-.delete-warning-icon {
-    flex-shrink: 0;
-    font-size: 18px;
-    margin-top: 1px;
-}
-
-.delete-warning-title {
-    margin-bottom: 3px;
-    font-size: 14px;
-    font-weight: 700;
-}
-
-.delete-warning-text {
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-/* CONFIRMATION TEXT */
-
-.delete-question {
-    margin-bottom: 18px;
-    color: #374151;
-    font-size: 14px;
-}
-
-/* BARANGAY INFORMATION */
-
-.barangay-confirmation-box {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-
-    padding: 18px;
-
-    margin-bottom: 28px;
-
-    background: #f7f9fc;
-    border: 1px solid #dbe3ee;
-}
-
-.barangay-confirmation-icon {
-    width: 50px;
-    height: 50px;
-
-    flex-shrink: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #eaf2ff;
-    border: 1px solid #d5e4ff;
-
-    color: #0038a8;
-    font-size: 21px;
-}
-
-.barangay-confirmation-name {
-    color: #172033;
-    font-size: 17px;
-    font-weight: 700;
-    line-height: 1.3;
-}
-
-.barangay-confirmation-label {
-    margin-top: 3px;
-    color: #6b7280;
-    font-size: 12px;
-}
-
-/* ACTIONS */
-
-.delete-actions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 10px;
-
-    padding-top: 22px;
-
-    border-top: 1px solid #e5e7eb;
-}
-
-.delete-actions .btn {
-    min-height: 42px;
-    padding: 9px 18px;
-
-    border-radius: 0;
-
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.delete-actions .btn-outline-secondary {
-    background: #ffffff;
-    border-color: #cbd5e1;
-    color: #374151;
-}
-
-.delete-actions .btn-outline-secondary:hover {
-    background: #f3f4f6;
-    border-color: #9ca3af;
-    color: #111827;
-}
-
-.delete-actions .btn-danger {
-    background: #b42318;
-    border-color: #b42318;
-}
-
-.delete-actions .btn-danger:hover {
-    background: #912018;
-    border-color: #912018;
-}
-
-/* FINAL NOTICE */
-
-.delete-final-notice {
-    margin-top: 18px;
-    padding: 14px 16px;
-
-    background: #fafafa;
-    border: 1px solid #e5e7eb;
-
-    color: #6b7280;
-    font-size: 12px;
-    line-height: 1.6;
-}
-
-.delete-final-notice strong {
-    color: #374151;
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 767.98px) {
-
-    .delete-form-header {
-        padding: 18px;
-    }
-
-    .delete-form-body {
-        padding: 22px 18px;
-    }
-
-    .barangay-confirmation-box {
-        align-items: flex-start;
-    }
-
-    .delete-actions {
-        flex-direction: column-reverse;
-        align-items: stretch;
-    }
-
-    .delete-actions .btn {
-        width: 100%;
-    }
-
-}
-
-</style>
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/comelec-brgy_delete.css' %}"
+    >
+    <link rel="stylesheet" href="{% static 'css/admin-barangays.css' %}">
 
 {% endblock %}
 
-
 {% block content %}
 
-<div class="container-fluid px-0">
+    <div class="container-fluid px-0">
 
-    <div class="delete-barangay-page">
+        <div class="delete-barangay-page">
 
-        <div class="row justify-content-center">
+            <div class="row justify-content-center">
 
-            <div class="col-xl-7 col-lg-8 col-md-10">
+                <div class="col-xl-7 col-lg-8 col-md-10">
 
-                <div class="delete-form-card">
+                    <div class="delete-form-card">
 
-                    <!-- =====================================================
+                        <!-- =====================================================
                          HEADER
                     ====================================================== -->
 
-                    <div class="delete-form-header">
+                        <div class="delete-form-header">
 
-                        <div class="delete-form-icon">
-                            <i class="bi bi-trash"></i>
+                            <div class="delete-form-icon">
+                                <i class="bi bi-trash">
+                                </i>
+                            </div>
+
+                            <div>
+
+                                <h5 class="delete-form-title">Delete Barangay</h5>
+
+                                <p class="delete-form-subtitle">Confirm removal of the selected barangay</p>
+
+                            </div>
+
                         </div>
 
-                        <div>
-
-                            <h5 class="delete-form-title">
-                                Delete Barangay
-                            </h5>
-
-                            <p class="delete-form-subtitle">
-                                Confirm removal of the selected barangay
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- =====================================================
+                        <!-- =====================================================
                          BODY
                     ====================================================== -->
 
-                    <div class="delete-form-body">
+                        <div class="delete-form-body">
 
+                            <!-- WARNING -->
 
-                        <!-- WARNING -->
+                            <div class="delete-warning">
 
-                        <div class="delete-warning">
+                                <i class="bi bi-exclamation-triangle-fill delete-warning-icon">
+                                </i>
 
-                            <i class="bi bi-exclamation-triangle-fill delete-warning-icon"></i>
+                                <div>
 
-                            <div>
+                                    <div class="delete-warning-title">Warning</div>
 
-                                <div class="delete-warning-title">
-                                    Warning
-                                </div>
+                                    <div class="delete-warning-text">
+                                        This action will permanently remove the
+                                        barangay record from the registration system
+                                        and cannot be undone.
+                                    </div>
 
-                                <div class="delete-warning-text">
-                                    This action will permanently remove the
-                                    barangay record from the registration system
-                                    and cannot be undone.
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- QUESTION -->
-
-                        <div class="delete-question">
-
-                            Are you sure you want to delete the following
-                            barangay?
-
-                        </div>
-
-
-                        <!-- BARANGAY -->
-
-                        <div class="barangay-confirmation-box">
-
-                            <div class="barangay-confirmation-icon">
-
-                                <i class="bi bi-building"></i>
-
-                            </div>
-
-                            <div>
-
-                                <div class="barangay-confirmation-name">
-                                    {{ barangay.name }}
-                                </div>
-
-                                <div class="barangay-confirmation-label">
-                                    Registered Barangay
                                 </div>
 
                             </div>
 
-                        </div>
+                            <!-- QUESTION -->
 
+                            <div class="delete-question">
 
-                        <!-- FORM -->
-
-                        <form method="POST">
-
-                            {% csrf_token %}
-
-                            <div class="delete-actions">
-
-                                <a
-                                    href="{% url 'brgy_list' %}"
-                                    class="btn btn-outline-secondary"
-                                >
-                                    <i class="bi bi-arrow-left me-1"></i>
-                                    Cancel
-                                </a>
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-danger"
-                                >
-                                    <i class="bi bi-trash me-1"></i>
-                                    Yes, Delete Barangay
-                                </button>
+                                Are you sure you want to delete the following
+                                barangay?
 
                             </div>
 
-                        </form>
+                            <!-- BARANGAY -->
 
+                            <div class="barangay-confirmation-box">
 
-                        <!-- FINAL NOTICE -->
+                                <div class="barangay-confirmation-icon">
 
-                        <div class="delete-final-notice">
+                                    <i class="bi bi-building">
+                                    </i>
 
-                            <strong>Please verify:</strong>
-                            Make sure you have selected the correct barangay
-                            before proceeding. Deleted barangay records cannot
-                            be restored through this confirmation page.
+                                </div>
+
+                                <div>
+
+                                    <div class="barangay-confirmation-name">{{ barangay.name }}</div>
+
+                                    <div class="barangay-confirmation-label">Registered Barangay</div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- FORM -->
+
+                            {% if delete_error %}<p role="alert" class="alert alert-danger">{{ delete_error }}</p>{% endif %}
+                            <form method="post">
+
+                                {% csrf_token %}
+
+                                <div class="delete-actions">
+
+                                    <a href="{% url 'brgy_list' %}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-left me-1">
+                                        </i>
+                                        Cancel
+                                    </a>
+
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="bi bi-trash me-1">
+                                        </i>
+                                        Yes, Delete Barangay
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                            <!-- FINAL NOTICE -->
+
+                            <div class="delete-final-notice">
+
+                                <strong>Please verify:</strong>
+                                Make sure you have selected the correct barangay
+                                before proceeding. Deleted barangay records cannot
+                                be restored through this confirmation page.
+
+                            </div>
 
                         </div>
 
@@ -411,7 +161,4 @@ Confirm barangay deletion
 
     </div>
 
-</div>
-
 {% endblock %}
-```

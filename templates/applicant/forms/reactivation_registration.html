@@ -1,938 +1,349 @@
+{% extends request.walk_in_base|default:"staff/base.html" %}
+{% load static %}
 
-{% extends "base.html" %}
-
-{% block title %}Reactivation Request{% endblock %}
+{% block body_class %}application-form-page{% endblock %}
+{% block vendor_css %}
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+{% endblock %}
+{% block title %}APPLICATION FOR REACTIVATION OF REGISTRATION RECORD{% endblock %}
 
 {% block extra_css %}
-<style>
-.reactivation-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding-bottom: 30px;
-    color: #1e293b;
-}
-
-.reactivation-header {
-    background: #fff;
-    border: 1px solid #dbe3ef;
-    border-left: 5px solid #0038a8;
-    padding: 24px 28px;
-    margin-bottom: 22px;
-}
-
-.reactivation-header h1 {
-    margin: 0 0 8px;
-    color: #172554;
-    font-size: 27px;
-    font-weight: 800;
-}
-
-.reactivation-header p {
-    margin: 0;
-    color: #64748b;
-    font-size: 14px;
-    line-height: 1.7;
-}
-
-.application-badge {
-    display: inline-block;
-    margin-top: 14px;
-    padding: 6px 11px;
-    color: #0038a8;
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: .5px;
-    text-transform: uppercase;
-}
-
-.step-indicator {
-    display: flex;
-    align-items: center;
-    margin: 22px 0;
-}
-
-.step {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #94a3b8;
-    font-size: 12px;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-.step-number {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: #e2e8f0;
-    color: #64748b;
-    font-weight: 800;
-}
-
-.step.active {
-    color: #0038a8;
-}
-
-.step.active .step-number {
-    background: #0038a8;
-    color: #fff;
-}
-
-.step.completed .step-number {
-    background: #198754;
-    color: #fff;
-}
-
-.step-line {
-    flex: 1;
-    height: 2px;
-    background: #dbe3ef;
-    margin: 0 12px;
-}
-
-.reactivation-error {
-    background: #fff1f2;
-    border: 1px solid #fecdd3;
-    border-left: 5px solid #ce1126;
-    border-radius: 5px;
-    color: #881337;
-    padding: 14px 17px;
-    margin-bottom: 22px;
-    font-size: 14px;
-    line-height: 1.6;
-}
-
-.registration-card {
-    background: #fff;
-    border: 1px solid #dbe3ef;
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 22px;
-}
-
-.card-header-government {
-    display: flex;
-    align-items: center;
-    padding: 17px 22px;
-    background: #f8fafc;
-    border-bottom: 1px solid #dbe3ef;
-}
-
-.card-header-marker {
-    width: 4px;
-    height: 26px;
-    background: #0038a8;
-    margin-right: 12px;
-    flex-shrink: 0;
-}
-
-.card-header-government h2 {
-    margin: 0;
-    color: #172554;
-    font-size: 17px;
-    font-weight: 800;
-}
-
-.card-header-government p {
-    margin: 5px 0 0;
-    color: #64748b;
-    font-size: 13px;
-    line-height: 1.6;
-}
-
-.card-body-government {
-    padding: 24px;
-}
-
-.form-label {
-    display: block;
-    color: #334155;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 7px;
-}
-
-.required {
-    color: #ce1126;
-}
-
-.optional {
-    color: #64748b;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.form-control {
-    display: block;
-    width: 100%;
-    min-height: 44px;
-    padding: 10px 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 5px;
-    background: #fff;
-    color: #1e293b;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-.form-control:focus {
-    border-color: #0038a8;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 56, 168, .10);
-}
-
-textarea.form-control {
-    min-height: 140px;
-    resize: vertical;
-}
-
-.form-help {
-    display: block;
-    color: #64748b;
-    font-size: 12px;
-    line-height: 1.6;
-    margin-top: 7px;
-}
-
-.applicant-found {
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-    border-left: 5px solid #0038a8;
-    border-radius: 5px;
-    padding: 15px 18px;
-    margin-bottom: 22px;
-    color: #1e3a8a;
-    font-size: 13px;
-    line-height: 1.6;
-}
-
-.applicant-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    border: 1px solid #e2e8f0;
-}
-
-.applicant-item {
-    padding: 15px 17px;
-    border-bottom: 1px solid #e2e8f0;
-    min-width: 0;
-}
-
-.applicant-item:nth-child(odd) {
-    border-right: 1px solid #e2e8f0;
-}
-
-.applicant-item:nth-last-child(-n+2) {
-    border-bottom: none;
-}
-
-.applicant-label {
-    display: block;
-    margin-bottom: 5px;
-    color: #64748b;
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: .4px;
-}
-
-.applicant-value {
-    color: #1e293b;
-    font-size: 14px;
-    font-weight: 600;
-    overflow-wrap: anywhere;
-}
-
-.status-active {
-    color: #166534;
-}
-
-.status-inactive {
-    color: #b91c1c;
-}
-
-.upload-panel {
-    padding: 19px;
-    background: #f8fafc;
-    border: 1px dashed #94a3b8;
-    border-radius: 6px;
-}
-
-.upload-panel-title {
-    margin: 0 0 6px;
-    color: #172554;
-    font-size: 14px;
-    font-weight: 800;
-}
-
-.upload-panel-description {
-    margin: 0 0 15px;
-    color: #64748b;
-    font-size: 13px;
-    line-height: 1.6;
-}
-
-.upload-icon {
-    width: 42px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 12px;
-    border-radius: 6px;
-    background: #dbeafe;
-    color: #0038a8;
-}
-
-.upload-icon svg {
-    width: 23px;
-    height: 23px;
-}
-
-.file-preview {
-    display: none;
-    margin-top: 12px;
-    padding: 10px 12px;
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-    border-radius: 5px;
-    color: #1e3a8a;
-    font-size: 13px;
-    overflow-wrap: anywhere;
-}
-
-.file-preview.visible {
-    display: block;
-}
-
-.information-notice {
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-    border-left: 4px solid #0038a8;
-    border-radius: 5px;
-    padding: 14px 16px;
-    margin-top: 20px;
-    color: #1e3a8a;
-    font-size: 13px;
-    line-height: 1.7;
-}
-
-.information-notice strong {
-    display: block;
-    margin-bottom: 4px;
-}
-
-.action-area {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    padding: 20px 24px;
-    background: #fff;
-    border: 1px solid #dbe3ef;
-    margin-bottom: 25px;
-}
-
-.btn-government {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 44px;
-    padding: 10px 20px;
-    background: #0038a8;
-    border: 1px solid #0038a8;
-    border-radius: 5px;
-    color: #fff;
-    font-size: 13px;
-    font-weight: 800;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.btn-government:hover {
-    background: #002b7f;
-    border-color: #002b7f;
-    color: #fff;
-}
-
-.btn-outline-government {
-    background: #fff;
-    color: #334155;
-    border-color: #cbd5e1;
-}
-
-.btn-outline-government:hover {
-    background: #f8fafc;
-    color: #0038a8;
-    border-color: #0038a8;
-}
-
-.btn-government:disabled {
-    opacity: .65;
-    cursor: not-allowed;
-}
-
-.page-footer {
-    text-align: center;
-    color: #64748b;
-    font-size: 12px;
-    line-height: 1.8;
-}
-
-@media (max-width: 650px) {
-    .reactivation-container {
-        padding: 0 10px 25px;
-    }
-
-    .reactivation-header {
-        padding: 19px;
-    }
-
-    .reactivation-header h1 {
-        font-size: 23px;
-    }
-
-    .step {
-        font-size: 11px;
-    }
-
-    .step-line {
-        margin: 0 7px;
-    }
-
-    .card-body-government {
-        padding: 17px;
-    }
-
-    .applicant-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .applicant-item,
-    .applicant-item:nth-child(odd),
-    .applicant-item:nth-last-child(-n+2) {
-        border-right: none;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .applicant-item:last-child {
-        border-bottom: none;
-    }
-
-    .action-area {
-        flex-direction: column-reverse;
-        align-items: stretch;
-        padding: 17px;
-    }
-
-    .action-area .btn-government {
-        width: 100%;
-        box-sizing: border-box;
-    }
-}
-</style>
+    <link rel="stylesheet" href="{% static 'css/application-dialog.css' %}">
+    <link
+        rel="stylesheet"
+        href="{% static 'css/pages/applicant-forms-reactivation_registration.css' %}"
+    >
+    <link rel="stylesheet" href="{% static 'css/application-forms.css' %}">
+    <link rel="stylesheet" href="{% static 'css/registration-lookup.css' %}">
+    <script src="{% static 'js/registration-lookup.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}
-<div class="reactivation-container">
+    {% include "components/application_blocked_dialog.html" %}
+    <div class="reactivation-container">
 
-    <header class="reactivation-header">
-        <h1>Request for Reactivation</h1>
-        <p>
-            Request the reactivation of an inactive voter registration
-            record. Provide your registration details, reason, and a
-            copy of your valid identification.
-        </p>
+        <header class="reactivation-header">
+            <h1>APPLICATION FOR REACTIVATION OF REGISTRATION RECORD</h1>
+            <p>
+                Request the reactivation of an inactive voter registration
+                record. Provide your registration details, reason, and a
+                copy of your valid identification.
+            </p>
 
-        <span class="application-badge">Voter Registration Services</span>
+            <span class="application-badge">APPLICATION FOR REACTIVATION OF REGISTRATION RECORD</span>
 
-        <div class="step-indicator" aria-label="Application steps">
-            <div class="step {% if not applicant %}active{% else %}completed{% endif %}">
-                <span class="step-number">1</span>
-                <span>Find Registration</span>
+            <div class="step-indicator" aria-label="Application steps">
+                <div
+                    class="step {% if not applicant %}active{% else %}completed{% endif %}"
+                >
+                    <span class="step-number">1</span>
+                    <span>Find Registration</span>
+                </div>
+
+                <div class="step-line"></div>
+
+                <div class="step {% if applicant %}active{% endif %}">
+                    <span class="step-number">2</span>
+                    <span>Request Reactivation</span>
+                </div>
             </div>
+        </header>
 
-            <div class="step-line"></div>
+        {% if error %}
+            <div class="reactivation-error" role="alert">
+                <strong>Unable to process your request</strong>
+                <div>{{ error }}</div>
 
-            <div class="step {% if applicant %}active{% endif %}">
-                <span class="step-number">2</span>
-                <span>Request Reactivation</span>
-            </div>
-        </div>
-    </header>
-
-    {% if error %}
-        <div class="reactivation-error" role="alert">
-            <strong>Unable to process your request</strong>
-            <div>{{ error }}</div>
-
-            {% if applicant and form_data.reason %}
-                <p class="mb-0 mt-2">
-                    Your entered information is preserved where possible.
-                    Please select the ID file again if the submission failed.
-                </p>
-            {% endif %}
-        </div>
-    {% endif %}
-
-    {% if not applicant %}
-
-        <!-- STEP 1: FIND REGISTRATION -->
-        <section class="registration-card">
-            <div class="card-header-government">
-                <div class="card-header-marker"></div>
-                <div>
-                    <h2>Find Your Registration</h2>
-                    <p>
-                        Enter your information as it appears in your
-                        registration record.
+                {% if applicant and form_data.reason %}
+                    <p class="mb-0 mt-2">
+                        Your entered information is preserved where possible.
+                        Please select the ID file again if the submission failed.
                     </p>
-                </div>
+                {% endif %}
             </div>
+        {% endif %}
 
-            <div class="card-body-government">
-                <form method="POST" id="findApplicantForm">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="find_applicant">
+        {% if not applicant %}
 
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <label for="lastname" class="form-label">
-                                Last Name <span class="required">*</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                id="lastname"
-                                name="lastname"
-                                class="form-control"
-                                value="{{ search_data.lastname|default:'' }}"
-                                autocomplete="family-name"
-                                maxlength="150"
-                                required
-                            >
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="firstname" class="form-label">
-                                First Name <span class="required">*</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                id="firstname"
-                                name="firstname"
-                                class="form-control"
-                                value="{{ search_data.firstname|default:'' }}"
-                                autocomplete="given-name"
-                                maxlength="150"
-                                required
-                            >
-                        </div>
-
-                        <!-- MIDDLE NAME IS OPTIONAL -->
-                        <div class="col-md-6">
-                            <label for="middlename" class="form-label">
-                                Middle Name
-                                <span class="optional">(Optional)</span>
-                            </label>
-
-                            <input
-                                type="text"
-                                id="middlename"
-                                name="middlename"
-                                class="form-control"
-                                value="{{ search_data.middlename|default:'' }}"
-                                autocomplete="additional-name"
-                                maxlength="150"
-                            >
-
-                            <small class="form-help">
-                                Leave blank if you do not have a middle name
-                                or it is not recorded.
-                            </small>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="birthdate" class="form-label">
-                                Birthdate <span class="required">*</span>
-                            </label>
-
-                            <input
-                                type="date"
-                                id="birthdate"
-                                name="birthdate"
-                                class="form-control"
-                                value="{{ search_data.birthdate|default:'' }}"
-                                required
-                            >
-                        </div>
-                    </div>
-
-                    <div class="information-notice">
-                        <strong>Important</strong>
-                        Enter your correct last name, first name, and
-                        birthdate. If you enter a middle name, it may be
-                        used to help identify your registration record.
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-4">
-                        <a href="/" class="btn-government btn-outline-government">
-                            Back to Home
-                        </a>
-
-                        <button type="submit" class="btn-government">
-                            Find Registration
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </section>
-
-    {% else %}
-
-        <!-- STEP 2: APPLICANT DETAILS -->
-        <div class="applicant-found">
-            <strong>Registration Record Found</strong>
-            <div>
-                Verify the information below before submitting your
-                reactivation request.
-            </div>
-        </div>
-
-        <section class="registration-card">
-            <div class="card-header-government">
-                <div class="card-header-marker"></div>
-                <div>
-                    <h2>Applicant Information</h2>
-                    <p>Existing registration details for verification.</p>
-                </div>
-            </div>
-
-            <div class="card-body-government">
-                <div class="applicant-grid">
-
-                    <div class="applicant-item">
-                        <span class="applicant-label">Full Name</span>
-                        <span class="applicant-value">
-                            {{ applicant.lastname }}, {{ applicant.firstname }}
-                            {% if applicant.middlename %}
-                                {{ applicant.middlename }}
-                            {% endif %}
-                        </span>
-                    </div>
-
-                    <div class="applicant-item">
-                        <span class="applicant-label">Birthdate</span>
-                        <span class="applicant-value">
-                            {{ applicant.birthdate|date:"F d, Y" }}
-                        </span>
-                    </div>
-
-                    <div class="applicant-item">
-                        <span class="applicant-label">Current Status</span>
-                        <span class="applicant-value">
-                            {% if applicant.is_active %}
-                                <span class="status-active">Active</span>
-                            {% else %}
-                                <span class="status-inactive">Inactive</span>
-                            {% endif %}
-                        </span>
-                    </div>
-
-                    <div class="applicant-item">
-                        <span class="applicant-label">Barangay</span>
-                        <span class="applicant-value">
-                            {% if applicant.brgy %}
-                                {{ applicant.brgy.name }}
-                            {% else %}
-                                Not specified
-                            {% endif %}
-                        </span>
-                    </div>
-
-                    <div class="applicant-item">
-                        <span class="applicant-label">Municipality</span>
-                        <span class="applicant-value">
-                            {{ applicant.municipality|default:"Not specified" }}
-                        </span>
-                    </div>
-
-                    <div class="applicant-item">
-                        <span class="applicant-label">Province</span>
-                        <span class="applicant-value">
-                            {{ applicant.province|default:"Not specified" }}
-                        </span>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- REACTIVATION REQUEST FORM -->
-        <form
-            method="POST"
-            enctype="multipart/form-data"
-            id="reactivationForm"
-        >
-            {% csrf_token %}
-
-            <input type="hidden" name="action" value="submit_reactivation">
-            <input type="hidden" name="applicant_id" value="{{ applicant.id }}">
-
-            <!-- REASON -->
+            <!-- STEP 1: FIND REGISTRATION -->
             <section class="registration-card">
                 <div class="card-header-government">
                     <div class="card-header-marker"></div>
                     <div>
-                        <h2>Reason for Reactivation</h2>
-                        <p>
-                            Explain why your voter registration should
-                            be reactivated.
-                        </p>
+                        <h2>Find Your Registration</h2>
+                        <p>Enter your saved registration reference number.</p>
                     </div>
                 </div>
 
                 <div class="card-body-government">
-                    <label for="reason" class="form-label">
-                        Reason for Reactivation
-                        <span class="required">*</span>
-                    </label>
+                    <form method="post" id="findApplicantForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="find_applicant">
 
-                    <textarea
-                        id="reason"
-                        name="reason"
-                        class="form-control"
-                        rows="6"
-                        minlength="5"
-                        maxlength="2000"
-                        placeholder="Enter your reason for requesting reactivation..."
-                        required
-                    >{{ form_data.reason|default:'' }}</textarea>
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <label for="registration_reference" class="form-label">
+                                    Registration Reference Number <span class="required">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="registration_reference"
+                                    name="registration_reference"
+                                    class="form-control"
+                                    value="{{ search_data.registration_reference|default:'' }}"
+                                    placeholder="PD- followed by your 32-character reference"
+                                    maxlength="35"
+                                    autocomplete="off"
+                                    autocapitalize="characters"
+                                    spellcheck="false"
+                                    required
+                                    aria-describedby="referenceHelp"
+                                    minlength="35"
+                                    pattern="[Pp][Dd]-[A-Fa-f0-9]{32}"
+                                >
+                                <small
+                                    id="referenceHelp"
+                                    class="form-text"
+                                >Paste the complete reference saved after registration. Keep it private.</small>
+                            </div>
+                        </div>
 
-                    <small class="form-help">
-                        Provide at least 5 characters and no more than
-                        2,000 characters.
-                    </small>
+                        <div class="information-notice application-important-notice"><span class="application-notice-symbol" aria-hidden="true"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.5" r=".9" fill="currentColor" stroke="none"/></svg></span><div><strong>Important</strong>
+                            Use your complete registration reference number. Do not share it publicly.
+                        </div></div>
+
+                        <div
+                            class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-4"
+                        >
+                            <a href="/" class="btn-government btn-outline-government">Back to Home</a>
+
+                            <button type="submit" class="btn-government">Find Registration</button>
+                        </div>
+                    </form>
                 </div>
             </section>
 
-            <!-- VALID ID UPLOAD -->
+        {% else %}
+
+            <!-- STEP 2: APPLICANT DETAILS -->
+            <div class="applicant-found">
+                <strong>Registration Record Found</strong>
+                <div>
+                    Verify the information below before submitting your
+                    reactivation request.
+                </div>
+            </div>
+
             <section class="registration-card">
                 <div class="card-header-government">
                     <div class="card-header-marker"></div>
                     <div>
-                        <h2>Valid Identification</h2>
-                        <p>
-                            Upload a clear copy of your valid ID for
-                            verification.
-                        </p>
+                        <h2>Applicant Information</h2>
+                        <p>Existing registration details for verification.</p>
                     </div>
                 </div>
 
                 <div class="card-body-government">
-                    <div class="upload-panel">
-                        <div class="upload-icon" aria-hidden="true">
-                            <svg
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.8"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-                                <path d="M12 16V4"></path>
-                                <path d="m7 9 5-5 5 5"></path>
-                                <path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"></path>
-                            </svg>
+                    <div class="applicant-grid">
+
+                        <div class="applicant-item">
+                            <span class="applicant-label">Full Name</span>
+                            <span class="applicant-value">
+                                {{ applicant.lastname }}, {{ applicant.firstname }}
+                                {% if applicant.middlename %}
+                                    {{ applicant.middlename }}
+                                {% endif %}
+                            </span>
                         </div>
 
-                        <p class="upload-panel-title">
-                            Upload a Copy of Your Valid ID
-                        </p>
+                        <div class="applicant-item">
+                            <span class="applicant-label">Birthdate</span>
+                            <span class="applicant-value">{{ applicant.birthdate|date:"F d, Y" }}</span>
+                        </div>
 
-                        <p class="upload-panel-description">
-                            Select a readable image or PDF of your
-                            identification. Ensure that the identifying
-                            details are clear.
-                        </p>
+                        <div class="applicant-item">
+                            <span class="applicant-label">Current Status</span>
+                            <span class="applicant-value">
+                                {% if applicant.is_active %}
+                                    <span class="status-active">Active</span>
+                                {% else %}
+                                    <span class="status-inactive">Inactive</span>
+                                {% endif %}
+                            </span>
+                        </div>
 
-                        <label for="valid_id_document" class="form-label">
-                            Valid ID Document
+                        <div class="applicant-item">
+                            <span class="applicant-label">Barangay</span>
+                            <span class="applicant-value">
+                                {% if applicant.brgy %}
+                                    {{ applicant.brgy.name }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="applicant-item">
+                            <span class="applicant-label">Municipality</span>
+                            <span class="applicant-value">{{ applicant.municipality|default:"Not specified" }}</span>
+                        </div>
+
+                        <div class="applicant-item">
+                            <span class="applicant-label">Province</span>
+                            <span class="applicant-value">{{ applicant.province|default:"Not specified" }}</span>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- REACTIVATION REQUEST FORM -->
+            <form method="post" enctype="multipart/form-data" id="reactivationForm">
+                {% csrf_token %}
+
+                <input type="hidden" name="action" value="submit_reactivation">
+                <input type="hidden" name="applicant_id" value="{{ applicant.id }}">
+
+                <!-- REASON -->
+                <section class="registration-card">
+                    <div class="card-header-government">
+                        <div class="card-header-marker"></div>
+                        <div>
+                            <h2>Reason for Reactivation</h2>
+                            <p>
+                                Explain why your voter registration should
+                                be reactivated.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card-body-government">
+                        <label for="reason" class="form-label">
+                            Reason for Reactivation
                             <span class="required">*</span>
                         </label>
 
-                        <input
-                            type="file"
-                            id="valid_id_document"
-                            name="valid_id_document"
+                        <textarea
+                            id="reason"
+                            name="reason"
                             class="form-control"
-                            accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                            rows="6"
+                            minlength="5"
+                            maxlength="2000"
+                            placeholder="Enter your reason for requesting reactivation..."
                             required
-                        >
+                        >{{ form_data.reason|default:'' }}</textarea>
 
                         <small class="form-help">
-                            Accepted formats: PDF, JPG, JPEG, PNG.
-                            Maximum file size: 5 MB.
+                            Provide at least 5 characters and no more than
+                            2,000 characters.
                         </small>
+                    </div>
+                </section>
 
-                        <div
-                            id="filePreview"
-                            class="file-preview"
-                            aria-live="polite"
-                        ></div>
+                <!-- VALID ID UPLOAD -->
+                <section class="registration-card">
+                    <div class="card-header-government">
+                        <div class="card-header-marker"></div>
+                        <div>
+                            <h2>Valid Identification</h2>
+                            <p>
+                                Upload a clear copy of your valid ID for
+                                verification.
+                            </p>
+                        </div>
                     </div>
 
-                    <div class="information-notice">
-                        <strong>Before submitting</strong>
-                        Review your reason and make sure the uploaded ID is
-                        correct and readable. Your request will be reviewed
-                        by authorized personnel. Submitting this form does
-                        not automatically reactivate your registration.
+                    <div class="card-body-government">
+                        <div class="upload-panel">
+                            <div class="upload-icon" aria-hidden="true">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path d="M12 16V4"></path>
+                                    <path d="m7 9 5-5 5 5"></path>
+                                    <path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"></path>
+                                </svg>
+                            </div>
+
+                            <p class="upload-panel-title">Upload a Copy of Your Valid ID</p>
+
+                            <p class="upload-panel-description">
+                                Select a readable image or PDF of your
+                                identification. Ensure that the identifying
+                                details are clear.
+                            </p>
+
+                            {% if applicant.valid_id_document %}
+                            <p><strong>Existing document on file.</strong>
+                                <a href="{{ applicant.valid_id_document.url }}" target="_blank" rel="noopener">View existing document</a>.
+                                Leave the upload empty to keep this document, or select a replacement to support your request.
+                            </p>
+                        {% endif %}
+                        <label for="valid_id_document" class="form-label">
+                            {% if applicant.valid_id_document %}Upload replacement document (optional){% else %}Upload valid ID <span class="required">*</span>{% endif %}
+                        </label>
+
+                            <input
+                                type="file"
+                                id="valid_id_document"
+                                name="valid_id_document"
+                                class="form-control"
+                                accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                                {% if not applicant.valid_id_document %}required{% endif %}
+                            >
+
+                            <small class="form-help">
+                                Accepted formats: PDF, JPG, JPEG, PNG.
+                                Maximum file size: 5 MB.
+                            </small>
+
+                            <div id="filePreview" class="file-preview" aria-live="polite"></div>
+                        </div>
+
+                        <div class="information-notice">
+                            <strong>Before submitting</strong>
+                            Review your reason and make sure the uploaded ID is
+                            correct and readable. Your request will be reviewed
+                            by authorized personnel. Submitting this form does
+                            not automatically reactivate your registration.
+                        </div>
                     </div>
+                </section>
+
+                <!-- ACTIONS -->
+                <div class="action-area">
+                    <a href="{% if request.walk_in_base %}{% url 'admin-walk-in' %}{% else %}{% url 'home' %}{% endif %}" class="application-cancel btn-government btn-outline-government">Cancel</a>
+
+                    <button
+                        type="submit"
+                        id="submitReactivation"
+                        class="btn-government"
+                    >Submit Reactivation Request</button>
                 </div>
-            </section>
+            </form>
 
-            <!-- ACTIONS -->
-            <div class="action-area">
-                <a
-                    href="{% url 'reactivate-registration' %}"
-                    class="btn-government btn-outline-government"
-                >
-                    Start Again
-                </a>
+        {% endif %}
 
-                <button
-                    type="submit"
-                    id="submitReactivation"
-                    class="btn-government"
-                >
-                    Submit Reactivation Request
-                </button>
-            </div>
-        </form>
+        <footer class="page-footer">
+            <strong>Voter Registration Services</strong>
+            <br>
+            Pio Duran, Albay
+            <br>
+            Please ensure that the information you submit is accurate and complete.
+        </footer>
 
-    {% endif %}
+    </div>
 
-    <footer class="page-footer">
-        <strong>Voter Registration Services</strong><br>
-        Pio Duran, Albay<br>
-        Please ensure that the information you submit is accurate and complete.
-    </footer>
-
-</div>
-
-<script>
-"use strict";
-
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("reactivationForm");
-    const fileInput = document.getElementById("valid_id_document");
-    const filePreview = document.getElementById("filePreview");
-    const reason = document.getElementById("reason");
-    const submitButton = document.getElementById("submitReactivation");
-
-    const allowedExtensions = ["pdf", "jpg", "jpeg", "png"];
-    const maxFileSize = 5 * 1024 * 1024;
-
-    if (fileInput && filePreview) {
-        fileInput.addEventListener("change", function () {
-            filePreview.textContent = "";
-            filePreview.classList.remove("visible");
-
-            const file = this.files && this.files[0];
-
-            if (!file) {
-                return;
-            }
-
-            const extension = file.name.includes(".")
-                ? file.name.split(".").pop().toLowerCase()
-                : "";
-
-            if (!allowedExtensions.includes(extension)) {
-                this.value = "";
-                alert(
-                    "Invalid file type. Please select a PDF, JPG, JPEG, or PNG file."
-                );
-                return;
-            }
-
-            if (file.size <= 0) {
-                this.value = "";
-                alert("The selected file is empty. Please choose another file.");
-                return;
-            }
-
-            if (file.size > maxFileSize) {
-                this.value = "";
-                alert("The valid ID file must not exceed 5 MB.");
-                return;
-            }
-
-            filePreview.textContent =
-                "Selected file: " + file.name +
-                " (" + (file.size / (1024 * 1024)).toFixed(2) + " MB)";
-
-            filePreview.classList.add("visible");
-        });
-    }
-
-    if (form) {
-        form.addEventListener("submit", function (event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                form.reportValidity();
-                return;
-            }
-
-            const file = fileInput.files && fileInput.files[0];
-
-            if (!file) {
-                event.preventDefault();
-                alert("Please upload your valid ID.");
-                fileInput.focus();
-                return;
-            }
-
-            const extension = file.name.includes(".")
-                ? file.name.split(".").pop().toLowerCase()
-                : "";
-
-            if (!allowedExtensions.includes(extension)) {
-                event.preventDefault();
-                alert("Please upload a PDF, JPG, JPEG, or PNG file.");
-                fileInput.focus();
-                return;
-            }
-
-            if (file.size <= 0 || file.size > maxFileSize) {
-                event.preventDefault();
-                alert("Please select a non-empty ID file no larger than 5 MB.");
-                fileInput.focus();
-                return;
-            }
-
-            if (reason.value.trim().length < 5) {
-                event.preventDefault();
-                alert("Please provide a more detailed reason for reactivation.");
-                reason.focus();
-                return;
-            }
-
-            if (submitButton) {
-                submitButton.disabled = true;
-                submitButton.textContent = "Submitting Request...";
-            }
-        });
-    }
-});
-</script>
+    <script src="{% static 'js/application-submit-state.js' %}"></script>
+    <script src="{% static 'js/pages/applicant-forms-reactivation_registration-1.js' %}"></script>
+    <script src="{% static 'js/replacement-document-preview.js' %}"></script>
 {% endblock %}

@@ -1,0 +1,29 @@
+/* Consistent application and status labels across the admin workspace. */
+:is(.badge, .application-badge, .status-badge, .update-status-badge, .registration-badge, .request-status, .active-badge, .report-badge, .walk-in-status) {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 28px;
+    padding: 5px 10px !important;
+    border: 1px solid var(--badge-border, #d9dce1) !important;
+    border-radius: 7px !important;
+    background: var(--badge-bg, #f0f1f3) !important;
+    color: var(--badge-color, #4b5563) !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    line-height: 1.4;
+    white-space: nowrap;
+    box-shadow: none !important;
+}
+:is(.application-new, .badge.bg-primary) { --badge-bg: #eaf2ff; --badge-border: #cfe0ff; --badge-color: #0038a8; }
+:is(.application-update, .status-review, .update-status-review, .registration-badge-info, .request-status.review, .report-badge-review, .badge.bg-info) { --badge-bg: #e9f7fb; --badge-border: #c9e9f0; --badge-color: #176477; }
+:is(.application-transfer, .status-pending, .update-status-pending, .registration-badge-warning, .request-status.pending, .report-badge-pending, .active-badge.inactive, .walk-in-status.inactive, .badge.bg-warning) { --badge-bg: #fff6df; --badge-border: #f0d996; --badge-color: #795700; }
+:is(.status-approved, .status-badge.verified, .update-status-approved, .registration-badge-success, .request-status.approved, .report-badge-approved, .report-badge-verified, .active-badge.active, .walk-in-status:not(.inactive), .badge.bg-success) { --badge-bg: #eaf7ef; --badge-border: #c8e6d2; --badge-color: #176b39; }
+:is(.status-disapproved, .update-status-disapproved, .registration-badge-danger, .request-status.disapproved, .report-badge-disapproved, .badge.bg-danger) { --badge-bg: #fff0f0; --badge-border: #f0caca; --badge-color: #a61b1b; }
+:is(.application-reactivation, .status-default, .registration-badge-secondary, .badge.bg-secondary) { --badge-bg: #f0f1f3; --badge-border: #d9dce1; --badge-color: #4b5563; }
+.application-reinstatement { --badge-bg: #e9ebee; --badge-border: #d2d6dc; --badge-color: #1f2937; }
+
+.application-badge { white-space: normal; overflow-wrap: anywhere; text-align: left; line-height: 1.5; max-width: 34rem; }
+
+.badge { white-space: normal; overflow-wrap: anywhere; line-height: 1.5; }

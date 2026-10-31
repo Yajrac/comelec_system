@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+:root { color-scheme: light; --blue: #073ba8; --navy: #142b54; --muted: #76849a; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: #f5f7fb; color: var(--navy); font: 14px Manrope, 'Segoe UI', sans-serif; display: flex; flex-direction: column; }
+a { color: inherit; text-decoration: none; }
+button, input { font: inherit; }
+:focus-visible { outline: 3px solid #c99b18; outline-offset: 4px; }
+.login-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 21px max(24px, calc((100vw - 1200px) / 2)); background: white; border-bottom: 1px solid #e4e9f1; }
+.brand { display: flex; align-items: center; gap: 13px; }
+.brand img { width: 49px; height: 49px; object-fit: contain; }
+.brand strong { display: block; font-size: 13px; letter-spacing: .8px; }
+.brand small { display: block; margin-top: 5px; font-size: 10px; color: var(--muted); }
+.return-link { font-size: 11px; font-weight: 700; color: #63738c; white-space: nowrap; }
+.return-link span { margin-right: 6px; }
+.return-link:hover { color: var(--blue); }
+main { flex: 1; display: grid; place-items: center; padding: 44px 24px; }
+.login-layout { width: 100%; max-width: 970px; display: grid; grid-template-columns: 1fr 1fr; background: white; border: 1px solid #e1e7f0; border-radius: 17px; overflow: hidden; box-shadow: 0 15px 50px #18345d08; }
+.welcome-panel { padding: 35px; background: linear-gradient(145deg, #073ba8, #102d6b); color: white; display: flex; flex-direction: column; justify-content: space-between; border-bottom: 4px solid #f4ce40; }
+.panel-label { font-size: 9px; font-weight: 700; letter-spacing: 1.8px; display: flex; align-items: center; gap: 8px; color: #dbe6ff; }
+.panel-label > span { width: 6px; height: 6px; border-radius: 50%; background: #f4ce40; }
+.welcome-content { padding: 33px 0; }
+.welcome-seal { width: 77px; height: 77px; margin-bottom: 20px; }
+h1 { font-size: clamp(29px, 3vw, 37px); line-height: 1.25; letter-spacing: -1px; margin: 0 0 16px; font-weight: 800; }
+h1 > span { color: #ffdc65; }
+.welcome-content p { max-width: 290px; font-size: 12px; color: #c3d2f1; line-height: 1.9; margin: 0; }
+.office-label { display: flex; align-items: center; gap: 11px; padding-top: 21px; border-top: 1px solid #ffffff26; }
+.office-label svg { width: 24px; height: 24px; color: #e6c353; }
+.office-label span { color: #c3d2f1; font-size: 9px; }
+.office-label strong { display: block; color: white; margin-top: 4px; font-size: 11px; font-weight: 600; }
+.form-panel { padding: 44px 42px; }
+.lock-icon { display: grid; place-items: center; width: 45px; height: 45px; background: #edf3ff; border-radius: 11px; color: var(--blue); margin-bottom: 24px; }
+.lock-icon svg { width: 24px; height: 24px; }
+.eyebrow { display: block; color: var(--blue); font-size: 9px; letter-spacing: 1.6px; font-weight: 800; }
+h2 { font-size: 29px; letter-spacing: -1px; margin: 8px 0 9px; }
+.form-intro { color: var(--muted); font-size: 11px; line-height: 1.8; margin: 0 0 26px; }
+form > label:not(.show-password) { display: block; font-size: 11px; font-weight: 700; margin: 18px 0 8px; }
+.input-wrap { display: flex; align-items: center; gap: 11px; border: 1px solid #dce3ed; border-radius: 7px; padding: 0 13px; background: #fff; }
+.input-wrap:focus-within { border-color: #5483dd; box-shadow: 0 0 0 3px #073ba80b; }
+.input-wrap svg { width: 17px; height: 17px; color: #96a2b5; flex-shrink: 0; }
+.input-wrap input { width: 100%; min-width: 0; padding: 13px 0; background: transparent; border: 0; outline: none; font-size: 12px; color: var(--navy); }
+input::placeholder { color: #a0aaba; }
+.show-password { display: flex; align-items: center; gap: 7px; color: #6c7c94; font-size: 10px; margin: 15px 0 23px; cursor: pointer; }
+.show-password input { width: 14px; height: 14px; accent-color: var(--blue); margin: 0; }
+button { width: 100%; background: var(--blue); color: white; border: 0; border-radius: 7px; padding: 14px; font-size: 12px; font-weight: 700; cursor: pointer; }
+button:hover { background: #07318a; }
+button:disabled { opacity: .7; cursor: wait; }
+#buttonContent { display: flex; align-items: center; justify-content: center; gap: 15px; }
+#buttonLoading:not([hidden]) { display: flex; align-items: center; justify-content: center; gap: 9px; }
+[hidden] { display: none !important; }
+.spinner { width: 14px; height: 14px; border: 2px solid #ffffff60; border-top-color: white; border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.access-note { display: flex; align-items: center; justify-content: center; gap: 6px; color: #94a0b2; font-size: 9px; margin: 20px 0 0; }
+.access-note svg { width: 14px; height: 14px; flex-shrink: 0; }
+.error-message { background: #fff2f1; border: 1px solid #f3d3d0; border-radius: 7px; padding: 12px; color: #a74036; font-size: 11px; line-height: 1.7; }
+.error-message strong, .error-message span { display: block; }
+footer { width: min(1200px, calc(100% - 48px)); margin: 0 auto; border-top: 1px solid #e4e9f1; padding: 19px 0; font-size: 9px; color: #97a3b4; }
+footer > span:not(.footer-end) { margin: 0 7px; }
+.footer-end { float: right; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+@media (max-width: 700px) { .login-layout { grid-template-columns: 1fr; max-width: 440px; } .welcome-panel { padding: 23px; } .welcome-content { padding: 20px 0 0; } .welcome-seal, .office-label { display: none; } h1 { font-size: 25px; } h1 br { display: none; } .welcome-content p { max-width: none; font-size: 11px; } .form-panel { padding: 28px 25px; } .lock-icon { display: none; } .login-header { padding: 15px 18px; flex-wrap: wrap; gap: 13px; } .brand strong { font-size: 11px; } .brand img { width: 42px; height: 42px; } main { padding: 25px 16px; } .return-link { margin-left: auto; } .footer-end { display: block; float: none; margin-top: 7px; } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }

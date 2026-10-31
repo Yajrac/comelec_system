@@ -1,0 +1,45 @@
+{% load static %}
+<div
+    class="report-header-controls d-flex align-items-center flex-wrap gap-2"
+>
+    <form
+        method="get"
+        action="{% url 'admin-reports' %}#{{ report_anchor }}"
+        class="m-0"
+        aria-label="{{ report_table }} report year"
+    >
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <label class="mb-0">
+                <span class="visually-hidden">Year</span>
+                <select
+                    name="year"
+                    class="form-select inline-comelec-components-report_controls-1"
+                >
+                    <option value="">All years</option>{% for year in report_year_options %}<option
+    value="{{ year }}"
+    {% if selected_report_year == year %}selected{% endif %}
+>{{ year }}</option>{% endfor %}</select>
+            </label>
+            <button class="btn btn-primary" type="submit">Apply period</button>
+            <a
+                href="{% url 'admin-reports' %}#{{ report_anchor }}"
+                class="btn btn-outline-secondary"
+            >All years</a>
+        </div>
+    </form>
+    <a
+        href="{% url 'admin-reports' %}?{{ period_query }}&amp;format=pdf&amp;table={{ report_table }}"
+        class="btn btn-primary report-filter-btn"
+    >
+        <i class="bi bi-download me-1" aria-hidden="true">
+        </i> Download PDF</a>
+        <a
+            href="{% url 'admin-reports' %}?{{ period_query }}&amp;format=print&amp;table={{ report_table }}"
+            target="_blank"
+            rel="noopener"
+            class="btn btn-dark report-filter-btn"
+        >
+            <i class="bi bi-printer me-1" aria-hidden="true">
+            </i> Print / Save PDF</a>
+            <a href="{{ request.get_full_path }}#{{ report_anchor }}" class="admin-table-refresh"><i class="bi bi-arrow-repeat" aria-hidden="true"></i> Refresh</a>
+        </div>

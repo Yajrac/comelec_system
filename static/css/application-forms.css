@@ -1,0 +1,46 @@
+/* Shared public application styling, scoped to avoid affecting admin screens. */
+.application-form-page { --gov-blue: #073ba8; --gov-blue-dark: #002b7f; --gov-blue-light: #edf3ff; --gov-border: #e4e9f1; --gov-text: #142b54; --gov-muted: #718096; --gov-bg: #f5f7fb; }
+.application-form-page .update-page { background: transparent; padding: 0; }
+.application-form-page .update-container, .application-form-page .transfer-page, .application-form-page .reactivation-container { max-width: none; width: 100%; margin: 0; padding: 0; }
+.application-form-page .registration-header, .application-form-page .reactivation-header, .application-form-page .update-page .page-heading { display: block; background: transparent; border: 0; padding: 0; margin: 0 0 26px; box-shadow: none; }
+.application-form-page .registration-header h1, .application-form-page .reactivation-header h1, .application-form-page .update-page .page-heading h1 { font-size: clamp(26px, 3vw, 34px); font-weight: 800; letter-spacing: -1px; color: #142b54; margin-bottom: 10px; }
+.application-form-page .registration-header p, .application-form-page .reactivation-header p, .application-form-page .update-page .page-heading p { color: #718096; font-size: 12px; line-height: 1.8; }
+.application-form-page .application-badge, .application-form-page .office-label { display: inline-block; border: 0; border-radius: 20px; background: #eaf1ff; color: #073ba8; font-size: 9px; padding: 6px 11px; letter-spacing: .7px; }
+.application-form-page .form-card, .application-form-page .registration-card { background: white; border: 1px solid #e4e9f1; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 18px #243b5304; margin-bottom: 22px; }
+.application-form-page .form-card-header, .application-form-page .card-header-government { padding: 20px 24px; background: #f8fafd; border-bottom: 1px solid #e4e9f1; border-left: 0; }
+.application-form-page .form-card-header h2, .application-form-page .card-header-government h2 { font-size: 15px; color: #142b54; font-weight: 800; margin: 0 0 7px; }
+.application-form-page .form-card-header p, .application-form-page .card-header-government p { color: #718096; font-size: 11px; line-height: 1.8; margin: 0; }
+.application-form-page .form-card-body, .application-form-page .card-body-government { padding: 24px; }
+.application-form-page .form-label { font-size: 12px; font-weight: 700; color: #405574; margin-bottom: 8px; }
+.application-form-page .form-control, .application-form-page .form-select { min-height: 45px; border: 1px solid #dce4ef; border-radius: 7px; color: #142b54; font-size: 13px; padding: 11px 13px; }
+.application-form-page .form-control:focus, .application-form-page .form-select:focus { border-color: #7b9edc; box-shadow: 0 0 0 3px #073ba80d; }
+.application-form-page .form-control[readonly] { background: #f5f8fc; }
+.application-form-page .form-text, .application-form-page .form-help { font-size: 11px; line-height: 1.7; color: #718096; }
+.application-form-page .btn-government, .application-form-page .btn-submit, .application-form-page .btn-gov { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 7px; min-height: 44px; padding: 11px 18px; font-family: inherit; font-size: 12px; font-weight: 750; }
+.application-form-page .btn-government:not(.btn-outline-government), .application-form-page .btn-submit, .application-form-page .btn-primary-gov { background: #073ba8; color: white; border-color: #073ba8; }
+.application-form-page .btn-outline-government, .application-form-page .btn-secondary-gov { background: white; border: 1px solid #dce4ef; color: #536b8d; }
+.application-form-page .information-notice, .application-form-page .alert-box, .application-form-page .error-alert, .application-form-page .reactivation-error { border-radius: 8px; font-size: 12px; line-height: 1.8; }
+.application-form-page .applicant-found, .application-form-page .record-found { border-radius: 8px; }
+.application-form-page .upload-area, .application-form-page .upload-panel, .application-form-page .upload-box, .application-form-page .address-card { border-radius: 9px; }
+.application-form-page .page-footer { display: none; }
+.application-form-page .step-number { border-radius: 50%; }
+@media (max-width: 640px) {
+ .application-form-page .form-card-header, .application-form-page .card-header-government { padding: 18px 16px; }
+ .application-form-page .form-card-body, .application-form-page .card-body-government { padding: 20px 16px; }
+ .application-form-page .button-row, .application-form-page .action-area { gap: 10px; flex-wrap: wrap; }
+ .application-form-page .button-row > a, .application-form-page .button-row > button { width: 100%; }
+ .application-form-page .form-grid { grid-template-columns: 1fr; }
+}
+
+.application-submit-spinner { display: inline-block; width: 1em; height: 1em; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; vertical-align: -.12em; animation: application-submit-spin .75s linear infinite; }
+@keyframes application-submit-spin { to { transform: rotate(360deg); } }
+.application-cancel[aria-disabled="true"] { opacity: .55; cursor: wait; }
+@media (prefers-reduced-motion: reduce) { .application-submit-spinner { animation-duration: 1.5s; } }
+
+.application-form-page .information-notice { border-left: 0; }
+.application-form-page .application-important-notice { display: flex; align-items: flex-start; gap: 12px; }
+.application-notice-symbol { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 10px; background: #e0eaff; color: #073ba8; }
+.application-notice-symbol svg { display: block; width: 21px; height: 21px; }
+
+.application-form-page .review-notice { border-left: 0; }
+.application-form-page .application-important-notice .application-notice-symbol svg { width: 21px; height: 21px; margin: 0; }

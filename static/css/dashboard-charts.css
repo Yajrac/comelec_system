@@ -1,0 +1,83 @@
+.dashboard-analytics { margin-top: 28px; }
+.demographics-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 20px; }
+.demographic-card header { align-items: flex-start; gap: 10px; margin-bottom: 18px; }
+.demographic-card h4 { font-size: 15px; }
+.demographic-card .analytics-canvas { height: 260px; }
+.demographic-card .demographic-donut { height: 180px; max-width: 220px; margin: 0 auto; }
+.demographic-legend { list-style: none; padding: 16px 0 0; margin: 16px 0 0; border-top: 1px solid #edf1f7; display: grid; gap: 12px; }
+.demographic-legend li { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #61748c; }
+.demographic-legend i { width: 8px; height: 8px; flex: 0 0 8px; border-radius: 50%; }
+.demographic-legend strong { margin-left: auto; color: #243d61; font-size: 12px; }
+.demographic-legend small { min-width: 48px; text-align: right; font-size: 10px; color: #8797ad; }
+@media (max-width: 1199.98px) { .demographics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .age-demographic { grid-column: 1 / -1; } .age-demographic .analytics-canvas { height: 230px; } }
+@media (max-width: 575.98px) { .demographics-grid { grid-template-columns: minmax(0, 1fr); gap: 15px; } .age-demographic { grid-column: auto; } }
+.analytics-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+.analytics-eyebrow { font-size: 9px; font-weight: 750; letter-spacing: 1.5px; color: var(--admin-blue); }
+.analytics-heading h3 { margin: 7px 0; color: var(--admin-text); font-size: 20px; font-weight: 750; }
+.analytics-heading p { margin: 0; color: var(--admin-muted); font-size: 11px; line-height: 1.8; }
+.analytics-report-link { display: inline-flex; align-items: center; gap: 8px; color: var(--admin-blue); font-size: 11px; font-weight: 700; }
+.analytics-grid { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(0,1fr); gap: 20px; }
+.analytics-card { min-width: 0; padding: 22px; border: 1px solid var(--admin-border); border-radius: 12px; background: white; box-shadow: 0 3px 14px #243b5304; }
+.analytics-card header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.analytics-card h4 { font-size: 14px; color: var(--admin-text); font-weight: 750; margin: 0 0 5px; }
+.analytics-card header p { margin: 0; font-size: 10px; color: var(--admin-muted); line-height: 1.7; }
+.analytics-icon { display: grid; place-items: center; flex: 0 0 38px; width: 38px; height: 38px; border-radius: 10px; background: #edf3ff; color: #2455bc; font-size: 18px; }
+.analytics-icon.purple { background: #f1ebff; color: #8055bd; }
+.analytics-icon.green { background: #e6f6ed; color: #26845a; }
+.analytics-canvas { position: relative; width: 100%; min-width: 0; height: 280px; }
+.status-canvas { height: 215px; }
+.analytics-wide { grid-column: 1 / -1; }
+.barangay-analytics-scroll { max-height: 350px; overflow-y: auto; overscroll-behavior: contain; }
+.analytics-status-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; margin-top: 20px; }
+.analytics-status-legend > span { display: flex; align-items: center; gap: 7px; color: #718096; font-size: 10px; }
+.analytics-status-legend i { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.analytics-status-legend b { margin-left: auto; color: var(--admin-text); }
+.analytics-status-legend .pending { background: #e6b84c; }
+.analytics-status-legend .review { background: #9674cd; }
+.analytics-status-legend .approved { background: #56a87f; }
+.analytics-status-legend .disapproved { background: #d77b71; }
+@media (max-width: 767.98px) { .analytics-grid { grid-template-columns: 1fr; gap: 15px; } .analytics-card { padding: 17px; } .analytics-canvas { height: 240px; } .status-canvas { height: 210px; } .analytics-wide { grid-column: 1; } }
+
+/* Modern analytics surfaces and compact chart controls. */
+.analytics-card { padding: 24px; border-color: #e5ebf4; border-radius: 16px; box-shadow: 0 4px 22px #233e6504; }
+.analytics-card header { margin-bottom: 24px; }
+.analytics-card h4 { font-size: 14px; }
+.analytics-status-legend { padding-top: 18px; border-top: 1px solid #edf1f7; margin-top: 18px; }
+.analytics-status-legend > span { min-width: 0; gap: 6px; font-size: 10px; }
+.legend-percentage { padding: 3px 5px; border-radius: 4px; background: #f3f6fb; font-size: 9px; color: #8a99ae; min-width: 40px; text-align: center; }
+.chart-view-toggle { margin-left: auto; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 8px 12px; border: 1px solid #dce5f4; border-radius: 7px !important; background: #f7faff; color: #2455bc; font-size: 11px; font-weight: 650; }
+.chart-view-toggle:hover { background: #edf3ff; }
+.chart-view-toggle[hidden] { display: none !important; }
+.chart-caption { margin: -8px 0 15px; color: #8a99ae; font-size: 10px; }
+@media (max-width: 575.98px) { .analytics-card { padding: 17px; } .analytics-card header { flex-wrap: wrap; } .chart-view-toggle { margin-left: 50px; } .analytics-canvas { height: 270px; } .analytics-status-legend { gap: 12px; } .legend-percentage { min-width: 34px; font-size: 8px; } }
+
+/* Application totals on a light analytics panel. */
+.analytics-type-card { background: #fff; border-color: #e5ebf4; color: #142b54; }
+.analytics-type-card h4 { color: #142b54; }
+.analytics-type-card header p { color: #718096; }
+.analytics-type-card .analytics-icon { background: #edf3ff; color: #2455bc; }
+.analytics-type-card .analytics-canvas { height: 265px; }
+.type-chart-legend { display: flex; flex-wrap: wrap; gap: 12px 18px; justify-content: center; margin: 15px 0 20px; }
+.type-chart-legend > span { display: inline-flex; align-items: center; gap: 6px; color: #526783; font-size: 10px; }
+.type-chart-legend i { width: 7px; height: 7px; border-radius: 2px; }
+.type-chart-breakdown { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 10px; border-top: 1px solid #edf1f7; padding-top: 18px; }
+.type-breakdown-item { min-width: 0; padding: 0 8px; border-right: 1px solid #edf1f7; }
+.type-breakdown-item:last-child { border-right: 0; }
+.type-breakdown-item strong { display: block; font-size: 9px; font-weight: 500; color: #526783; min-height: 28px; line-height: 1.5; }
+.type-breakdown-item b { display: block; color: #142b54; font-size: 20px; margin-top: 6px; }
+.type-breakdown-item small { display: block; color: #718096; font-size: 8px; margin-top: 4px; }
+@media (max-width: 575.98px) { .analytics-type-card .analytics-canvas { height: 250px; } .type-chart-breakdown { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 15px 8px; } .type-chart-legend { gap: 10px 14px; } }
+
+/* Compact horizontal barangay ranking. */
+.barangay-ranking { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 19px; }
+.barangay-rank-row { display: grid; grid-template-columns: 24px minmax(110px,170px) minmax(0,1fr) 45px; align-items: center; gap: 14px; }
+.barangay-rank-number { color: #a2afc1; font-size: 10px; font-variant-numeric: tabular-nums; }
+.barangay-rank-name { font-size: 12px; font-weight: 600; color: #526783; overflow-wrap: anywhere; }
+.barangay-rank-track { height: 13px; background: #f0f4fa; border-radius: 5px; overflow: hidden; }
+.barangay-rank-fill { display: block; height: 100%; border-radius: 5px; background: #7fa1dc; }
+.barangay-rank-row:first-child .barangay-rank-fill { background: #073ba8; }
+.barangay-rank-count { font-size: 12px; color: #243d61; text-align: right; font-variant-numeric: tabular-nums; }
+.barangay-unassigned-notice { margin: 16px 0; padding: 11px 14px; border: 1px solid #efe0b5; border-radius: 8px; background: #fff9e9; color: #95722e; font-size: 11px; line-height: 1.7; }
+.barangay-unassigned-notice[hidden] { display: none; }
+.barangay-ranking-empty { padding: 18px; border: 1px dashed #dce4ef; border-radius: 8px; color: #8a99ae; font-size: 12px; text-align: center; }
+@media (max-width: 575.98px) { .barangay-rank-row { grid-template-columns: 20px minmax(0,1fr) 40px; gap: 8px 12px; } .barangay-rank-name { font-size: 11px; } .barangay-rank-track { grid-column: 2; grid-row: 2; height: 10px; } .barangay-rank-count { grid-column: 3; grid-row: 1 / 3; } }

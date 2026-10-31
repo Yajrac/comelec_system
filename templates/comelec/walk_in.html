@@ -1,0 +1,151 @@
+{% extends "admin.html" %}
+{% load static %}
+
+{% block title %}Walk-in Applications{% endblock %}
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/walk-in.css' %}?v=search-matched-3"
+    >
+{% endblock %}
+{% block content %}
+    <header class="walk-in-heading">
+        <div>
+            <h1>Walk-in Applications</h1>
+            <p>Find an applicant record and choose a registration service.</p>
+        </div>
+        <a class="walk-in-new" href="{% url 'admin-walk-in-form' 'new' %}">
+            <i class="bi bi-person-plus" aria-hidden="true">
+            </i> APPLICATION FOR NEW REGISTRATION</a>
+        </header>
+        <section class="walk-in-directory" aria-labelledby="recordsTitle">
+            <header>
+                <div>
+                    <h2 id="recordsTitle">
+                        Applicant records <span>{{ records.paginator.count }} record{{ records.paginator.count|pluralize }}</span>
+                    </h2>
+                    <p>Select the three-dot menu beside a record to start a service.</p>
+                </div>
+                <a class="admin-table-refresh" href="{% url 'admin-walk-in' %}">
+                    <i class="bi bi-arrow-repeat" aria-hidden="true">
+                    </i> Refresh</a>
+                </header>
+                <form method="get" class="walk-in-filters" id="walkInSearch">
+                    <label class="form-label fw-semibold">
+                        Search records<span class="walk-in-search-field input-group admin-search-field">
+                        <span class="input-group-text bg-white"><i class="bi bi-search" aria-hidden="true"></i></span>
+                        <input
+                            type="search"
+                            class="form-control"
+                            name="search"
+                            value="{{ search }}"
+                            placeholder="Name or registration reference number"
+                            maxlength="150"
+                        >
+                        </span>
+                    </label>
+                    <label class="form-label fw-semibold">
+                        Barangay<select name="barangay" class="form-select">
+                        <option value="">All barangays</option>{% for barangay in barangays %}<option
+    value="{{ barangay.pk }}"
+    {% if selected_barangay == barangay.pk|stringformat:"s" %}selected{% endif %}
+>{{ barangay.name }}</option>{% endfor %}</select>
+                </label>
+                <label class="form-label fw-semibold">
+                    Record status<select name="status" class="form-select">
+                    <option value="">All statuses</option>
+                    <option
+                        value="active"
+                        {% if selected_status == 'active' %}selected{% endif %}
+                    >Active</option>
+                    <option
+                        value="inactive"
+                        {% if selected_status == 'inactive' %}selected{% endif %}
+                    >Inactive</option>
+                    </select>
+                </label>
+                <button type="submit" class="walk-in-search-button">Search</button>
+            </form>
+            <div class="walk-in-table-wrap">
+                <table class="walk-in-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>REFERENCE NUMBER</th>
+                            <th>APPLICANT NAME</th>
+                            <th>BARANGAY</th>
+                            <th>DATE REGISTERED</th>
+                            <th>STATUS</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for applicant in records %}
+                            <tr>
+                                <td>{{ records.start_index|add:forloop.counter0 }}</td>
+                                <td class="walk-in-reference">{{ applicant.registration_reference }}</td>
+                                <td>
+                                    <div class="walk-in-person">
+                                        <span
+                                            class="walk-in-avatar"
+                                            aria-hidden="true"
+                                        ><i class="bi bi-person" aria-hidden="true"></i></span>
+                                        <strong>{{ applicant.lastname }}, {{ applicant.firstname }} {{ applicant.middlename }}</strong>
+                                    </div>
+                                </td>
+                                <td>{{ applicant.brgy.name|default:"Unassigned" }}</td>
+                                <td>{{ applicant.date_joined|date:"M d, Y" }}</td>
+                                <td>
+                                    <span
+                                        class="walk-in-status {% if not applicant.is_active %}inactive{% endif %}"
+                                    >{% if applicant.is_active %}Active{% else %}Inactive{% endif %}</span>
+                                </td>
+                                <td>
+                                    <details class="walk-in-actions">
+                                        <summary
+                                            aria-label="Choose a service for {{ applicant.firstname }} {{ applicant.lastname }}"
+                                        >
+                                            <i class="bi bi-three-dots" aria-hidden="true">
+                                            </i>
+                                        </summary>
+                                        <div class="walk-in-action-menu">
+                                            {% for service in services %}
+                                                <form method="post" action="{% url 'admin-walk-in-form' service.key %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="find_applicant">
+                                                    <input
+                                                        type="hidden"
+                                                        name="registration_reference"
+                                                        value="{{ applicant.registration_reference }}"
+                                                    >
+                                                    <button type="submit">{% if service.key == "update" %}Change of name / Correction{% elif service.key == "transfer" %}Transfer registration{% elif service.key == "reactivation" %}Reactivation{% else %}Inclusion / Reinstatement{% endif %}</button>
+                                                </form>
+                                            {% endfor %}
+                                        </div>
+                                    </details>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="7" class="walk-in-empty">No applicant records found.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <footer>
+                <span>{% if records.paginator.count %}Showing {{ records.start_index }}&ndash;{{ records.end_index }} of {{ records.paginator.count }} records{% else %}0 records{% endif %}</span>
+                <nav aria-label="Record pages" class="walk-in-pagination">
+                    {% if records.has_previous %}<a href="?{{ query }}&amp;page={{ records.previous_page_number }}">Previous</a>{% else %}<span class="is-disabled" aria-disabled="true">Previous</span>{% endif %}
+                    {% for number in records.paginator.page_range %}
+                        {% if number == records.number %}<span aria-current="page">{{ number }}</span>
+                        {% elif number >= records.number|add:"-2" and number <= records.number|add:"2" %}<a href="?{{ query }}&amp;page={{ number }}">{{ number }}</a>{% endif %}
+                    {% endfor %}
+                    {% if records.has_next %}<a href="?{{ query }}&amp;page={{ records.next_page_number }}">Next</a>{% else %}<span class="is-disabled" aria-disabled="true">Next</span>{% endif %}
+                </nav>
+            </footer>
+        </section>
+{% endblock %}
+{% block extra_js %}
+    <script src="{% static 'js/walk-in.js' %}?v=action-overlay" defer></script>
+{% endblock %}

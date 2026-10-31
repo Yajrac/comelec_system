@@ -278,7 +278,6 @@ const Transfer = () => {
         if (
             !formData.lastname.trim() ||
             !formData.firstname.trim() ||
-            !formData.middlename.trim() ||
             !formData.birthdate ||
             !formData.current_brgy ||
             !formData.new_brgy
@@ -639,8 +638,8 @@ const Transfer = () => {
                     <div className="government-logo">
 
                         <img
-                            src="/images/PIODURAN.png"
-                            alt="Pio Duran Logo"
+                            src="/images/comelec.png"
+                            alt="Commission on Elections logo"
                         />
 
                     </div>
@@ -979,7 +978,7 @@ const Transfer = () => {
                                                     handleChange
                                                 }
                                                 placeholder="Enter middle name"
-                                                required
+                                               
                                             />
 
                                         </div>

@@ -109,7 +109,6 @@ function Reactivation() {
         if (
             !formData.lastname.trim() ||
             !formData.firstname.trim() ||
-            !formData.middlename.trim() ||
             !formData.birthdate ||
             !formData.reason.trim()
         ) {
@@ -365,8 +364,8 @@ function Reactivation() {
                     <div className="government-logo">
 
                         <img
-                            src="/images/PIODURAN.png"
-                            alt="Pio Duran Registration"
+                            src="/images/comelec.png"
+                            alt="Commission on Elections logo"
                         />
 
                     </div>
@@ -699,7 +698,7 @@ function Reactivation() {
                                                 disabled={
                                                     submitting
                                                 }
-                                                required
+                                               
                                             />
 
                                         </div>

@@ -1,17 +1,20 @@
+from pathlib import Path
+from Applicants.validation import validate_request
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from .models import Applicant, Barangay, ApplicantUpdateRequest, ApplicantTransferRequest, ApplicantReactivationRequest, ApplicantReinstatementRequest
 import os
 import re
 from datetime import date
 from django.utils.dateparse import parse_date
+from django.utils import timezone
 
 def home(request):
+    return render(request, "applicant/home.html")
 
-    return render(
-        request,
-        "applicant/home.html"
-    )
 
+@validate_request(template="applicant/forms/new_registration.html")
 def new_registration(request):
     barangays = Barangay.objects.all().order_by("name")
 
@@ -102,7 +105,6 @@ def new_registration(request):
         required_fields = [
             (lastname, "Last name is required."),
             (firstname, "First name is required."),
-            (middlename, "Middle name is required."),
             (age, "Age is required."),
             (sex, "Sex is required."),
             (birthdate_input, "Birthdate is required."),
@@ -110,7 +112,6 @@ def new_registration(request):
             (civil_status, "Please select your civil status."),
             (brgy_id, "Please select a barangay."),
             (phone, "Phone number is required."),
-            (email, "Email address is required."),
             (father, "Father's name is required."),
             (mother, "Mother's name is required."),
         ]
@@ -181,13 +182,14 @@ def new_registration(request):
         from django.core.exceptions import ValidationError
 
         try:
-            validate_email(email)
+            if email:
+                validate_email(email)
         except ValidationError:
             return render_error(
                 "Please enter a valid email address."
             )
 
-        if Applicant.objects.filter(email__iexact=email).exists():
+        if email and Applicant.objects.filter(email__iexact=email).exists():
             return render_error(
                 "An applicant with this email address already exists."
             )
@@ -288,7 +290,7 @@ def new_registration(request):
 
             # CONTACT
             phone=phone,
-            email=email,
+            email=email or None,
 
             # APPLICATION
             application_type="NEW",
@@ -347,6 +349,7 @@ def registration_success(request, applicant_id):
     )
 
 
+@validate_request(template="applicant/forms/verify_registration.html")
 def verify_new_registration(request):
 
     if request.method == "POST":
@@ -391,15 +394,6 @@ def verify_new_registration(request):
                 }
             )
 
-        if not middlename:
-            return render(
-                request,
-                "applicant/forms/verify_registration.html",
-                {
-                    "error": "Middle name is required.",
-                    "form_data": request.POST,
-                }
-            )
 
         if not birthdate:
             return render(
@@ -437,6 +431,7 @@ def verify_new_registration(request):
     )
 
 
+@validate_request(template="applicant/forms/update_registration.html")
 def update_registration(request):
     template_name = "applicant/forms/update_registration.html"
     barangays = Barangay.objects.all().order_by("name")
@@ -450,6 +445,7 @@ def update_registration(request):
         error=None,
         form_data=None,
         search_data=None,
+        pending_request=False,
     ):
         return render(
             request,
@@ -457,9 +453,11 @@ def update_registration(request):
             {
                 "applicant": applicant,
                 "barangays": barangays,
+                "pwd_choices": Applicant.PWD_CHOICES,
                 "error": error,
                 "form_data": form_data or {},
                 "search_data": search_data or {},
+                "pending_request": pending_request,
             },
         )
 
@@ -469,82 +467,13 @@ def update_registration(request):
 
     if request.method == "POST" and request.POST.get("action") == "find_applicant":
 
-        lastname = request.POST.get("lastname", "").strip()
-        firstname = request.POST.get("firstname", "").strip()
-        middlename = request.POST.get("middlename", "").strip()
-        birthdate_input = request.POST.get("birthdate", "").strip()
-
         search_data = request.POST
-
-        if not lastname:
-            return render_page(
-                error="Please enter the last name.",
-                form_data=search_data,
-                search_data=search_data,
-            )
-
-        if not firstname:
-            return render_page(
-                error="Please enter the first name.",
-                form_data=search_data,
-                search_data=search_data,
-            )
-
-        if not birthdate_input:
-            return render_page(
-                error="Please enter your date of birth.",
-                form_data=search_data,
-                search_data=search_data,
-            )
-
-        birthdate = parse_date(birthdate_input)
-
-        if not birthdate:
-            return render_page(
-                error="Please enter a valid date of birth.",
-                form_data=search_data,
-                search_data=search_data,
-            )
-
-        # Middle name is optional.
-        applicant_query = Applicant.objects.filter(
-            lastname__iexact=lastname,
-            firstname__iexact=firstname,
-            birthdate=birthdate,
-        )
-
-        if middlename:
-            applicant_query = applicant_query.filter(
-                middlename__iexact=middlename
-            )
-        else:
-            applicant_query = applicant_query.filter(
-                Q(middlename__isnull=True) | Q(middlename="")
-            )
-
-        matching_applicants = list(applicant_query[:2])
-
-        if not matching_applicants:
-            return render_page(
-                error=(
-                    "No registration record was found using the "
-                    "information provided. Please check your details."
-                ),
-                form_data=search_data,
-                search_data=search_data,
-            )
-
-        if len(matching_applicants) > 1:
-            return render_page(
-                error=(
-                    "More than one record matched these details. "
-                    "Please enter your middle name and try again."
-                ),
-                form_data=search_data,
-                search_data=search_data,
-            )
-
-        applicant = matching_applicants[0]
+        reference = request.POST.get("registration_reference", "").strip().upper()
+        applicant = None
+        if re.fullmatch(r"PD-[A-F0-9]{32}", reference):
+            applicant = Applicant.objects.filter(registration_reference=reference).first()
+        if applicant is None:
+            return render_page(error="Enter a valid registration reference number.", search_data=request.POST)
 
         # Check for an existing request awaiting review.
         existing_request = ApplicantUpdateRequest.objects.filter(
@@ -554,11 +483,8 @@ def update_registration(request):
 
         if existing_request:
             return render_page(
-                applicant=applicant,
-                error=(
-                    "This applicant already has an update or "
-                    "correction request pending review."
-                ),
+                pending_request=True,
+                search_data=request.POST,
             )
 
         return render_page(applicant=applicant)
@@ -604,7 +530,7 @@ def update_registration(request):
         phone = request.POST.get("phone", "").strip()
         email = request.POST.get("email", "").strip()
 
-        civil_status = request.POST.get("civil_status", "").strip()
+        civil_status = request.POST.get("civil_status", applicant.civil_status).strip().upper()
 
         pwd_status = request.POST.get("pwd_status", "NO").strip()
         citizenship_status = request.POST.get(
@@ -634,7 +560,6 @@ def update_registration(request):
             "Province": province,
             "Municipality": municipality,
             "Phone": phone,
-            "Email": email,
             "Father's name": father,
             "Mother's name": mother,
             "Reason": reason,
@@ -740,7 +665,8 @@ def update_registration(request):
         # -----------------------------------------------------
 
         try:
-            validate_email(email)
+            if email:
+                validate_email(email)
         except ValidationError:
             return render_page(
                 applicant=applicant,
@@ -770,7 +696,7 @@ def update_registration(request):
         # PWD AND CITIZENSHIP VALIDATION
         # -----------------------------------------------------
 
-        if pwd_status not in {"YES", "NO"}:
+        if pwd_status not in dict(Applicant.PWD_CHOICES):
             return render_page(
                 applicant=applicant,
                 error="Please select a valid PWD status.",
@@ -788,40 +714,41 @@ def update_registration(request):
         # VALID ID / SUPPORTING DOCUMENT VALIDATION
         # -----------------------------------------------------
 
-        if not valid_id_document:
+        if not valid_id_document and not applicant.valid_id_document:
             return render_page(
                 applicant=applicant,
                 error="Please upload a valid ID or supporting document.",
                 form_data=form_data,
             )
 
-        allowed_extensions = {".pdf", ".jpg", ".jpeg", ".png"}
-        max_file_size = 5 * 1024 * 1024  # 5 MB
+        if valid_id_document:
+            allowed_extensions = {".pdf", ".jpg", ".jpeg", ".png"}
+            max_file_size = 5 * 1024 * 1024  # 5 MB
 
-        file_extension = os.path.splitext(
-            valid_id_document.name
-        )[1].lower()
+            file_extension = os.path.splitext(
+                valid_id_document.name
+            )[1].lower()
 
-        if file_extension not in allowed_extensions:
-            return render_page(
-                applicant=applicant,
-                error="Invalid document format. Upload PDF, JPG, JPEG, or PNG only.",
-                form_data=form_data,
-            )
+            if file_extension not in allowed_extensions:
+                return render_page(
+                    applicant=applicant,
+                    error="Invalid document format. Upload PDF, JPG, JPEG, or PNG only.",
+                    form_data=form_data,
+                )
 
-        if valid_id_document.size == 0:
-            return render_page(
-                applicant=applicant,
-                error="The uploaded document is empty.",
-                form_data=form_data,
-            )
+            if valid_id_document.size == 0:
+                return render_page(
+                    applicant=applicant,
+                    error="The uploaded document is empty.",
+                    form_data=form_data,
+                )
 
-        if valid_id_document.size > max_file_size:
-            return render_page(
-                applicant=applicant,
-                error="The uploaded document must not exceed 5 MB.",
-                form_data=form_data,
-            )
+            if valid_id_document.size > max_file_size:
+                return render_page(
+                    applicant=applicant,
+                    error="The uploaded document must not exceed 5 MB.",
+                    form_data=form_data,
+                )
 
         # -----------------------------------------------------
         # CHECK BARANGAY
@@ -866,7 +793,7 @@ def update_registration(request):
             id=applicant.id,
         ).exists()
 
-        if duplicate_email:
+        if email and duplicate_email:
             return render_page(
                 applicant=applicant,
                 error="Another applicant with this email address already exists.",
@@ -916,8 +843,7 @@ def update_registration(request):
             phone=phone,
             email=email,
 
-            # Requires a civil_status field on ApplicantUpdateRequest.
-            civil_status=civil_status,
+            civil_status=civil_status.title(),
 
             pwd_status=pwd_status,
             citizenship_status=citizenship_status,
@@ -928,7 +854,7 @@ def update_registration(request):
             reason=reason,
 
             # Requires a FileField on ApplicantUpdateRequest.
-            valid_id_document=valid_id_document,
+            valid_id_document=valid_id_document or applicant.valid_id_document.name,
 
             status="PENDING",
         )
@@ -961,15 +887,20 @@ def update_success(request, request_id):
     )
 
 
+@validate_request(template="applicant/forms/transfer_registration.html")
 def transfer_registration(request):
     template_name = "applicant/forms/transfer_registration.html"
     barangays = Barangay.objects.all().order_by("name")
 
     def render_page(applicant=None, error=None, search_data=None, form_data=None):
+        blocked_message = None
+        if error and "pending review" in error:
+            blocked_message, error, applicant = error, None, None
         return render(
             request,
             template_name,
             {
+                "blocked_message": blocked_message,
                 "applicant": applicant,
                 "barangays": barangays,
                 "error": error,
@@ -985,73 +916,13 @@ def transfer_registration(request):
         request.method == "POST"
         and request.POST.get("action") == "find_applicant"
     ):
-        lastname = request.POST.get("lastname", "").strip()
-        firstname = request.POST.get("firstname", "").strip()
-        middlename = request.POST.get("middlename", "").strip()
-        birthdate_input = request.POST.get("birthdate", "").strip()
-
-        if not lastname:
-            return render_page(
-                error="Please enter the last name.",
-                search_data=request.POST,
-            )
-
-        if not firstname:
-            return render_page(
-                error="Please enter the first name.",
-                search_data=request.POST,
-            )
-
-        if not birthdate_input:
-            return render_page(
-                error="Please enter the birthdate.",
-                search_data=request.POST,
-            )
-
-        birthdate = parse_date(birthdate_input)
-
-        if not birthdate:
-            return render_page(
-                error="Please enter a valid birthdate.",
-                search_data=request.POST,
-            )
-
-        applicant_query = Applicant.objects.filter(
-            lastname__iexact=lastname,
-            firstname__iexact=firstname,
-            birthdate=birthdate,
-        )
-
-        if middlename:
-            applicant_query = applicant_query.filter(
-                middlename__iexact=middlename,
-            )
-        else:
-            applicant_query = applicant_query.filter(
-                Q(middlename__isnull=True) | Q(middlename=""),
-            )
-
-        matches = list(applicant_query[:2])
-
-        if not matches:
-            return render_page(
-                error=(
-                    "No registration record was found using the "
-                    "information provided. Check your details and try again."
-                ),
-                search_data=request.POST,
-            )
-
-        if len(matches) > 1:
-            return render_page(
-                error=(
-                    "Multiple registration records match those details. "
-                    "Please enter your middle name and try again."
-                ),
-                search_data=request.POST,
-            )
-
-        applicant = matches[0]
+        search_data = request.POST
+        reference = request.POST.get("registration_reference", "").strip().upper()
+        applicant = None
+        if re.fullmatch(r"PD-[A-F0-9]{32}", reference):
+            applicant = Applicant.objects.filter(registration_reference=reference).first()
+        if applicant is None:
+            return render_page(error="Enter a valid registration reference number.", search_data=request.POST)
 
         existing_request = ApplicantTransferRequest.objects.filter(
             applicant=applicant,
@@ -1135,28 +1006,29 @@ def transfer_registration(request):
         # -----------------------------------------------------
         # VALIDATE UPLOADED VALID ID
         # -----------------------------------------------------
-        if not valid_id_document:
+        if not valid_id_document and not applicant.valid_id_document:
             return show_error(
                 "Please upload a valid ID before submitting your request."
             )
 
-        allowed_extensions = {".pdf", ".jpg", ".jpeg", ".png"}
+        if valid_id_document:
+            allowed_extensions = {".pdf", ".jpg", ".jpeg", ".png"}
 
-        file_extension = os.path.splitext(
-            valid_id_document.name
-        )[1].lower()
+            file_extension = os.path.splitext(
+                valid_id_document.name
+            )[1].lower()
 
-        if file_extension not in allowed_extensions:
-            return show_error(
-                "Invalid ID file format. Upload a PDF, JPG, JPEG, or PNG file."
-            )
+            if file_extension not in allowed_extensions:
+                return show_error(
+                    "Invalid ID file format. Upload a PDF, JPG, JPEG, or PNG file."
+                )
 
-        max_file_size = 5 * 1024 * 1024  # 5 MB
+            max_file_size = 5 * 1024 * 1024  # 5 MB
 
-        if valid_id_document.size > max_file_size:
-            return show_error(
-                "The uploaded valid ID must not exceed 5 MB."
-            )
+            if valid_id_document.size > max_file_size:
+                return show_error(
+                    "The uploaded valid ID must not exceed 5 MB."
+                )
 
         # -----------------------------------------------------
         # VALIDATE NEW BARANGAY
@@ -1220,7 +1092,7 @@ def transfer_registration(request):
             new_municipality=new_municipality,
             new_province=new_province,
             reason=reason,
-            valid_id_document=valid_id_document,
+            valid_id_document=valid_id_document or applicant.valid_id_document.name,
             status="PENDING",
         )
 
@@ -1251,6 +1123,7 @@ def transfer_success(request, request_id):
     )
 
 
+@validate_request(template="applicant/forms/reactivation_registration.html")
 def reactivate_registration(request):
     template_name = "applicant/forms/reactivation_registration.html"
     max_file_size = 5 * 1024 * 1024  # 5 MB
@@ -1264,10 +1137,14 @@ def reactivate_registration(request):
 
     def render_page(applicant=None, error=None,
                     search_data=None, form_data=None):
+        blocked_message = None
+        if error and ("already active" in error or "pending review" in error):
+            blocked_message, error, applicant = error, None, None
         return render(
             request,
             template_name,
             {
+                "blocked_message": blocked_message,
                 "applicant": applicant,
                 "error": error,
                 "search_data": search_data or {},
@@ -1283,59 +1160,13 @@ def reactivate_registration(request):
         request.method == "POST"
         and request.POST.get("action") == "find_applicant"
     ):
-        lastname = request.POST.get("lastname", "").strip()
-        firstname = request.POST.get("firstname", "").strip()
-        middlename = request.POST.get("middlename", "").strip()
-        birthdate_input = request.POST.get("birthdate", "").strip()
-
-        if not lastname:
-            return render_page(
-                error="Please enter the last name.",
-                search_data=request.POST,
-            )
-
-        if not firstname:
-            return render_page(
-                error="Please enter the first name.",
-                search_data=request.POST,
-            )
-
-        if not middlename:
-            return render_page(
-                error="Please enter the middle name.",
-                search_data=request.POST,
-            )
-
-        if not birthdate_input:
-            return render_page(
-                error="Please enter the birthdate.",
-                search_data=request.POST,
-            )
-
-        birthdate = parse_date(birthdate_input)
-
-        if not birthdate:
-            return render_page(
-                error="Please enter a valid birthdate.",
-                search_data=request.POST,
-            )
-
-        applicant = Applicant.objects.filter(
-            lastname__iexact=lastname,
-            firstname__iexact=firstname,
-            middlename__iexact=middlename,
-            birthdate=birthdate,
-        ).first()
-
-        if not applicant:
-            return render_page(
-                error=(
-                    "No registration record was found using "
-                    "the information provided. Please check "
-                    "your details and try again."
-                ),
-                search_data=request.POST,
-            )
+        search_data = request.POST
+        reference = request.POST.get("registration_reference", "").strip().upper()
+        applicant = None
+        if re.fullmatch(r"PD-[A-F0-9]{32}", reference):
+            applicant = Applicant.objects.filter(registration_reference=reference).first()
+        if applicant is None:
+            return render_page(error="Enter a valid registration reference number.", search_data=request.POST)
 
         # An active applicant does not need reactivation.
         if applicant.is_active:
@@ -1426,28 +1257,29 @@ def reactivate_registration(request):
         # VALIDATE REQUIRED VALID ID
         # -------------------------------------------------
 
-        if not valid_id_document:
+        if not valid_id_document and not applicant.valid_id_document:
             return render_page(
                 applicant=applicant,
                 error="Please upload a copy of your valid ID.",
                 form_data=request.POST,
             )
 
-        file_extension = Path(valid_id_document.name).suffix.lower()
+        if valid_id_document:
+            file_extension = Path(valid_id_document.name).suffix.lower()
 
-        if file_extension not in allowed_extensions:
-            return render_page(
-                applicant=applicant,
-                error="Invalid file type. Upload a PDF, JPG, JPEG, or PNG file.",
-                form_data=request.POST,
-            )
+            if file_extension not in allowed_extensions:
+                return render_page(
+                    applicant=applicant,
+                    error="Invalid file type. Upload a PDF, JPG, JPEG, or PNG file.",
+                    form_data=request.POST,
+                )
 
-        if valid_id_document.size > max_file_size:
-            return render_page(
-                applicant=applicant,
-                error="The valid ID file must not exceed 5 MB.",
-                form_data=request.POST,
-            )
+            if valid_id_document.size > max_file_size:
+                return render_page(
+                    applicant=applicant,
+                    error="The valid ID file must not exceed 5 MB.",
+                    form_data=request.POST,
+                )
 
         # -------------------------------------------------
         # CHECK FOR EXISTING REQUEST AGAIN
@@ -1477,7 +1309,7 @@ def reactivate_registration(request):
         reactivation_request = ApplicantReactivationRequest.objects.create(
             applicant=applicant,
             reason=reason,
-            valid_id_document=valid_id_document,
+            valid_id_document=valid_id_document or applicant.valid_id_document.name,
             status="PENDING",
         )
 
@@ -1510,6 +1342,7 @@ def reactivation_success(request, request_id):
     )
 
 
+@validate_request(template="applicant/forms/reinstatement_registration.html")
 def reinstate_registration(request):
     template_name = "applicant/forms/reinstatement_registration.html"
 
@@ -1521,60 +1354,18 @@ def reinstate_registration(request):
         request.method == "POST"
         and request.POST.get("action") == "find_applicant"
     ):
-        lastname = request.POST.get("lastname", "").strip()
-        firstname = request.POST.get("firstname", "").strip()
-        middlename = request.POST.get("middlename", "").strip()
-        birthdate_input = request.POST.get("birthdate", "").strip()
-
         search_data = request.POST
-
-        if not lastname:
-            return render(request, template_name, {
-                "error": "Please enter the last name.",
-                "search_data": search_data,
-            })
-
-        if not firstname:
-            return render(request, template_name, {
-                "error": "Please enter the first name.",
-                "search_data": search_data,
-            })
-
-        if not middlename:
-            return render(request, template_name, {
-                "error": "Please enter the middle name.",
-                "search_data": search_data,
-            })
-
-        birthdate = parse_date(birthdate_input)
-
-        if not birthdate:
-            return render(request, template_name, {
-                "error": "Please enter a valid birthdate.",
-                "search_data": search_data,
-            })
-
-        # Find the existing registration
-        applicant = Applicant.objects.filter(
-            lastname__iexact=lastname,
-            firstname__iexact=firstname,
-            middlename__iexact=middlename,
-            birthdate=birthdate,
-        ).first()
-
-        if not applicant:
-            return render(request, template_name, {
-                "error": (
-                    "No registration record was found "
-                    "using the information provided."
-                ),
-                "search_data": search_data,
-            })
+        reference = request.POST.get("registration_reference", "").strip().upper()
+        applicant = None
+        if re.fullmatch(r"PD-[A-F0-9]{32}", reference):
+            applicant = Applicant.objects.filter(registration_reference=reference).first()
+        if applicant is None:
+            return render(request, template_name, {"error": "Enter a valid registration reference number.", "search_data": request.POST})
 
         # An active applicant normally does not need reinstatement.
         if applicant.is_active:
             return render(request, template_name, {
-                "error": (
+                "blocked_message": (
                     "This registration is already active. "
                     "A reinstatement request cannot be submitted."
                 ),
@@ -1591,8 +1382,8 @@ def reinstate_registration(request):
 
         if existing_request:
             return render(request, template_name, {
-                "applicant": applicant,
-                "error": (
+                
+                "blocked_message": (
                     "This applicant already has a reinstatement "
                     "request pending review."
                 ),
@@ -1632,8 +1423,8 @@ def reinstate_registration(request):
 
         if applicant.is_active:
             return render(request, template_name, {
-                "applicant": applicant,
-                "error": (
+                
+                "blocked_message": (
                     "This registration is already active. "
                     "A reinstatement request cannot be submitted."
                 ),
@@ -1678,36 +1469,37 @@ def reinstate_registration(request):
         # VALIDATE VALID ID DOCUMENT
         # =====================================================
 
-        if not valid_id_document:
+        if not valid_id_document and not applicant.valid_id_document:
             return render(request, template_name, {
                 "applicant": applicant,
                 "error": "Please upload a valid ID document.",
                 "form_data": request.POST,
             })
 
-        allowed_extensions = {".pdf", ".jpg", ".jpeg", ".png"}
-        file_extension = Path(valid_id_document.name).suffix.lower()
+        if valid_id_document:
+            allowed_extensions = {".pdf", ".jpg", ".jpeg", ".png"}
+            file_extension = Path(valid_id_document.name).suffix.lower()
 
-        if file_extension not in allowed_extensions:
-            return render(request, template_name, {
-                "applicant": applicant,
-                "error": (
-                    "Invalid ID file format. Upload a PDF, "
-                    "JPG, JPEG, or PNG file."
-                ),
-                "form_data": request.POST,
-            })
+            if file_extension not in allowed_extensions:
+                return render(request, template_name, {
+                    "applicant": applicant,
+                    "error": (
+                        "Invalid ID file format. Upload a PDF, "
+                        "JPG, JPEG, or PNG file."
+                    ),
+                    "form_data": request.POST,
+                })
 
-        max_file_size = 5 * 1024 * 1024  # 5 MB
+            max_file_size = 5 * 1024 * 1024  # 5 MB
 
-        if valid_id_document.size > max_file_size:
-            return render(request, template_name, {
-                "applicant": applicant,
-                "error": (
-                    "The ID document must not exceed 5 MB."
-                ),
-                "form_data": request.POST,
-            })
+            if valid_id_document.size > max_file_size:
+                return render(request, template_name, {
+                    "applicant": applicant,
+                    "error": (
+                        "The ID document must not exceed 5 MB."
+                    ),
+                    "form_data": request.POST,
+                })
 
         # =====================================================
         # CHECK EXISTING REQUEST AGAIN
@@ -1722,8 +1514,8 @@ def reinstate_registration(request):
 
         if existing_request:
             return render(request, template_name, {
-                "applicant": applicant,
-                "error": (
+                
+                "blocked_message": (
                     "This applicant already has a reinstatement "
                     "request pending review."
                 ),
@@ -1738,7 +1530,7 @@ def reinstate_registration(request):
             ApplicantReinstatementRequest.objects.create(
                 applicant=applicant,
                 reason=reason,
-                valid_id_document=valid_id_document,
+                valid_id_document=valid_id_document or applicant.valid_id_document.name,
                 status="PENDING",
             )
         )

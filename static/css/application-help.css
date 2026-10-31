@@ -1,0 +1,18 @@
+.public-service-options a { align-items: flex-start; }
+.public-service-options a > span:not(.service-arrow) { white-space: normal; overflow-wrap: anywhere; font-size: 11px; line-height: 1.6; }
+.public-service-options .ui-icon, .public-service-options .service-arrow { flex-shrink: 0; }
+.public-service-options { max-height: min(65dvh, 540px); overflow-y: auto; }
+.application-help-panel { margin: 24px 0; padding: 26px; border: 1px solid #dce5f4; border-radius: 16px; background: #fff; color: #142b54; }
+.application-help-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.application-help-header h2 { margin: 8px 0 12px; font-size: 22px; }
+.application-help-panel > p { font-size: 13px; line-height: 1.7; color: #61748c; }
+.application-help-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+.application-help-choices button { padding: 12px 14px; min-height: 44px; text-align: left; border: 1px solid #dce5f4; border-radius: 8px; background: white; color: #243d61; font: inherit; font-size: 13px; line-height: 1.5; cursor: pointer; }
+.application-help-choices button:hover, .application-help-choices button[aria-pressed="true"] { border-color: #073ba8; background: #edf3ff; color: #073ba8; }
+.application-help-result { margin-top: 20px; padding: 16px; background: #f1f6ff; border: 1px solid #cbdaf5; border-radius: 10px; }
+.application-help-result p { font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.application-help-continue { display: inline-flex; padding: 11px 18px; border-radius: 7px; background: #073ba8; color: white; text-decoration: none; font-size: 13px; font-weight: 700; }
+.application-help-panel :focus-visible { outline: 3px solid #d5aa20; outline-offset: 3px; }
+@media (max-width: 575px) { .application-help-panel { padding: 18px; } .application-help-header h2 { font-size: 19px; } }
+
+@media (max-width: 767px) { .application-help-choices { grid-template-columns: 1fr; } }

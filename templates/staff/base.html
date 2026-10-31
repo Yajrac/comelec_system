@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Applicant services{% endblock %}</title>
+        <link rel="icon" href="{% static 'images/comelec.png' %}">
+        {% block vendor_css %}{% endblock %}
+        <link rel="stylesheet" href="{% static 'css/staff-workspace.css' %}">
+        {% block extra_css %}{% endblock %}
+        <link rel="stylesheet" href="{% static 'css/input-validation.css' %}">
+        <link rel="stylesheet" href="{% static 'css/scrollbars.css' %}">
+    </head>
+    <body class="{% block body_class %}{% endblock %}">
+        <header class="header">
+            <div class="header-inner">
+                <a class="brand" href="{% url 'home' %}">
+                    <img
+                        src="{% static 'images/comelec.png' %}"
+                        alt="Commission on Elections logo"
+                    >
+                    <span>
+                        <strong>COMMISSION ON ELECTIONS</strong>
+                        <small>Municipality of Pio Duran, Albay</small>
+                    </span>
+                </a>
+
+            </div>
+        </header>
+        <nav class="navigation" aria-label="Main navigation">
+            <div class="nav-inner">
+                <a
+                    href="{% url 'home' %}"
+                    {% if request.resolver_match.url_name == "home" %}aria-current="page"{% endif %}
+                >Home</a>
+                <a
+                    href="{% url 'new-registration' %}"
+                    {% if request.resolver_match.url_name == "new-registration" %}aria-current="page"{% endif %}
+                >New registration</a>
+            </div>
+        </nav>
+
+        <main>{% block content %}{% endblock %}<footer>Commission on Elections <span>&bull;</span> Pio Duran, Albay <a
+     class="footer-download"
+     href="{% static 'downloads/online-registration-mobile.apk' %}"
+     download
+ >
+            <svg
+                class="ui-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+            >
+                <path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5" />
+            </svg>
+            Download Android App <span class="apk-label">APK</span>
+            </a>
+            </footer>
+        </main>
+        <script src="{% static 'js/staff-workspace.js' %}" defer></script>
+        {% block extra_js %}{% endblock %}
+        <script src="{% static 'js/input-validation.js' %}" defer></script>
+        <script src="{% static 'js/template-actions.js' %}" defer></script>
+    </body>
+</html>

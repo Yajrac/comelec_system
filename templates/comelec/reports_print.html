@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Applicant Registration Report | Pio Duran</title>
+        <link rel="stylesheet" href="{% static 'css/reports-print.css' %}">
+    </head>
+    <body>
+        <div class="print-toolbar">
+            <span>{{ total }} {% if applicant_only %}applicant{% else %}application{% endif %}{{ total|pluralize }} &middot; {{ pages|length }} page{{ pages|length|pluralize }}</span>
+            <button type="button" data-click-action="print">Print / Save as PDF</button>
+        </div>
+        {% for page in pages %}
+            <section class="report-sheet">
+                <header class="report-letterhead">
+                    <img src="{% static 'images/comelec.png' %}" alt="COMELEC logo">
+                    <div>
+                        Republic of the Philippines
+                        <br>
+                        <strong>COMMISSION ON ELECTIONS</strong>
+                    </div>
+                </header>
+                <div class="report-locality">
+                    PROVINCE: <strong>ALBAY</strong>
+                    <br>
+                    CITY / MUNICIPALITY: <strong>PIO DURAN</strong>
+                    <br>
+                    BARANGAY: <strong>{{ page.barangay|upper }}</strong>
+                </div>
+                <h1>{% if applicant_only %}LIST OF VERIFIED APPLICANTS{% else %}LIST OF APPLICANTS{% endif %}</h1>
+                <p class="report-period">{% if applicant_only %}Applicants who completed registration and verification.{% elif period_label %}Period: {{ period_label }}{% else %}Date submitted: {{ date_from|default:"Beginning" }} &ndash; {{ date_to|default:"Present" }}{% endif %}</p>
+                <table>
+                    <colgroup>
+                        <col class="number-col">
+                        <col class="name-col">
+                        <col class="address-col">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Applicant's Name</th>
+                            <th>Applicant's Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in page.rows %}
+                            <tr>
+                                <td>{{ row.number }}</td>
+                                <td>{{ row.name }}</td>
+                                <td>{{ row.address }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3" class="empty">No applicants match the selected year.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <footer>
+                    <p>{% if applicant_only %}Each row represents one verified applicant. This report is not a certified list of registered voters.{% else %}Application records only. Each row represents one application; this report is not a certified list of registered voters.{% endif %} Address is shown to the level recorded in the system.</p>
+                    <p>Contains personal information. Handle and share only for authorized registration processing.</p>
+                    <div>
+                        <span>Generated: {{ generated_at|date:"M d, Y h:i A" }}</span>
+                        <span>Page {{ forloop.counter }} of {{ pages|length }}</span>
+                    </div>
+                </footer>
+            </section>
+        {% endfor %}
+        <script src="{% static 'js/template-actions.js' %}" defer></script>
+    </body>
+</html>

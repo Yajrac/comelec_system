@@ -1,0 +1,36 @@
+/* Compact administrator review screen. */
+.registration-header, .registration-status-card, .registration-card, .registration-action-card, .registration-processing-card { border: 1px solid var(--admin-border); border-radius: 12px; background: white; box-shadow: 0 3px 14px #243b5304; overflow: hidden; }
+.registration-header { padding: 23px 24px; }
+.review-eyebrow { display: block; color: var(--admin-blue); font-size: 9px; font-weight: 750; letter-spacing: 1.5px; margin-bottom: 8px; }
+.registration-header h4 { color: var(--admin-text); font-size: 24px; font-weight: 750; overflow-wrap: anywhere; }
+.registration-header p { font-size: 11px; color: var(--admin-muted); }
+.review-reference { display: inline-block; margin-left: 12px; font: 11px monospace; color: #617998; overflow-wrap: anywhere; }
+.registration-status-card .card-body { padding: 18px 24px; }
+.registration-status-label { font-size: 9px; letter-spacing: .7px; color: var(--admin-muted); margin-bottom: 7px; }
+.registration-status-date { font-size: 12px; color: var(--admin-text); }
+.registration-badge { border-radius: 6px; font-size: 10px; padding: 6px 10px; }
+.application-review-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; }
+.review-information, .review-side-panel { min-width: 0; }
+.review-information > .row { --bs-gutter-x: 18px; --bs-gutter-y: 18px; }
+.review-information > .row > .col-lg-6:first-of-type { width: 100%; }
+.registration-card-header, .registration-action-header { background: #f8fafd; padding: 16px 20px; border-bottom: 1px solid var(--admin-border); }
+.registration-card-header h5, .registration-action-header h5 { margin: 0; font-size: 13px; color: var(--admin-text); font-weight: 750; }
+.registration-card-body, .registration-action-body { padding: 20px; }
+.registration-field { margin-bottom: 0; }
+.registration-field.mb-4 { margin-bottom: 17px !important; }
+.registration-field-label { color: var(--admin-muted); font-size: 9px; letter-spacing: .5px; margin-bottom: 6px; }
+.registration-field-value { color: #263d5e; font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.registration-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border-radius: 7px !important; min-height: 42px; font-size: 11px; padding: 10px 13px; }
+.review-side-panel { position: sticky; top: 20px; display: flex; flex-direction: column; gap: 18px; }
+.review-side-panel .registration-action-card, .review-side-panel .registration-processing-card { margin: 0; }
+.review-side-panel .registration-action-body > .d-flex { flex-direction: column; gap: 10px !important; }
+.review-side-panel .registration-action-body form, .review-side-panel .registration-action-body button { width: 100%; }
+.review-side-panel .registration-processing-card .card-body { padding: 20px; }
+.review-file { display: flex; align-items: center; gap: 11px; margin-bottom: 18px; }
+.review-file strong { display: block; color: var(--admin-text); font-size: 11px; }
+.review-file small { display: block; color: var(--admin-muted); font-size: 10px; margin-top: 5px; line-height: 1.7; }
+.review-file-icon { display: grid; place-items: center; width: 40px; height: 44px; flex-shrink: 0; color: var(--admin-blue); background: #edf3ff; border-radius: 9px; font-size: 21px; }
+.review-document-empty { color: var(--admin-muted); font-size: 12px; line-height: 1.8; margin: 0; }
+.review-document-empty i { margin-right: 7px; }
+@media (max-width: 1199.98px) { .application-review-layout { grid-template-columns: minmax(0,1fr) 285px; gap: 18px; } .review-information > .row > .col-lg-6 { width: 100%; } }
+@media (max-width: 767.98px) { .application-review-layout { grid-template-columns: 1fr; } .review-side-panel { position: static; } .registration-header { padding: 19px; } .registration-header h4 { font-size: 21px; } .review-reference { display: block; margin: 7px 0 0; } .registration-card-body, .registration-action-body { padding: 18px; } .registration-header-actions { justify-content: flex-start; } }

@@ -1,0 +1,12 @@
+{% load static %}
+{% if blocked_message %}
+    <dialog id="pendingCorrectionDialog" class="pending-correction-dialog" aria-labelledby="pendingCorrectionTitle" aria-describedby="pendingCorrectionMessage" open>
+        <div class="pending-correction-icon" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </div>
+        <h2 id="pendingCorrectionTitle" tabindex="-1" autofocus>Unable to continue</h2>
+        <p id="pendingCorrectionMessage">{{ blocked_message }}</p>
+        <form method="dialog"><button type="submit" class="btn-government">Back</button></form>
+    </dialog>
+    <script src="{% static 'js/pending-correction-dialog.js' %}" defer></script>
+{% endif %}

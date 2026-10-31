@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Page not found | Pio Duran Registration</title>
+        <link rel="stylesheet" href="{% static 'css/pages/errors-404.css' %}">
+    </head>
+    <body>
+        <main>
+            <div class="icon" aria-hidden="true">
+                <svg
+                    width="34"
+                    height="34"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+                    <path d="M14 2v6h6M9 13l6 6m0-6-6 6" />
+                </svg>
+            </div>
+
+            <span class="code">ERROR 404</span>
+            <h1>Page not found</h1>
+            <p>
+                The page you are looking for does not exist or may have moved.
+                Check the address or return to the workspace.
+            </p>
+
+            {% if is_admin %}
+                <a href="{% url 'dashboard' %}">Back to dashboard</a>
+            {% else %}
+                <a href="{% url 'home' %}">Back to home</a>
+            {% endif %}
+
+            <span class="office">Pio Duran Voter Registration System</span>
+        </main>
+    </body>
+</html>

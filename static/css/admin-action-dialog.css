@@ -1,0 +1,18 @@
+.admin-action-dialog { width: min(440px, calc(100% - 32px)); border: 1px solid #dce5f4; border-radius: 16px; padding: 28px; color: #142b54; box-shadow: 0 20px 70px #142b5433; }
+.admin-action-dialog::backdrop { background: #142b5466; }
+.admin-action-dialog-icon { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 18px; border-radius: 12px; background: #edf3ff; color: #073ba8; font-size: 25px; }
+.admin-action-dialog h2 { margin: 0 0 12px; font-size: 22px; font-weight: 750; outline: none; }
+.admin-action-dialog p { margin: 0 0 24px; color: #61748c; font-size: 14px; line-height: 1.7; }
+.admin-action-dialog-buttons { display: flex; justify-content: flex-end; gap: 10px; }
+.admin-action-dialog-buttons button { border: 1px solid #dce5f4; border-radius: 8px; min-height: 42px; padding: 10px 18px; background: white; color: #526783; font: inherit; font-size: 13px; font-weight: 700; }
+#adminActionConfirm { background: #073ba8; border-color: #073ba8; color: white; }
+.admin-action-dialog[data-kind="approve"] #adminActionConfirm { background: #168451; border-color: #168451; }
+.admin-action-dialog:is([data-kind="disapprove"], [data-kind="delete"]) #adminActionConfirm { background: #c43742; border-color: #c43742; }
+.admin-action-dialog:is([data-kind="disapprove"], [data-kind="delete"]) .admin-action-dialog-icon { background: #fff0f0; color: #c43742; }
+.admin-action-dialog[data-kind="approve"] .admin-action-dialog-icon { background: #eaf7ef; color: #168451; }
+.admin-action-dialog button:focus-visible { outline: 3px solid #d5af3a; outline-offset: 2px; }
+.admin-action-dialog[open] { animation: admin-confirm-in .22s ease-out both; }
+.admin-action-dialog.is-closing { animation: admin-confirm-out .18s ease-in both; }
+@keyframes admin-confirm-in { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes admin-confirm-out { to { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { .admin-action-dialog[open], .admin-action-dialog.is-closing { animation: none; } }

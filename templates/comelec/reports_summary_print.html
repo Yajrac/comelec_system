@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{{ report_title }} | Pio Duran</title>
+        <link rel="stylesheet" href="{% static 'css/reports-print.css' %}">
+        <link
+            rel="stylesheet"
+            href="{% static 'css/pages/comelec-reports_summary_print.css' %}"
+        >
+    </head>
+    <body>
+        <div class="print-toolbar">
+            <span>{{ report_title }} &middot; {{ period_label }}</span>
+            <button type="button" data-click-action="print">Print / Save as PDF</button>
+        </div>
+        {% for page in pages %}
+            <section class="report-sheet">
+                <header class="report-letterhead">
+                    <img src="{% static 'images/comelec.png' %}" alt="COMELEC logo">
+                    <div>
+                        Republic of the Philippines
+                        <br>
+                        <strong>COMMISSION ON ELECTIONS</strong>
+                    </div>
+                </header>
+                <div class="report-locality">
+                    PROVINCE: <strong>ALBAY</strong>
+                    <br>
+                    CITY / MUNICIPALITY: <strong>PIO DURAN</strong>
+                </div>
+                <h1>{{ report_title|upper }}</h1>
+                <p class="report-period">Period: {{ period_label }}</p>
+                {% if summary_note %}<p class="report-period">{{ summary_note }}</p>{% endif %}
+                <table>
+                    <thead>
+                        <tr>{% for label in columns %}<th scope="col">{{ label }}</th>{% endfor %}</tr>
+                    </thead>
+                    <tbody>{% for row in page %}<tr>{% for value in row %}<td>{{ value }}</td>{% endfor %}</tr>{% empty %}<tr>
+                        <td colspan="{{ columns|length }}">No data to display.</td>
+                        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<footer>
+    <div>
+        <span>Generated: {{ generated_at|date:"M d, Y h:i A" }}</span>
+        <span>Page {{ forloop.counter }} of {{ pages|length }}</span>
+    </div>
+</footer>
+</section>
+{% endfor %}
+<script src="{% static 'js/template-actions.js' %}" defer></script>
+</body>
+</html>

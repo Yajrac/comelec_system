@@ -1,0 +1,11 @@
+.lookup-spinner { display: inline-block; width: 17px; height: 17px; flex-shrink: 0; vertical-align: middle; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: lookup-spin .7s linear infinite; }
+button[aria-busy="true"] { display: inline-flex; align-items: center; justify-content: center; gap: 9px; opacity: .75; cursor: wait; }
+.lookup-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+@keyframes lookup-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .lookup-spinner { animation: none; } }
+
+form:has(input[name="action"][value="find_applicant"]) button[type="submit"]:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+form:has(input[name="action"][value="find_applicant"]) button[aria-busy="true"]:disabled { opacity: .75; cursor: wait; }
+
+form:has(input[name="action"][value="find_applicant"]) button[type="submit"] svg { width: 20px; height: 20px; flex: 0 0 20px; }
+button .lookup-spinner { width: 17px; height: 17px; flex: 0 0 17px; }

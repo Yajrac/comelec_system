@@ -1,3 +1,5 @@
+import "./utils/inputValidation.js";
+import "./input-validation.css";
 import React, { useEffect } from "react";
 import {
     BrowserRouter,

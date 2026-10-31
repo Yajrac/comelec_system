@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { calculateAge } from "../utils/calculateAge";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { submitWithOfflineSupport } from "../services/apiRequest";
@@ -51,6 +52,11 @@ function UpdateInformation() {
     const [requestId, setRequestId] = useState("");
     const [requestStatus, setRequestStatus] = useState("");
     const [isOfflineRequest, setIsOfflineRequest] = useState(false);
+
+    useEffect(() => {
+        const age = calculateAge(formData.birthdate);
+        setFormData(previous => previous.age === age ? previous : { ...previous, age });
+    }, [formData.birthdate]);
 
     const handleSearchChange = (e) => {
         const { name, value } = e.target;
@@ -549,8 +555,8 @@ function UpdateInformation() {
 
                     <div className="registration-header-logo">
                         <img
-                            src="/images/PIODURAN.png"
-                            alt="Pio Duran Registration"
+                            src="/images/comelec.png"
+                            alt="Commission on Elections logo"
                         />
                     </div>
 
@@ -1119,13 +1125,30 @@ function UpdateInformation() {
 
                                         <div className="form-group">
                                             <label>
+                                                Birthdate
+                                            </label>
+
+                                            <input
+                                                className="form-control"
+                                                type="date"
+                                                name="birthdate"
+                                                value={
+                                                    formData.birthdate
+                                                }
+                                                onChange={
+                                                    handleFormChange
+                                                }
+                                            />
+                                        </div>
+<div className="form-group">
+                                            <label>
                                                 Age
                                             </label>
 
                                             <input
                                                 className="form-control"
                                                 type="number"
-                                                name="age"
+                                                name="age" readOnly
                                                 min="18"
                                                 value={
                                                     formData.age
@@ -1165,23 +1188,7 @@ function UpdateInformation() {
                                             </select>
                                         </div>
 
-                                        <div className="form-group">
-                                            <label>
-                                                Birthdate
-                                            </label>
-
-                                            <input
-                                                className="form-control"
-                                                type="date"
-                                                name="birthdate"
-                                                value={
-                                                    formData.birthdate
-                                                }
-                                                onChange={
-                                                    handleFormChange
-                                                }
-                                            />
-                                        </div>
+                                        
 
                                         <div className="form-group form-group-wide">
                                             <label>

@@ -1,0 +1,9 @@
+.admin-icon-action { display: inline-flex !important; align-items: center; justify-content: center; flex: 0 0 40px; width: 40px; min-width: 40px; height: 40px; min-height: 40px; padding: 0 !important; border: 1px solid #dbe5f4 !important; border-radius: 9px !important; background: #f3f7ff !important; color: #2455b4 !important; text-decoration: none; box-shadow: none !important; }
+.admin-icon-action i { font-size: 17px; line-height: 1; margin: 0 !important; }
+.admin-icon-action:hover { background: #e5eeff !important; border-color: #aac3ef !important; color: #073ba8 !important; }
+.admin-icon-action.admin-icon-danger { background: #fff4f2 !important; border-color: #f1d7d1 !important; color: #ba5549 !important; }
+.admin-icon-action.admin-icon-danger:hover { background: #ffe6e1 !important; border-color: #dea69b !important; color: #a63c30 !important; }
+.admin-icon-action:focus-visible { outline: 3px solid #d5af3a; outline-offset: 3px; }
+.admin-icon-action:disabled { opacity: .45; cursor: not-allowed; }
+.application-action-group { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: nowrap; }
+@media (max-width: 767px) { .admin-icon-action { width: 44px; min-width: 44px; height: 44px; min-height: 44px; flex-basis: 44px; } }

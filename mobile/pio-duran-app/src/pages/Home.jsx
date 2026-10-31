@@ -55,8 +55,8 @@ const Home = () => {
 
                     <div className="government-logo">
                         <img
-                            src="/images/PIODURAN.png"
-                            alt="Pio Duran Logo"
+                            src="/images/comelec.png"
+                            alt="Commission on Elections logo"
                         />
                     </div>
 

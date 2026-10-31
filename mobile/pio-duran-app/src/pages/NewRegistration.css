@@ -873,3 +873,7 @@
         width: 100%;
     }
 }
+.reference-copy-feedback:not(:empty) { display: inline-block; margin: 10px 0; padding: 8px 12px; background: #e4f6eb; border: 1px solid #b6e3c8; border-radius: 7px; color: #207347; font-size: 12px; font-weight: 600; }
+.reference-copy-feedback.copy-error:not(:empty) { background: #fff2ef; border-color: #f1cec6; color: #a34031; }
+
+input[name="age"][readonly] { background: #f1f5f9; color: #536b8d; cursor: default; }

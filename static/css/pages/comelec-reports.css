@@ -1,0 +1,826 @@
+.report-pagination { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; padding: 16px 24px; border-top: 1px solid #e5ebf4; font-size: 12px; color: #61748c; }
+.report-pagination nav { display: flex; gap: 5px; flex-wrap: wrap; }
+.report-pagination button { min-width: 34px; min-height: 34px; padding: 6px 10px; border: 1px solid #dce5f4; border-radius: 6px; background: white; color: #073ba8; }
+.report-pagination button[aria-current="page"] { background: #073ba8; color: white; border-color: #073ba8; }
+.report-pagination button:disabled { opacity: .45; cursor: default; }
+.report-table-card [id] { scroll-margin-top: 90px; }
+@media print { .report-pagination { display: none; } .report-table-card tbody tr[hidden] { display: table-row !important; } }
+
+
+/* =====================================================
+   REPORT PAGE
+===================================================== */
+
+.report-page {
+    width: 100%;
+}
+
+
+/* =====================================================
+   GENERAL CARD
+===================================================== */
+
+.report-card {
+    background: #ffffff;
+
+    border: 1px solid #e1e5eb;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.04);
+}
+
+
+/* =====================================================
+   FILTER CARD
+===================================================== */
+
+.report-filter-card {
+
+    background: #ffffff;
+
+    border: 1px solid #e1e5eb;
+
+    border-radius: 8px;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.04);
+}
+
+
+.report-filter-card .card-body {
+
+    padding: 20px;
+}
+
+
+/* =====================================================
+   REPORT STAT CARDS
+===================================================== */
+
+.report-stat-card {
+
+    border: 0;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.08);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.report-stat-card:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0.6rem 1.2rem rgba(0, 0, 0, 0.15);
+}
+
+
+.report-stat-card .card-body {
+
+    padding: 18px 20px;
+}
+
+
+/* =====================================================
+   STAT CARD COLORS
+===================================================== */
+
+.report-stat-total {
+
+    background: #0d6efd;
+}
+
+
+.report-stat-verified {
+
+    background: #198754;
+}
+
+
+.report-stat-biometrics {
+
+    background: #c77700;
+}
+
+
+.report-stat-suspended {
+
+    background: #dc3545;
+}
+
+
+/* =====================================================
+   STAT ICON
+===================================================== */
+
+.report-stat-icon {
+
+    width: 46px;
+
+    height: 46px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: rgba(255, 255, 255, 0.18);
+
+    border: 1px solid rgba(255, 255, 255, 0.20);
+
+    border-radius: 6px;
+
+    color: #ffffff;
+
+    flex-shrink: 0;
+
+    font-size: 20px;
+}
+
+
+/* =====================================================
+   STAT TEXT
+===================================================== */
+
+.report-stat-label {
+
+    color: rgba(255, 255, 255, 0.82);
+
+    font-size: 12px;
+
+    margin-bottom: 2px;
+}
+
+
+.report-stat-value {
+
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 22px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+
+/* =====================================================
+   APPLICATION TYPE CARDS
+===================================================== */
+
+.application-type-card {
+
+    border: 0;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.08);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.application-type-card:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0.6rem 1.2rem rgba(0, 0, 0, 0.15);
+}
+
+
+.application-type-card .card-body {
+
+    padding: 17px 19px;
+}
+
+
+/* =====================================================
+   APPLICATION TYPE COLORS
+===================================================== */
+
+.application-type-new {
+
+    background: #0d6efd;
+}
+
+
+.application-type-update {
+
+    background: #6f42c1;
+}
+
+
+.application-type-transfer {
+
+    background: #087990;
+}
+
+
+.application-type-reactivation {
+
+    background: #c77700;
+}
+
+
+.application-type-reinstatement {
+
+    background: #343a40;
+}
+
+
+/* =====================================================
+   APPLICATION TYPE TEXT
+===================================================== */
+
+.application-type-label {
+
+    color: rgba(255, 255, 255, 0.82);
+
+    font-size: 11px;
+
+    font-weight: 500;
+}
+
+
+.application-type-value {
+
+    margin: 4px 0 0;
+
+    color: #ffffff;
+
+    font-size: 21px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+
+/* =====================================================
+   STATUS SECTION
+===================================================== */
+
+.status-card {
+
+    border: 1px solid #e1e5eb;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.04);
+}
+
+
+.status-card .card-header {
+
+    padding: 16px 20px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e1e5eb;
+}
+
+
+.report-section-title {
+
+    color: #172033;
+
+    font-size: 15px;
+
+    font-weight: 700;
+}
+
+
+.status-card .card-body {
+
+    padding: 20px;
+}
+
+
+/* =====================================================
+   STATUS ITEMS
+===================================================== */
+
+.status-item {
+
+    padding: 15px 17px;
+
+    border-radius: 7px;
+
+    color: #ffffff;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.status-item:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 5px 12px rgba(0, 0, 0, 0.10);
+}
+
+
+.status-item-pending {
+
+    background: #c77700;
+}
+
+
+.status-item-review {
+
+    background: #087990;
+}
+
+
+.status-item-approved {
+
+    background: #198754;
+}
+
+
+.status-item-disapproved {
+
+    background: #dc3545;
+}
+
+
+.status-label {
+
+    color: rgba(255, 255, 255, 0.82);
+
+    font-size: 11px;
+
+    margin-bottom: 4px;
+}
+
+
+.status-value {
+
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 21px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+
+/* =====================================================
+   CHART CONTAINER
+===================================================== */
+
+.chart-container {
+
+    position: relative;
+
+    height: 350px;
+}
+
+
+/* =====================================================
+   CHART CARD
+===================================================== */
+
+.chart-card {
+
+    border: 1px solid #e1e5eb;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.04);
+}
+
+
+.chart-card .card-header {
+
+    padding: 16px 20px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e1e5eb;
+}
+
+
+.chart-card .card-body {
+
+    padding: 20px;
+}
+
+
+/* =====================================================
+   REPORT TABLE CARD
+===================================================== */
+
+.report-table-card {
+
+    border: 1px solid #e1e5eb;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 2px 7px rgba(0, 0, 0, 0.04);
+}
+
+
+.report-table-card .card-header {
+
+    padding: 16px 20px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e1e5eb;
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.report-table {
+
+    margin: 0;
+
+    width: 100%;
+}
+
+
+.report-table thead th {
+
+    padding:
+        13px 18px;
+
+    background: #f8f9fb;
+
+    border-bottom:
+        1px solid #dfe3e8;
+
+    color: #5d6675;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.04em;
+
+    white-space: nowrap;
+}
+
+
+.report-table tbody td {
+
+    padding:
+        14px 18px;
+
+    border-bottom:
+        1px solid #edf0f3;
+
+    color: #374151;
+
+    vertical-align: middle;
+}
+
+
+.report-table tbody tr:last-child td {
+
+    border-bottom: none;
+}
+
+
+.report-table tbody tr {
+
+    transition:
+        background 0.12s ease;
+}
+
+
+.report-table tbody tr:hover {
+
+    background: #f8faff;
+}
+
+
+/* =====================================================
+   TABLE BADGES
+===================================================== */
+
+.report-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 30px;
+
+    padding:
+        4px 8px;
+
+    border-radius: 5px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+.report-badge-pending {
+
+    background: #fff3cd;
+
+    border: 1px solid #ffe69c;
+
+    color: #8a5a00;
+}
+
+
+.report-badge-review {
+
+    background: #cff4fc;
+
+    border: 1px solid #9eeaf9;
+
+    color: #087990;
+}
+
+
+.report-badge-approved {
+
+    background: #d1e7dd;
+
+    border: 1px solid #a3cfbb;
+
+    color: #146c43;
+}
+
+
+.report-badge-disapproved {
+
+    background: #f8d7da;
+
+    border: 1px solid #f1aeb5;
+
+    color: #b02a37;
+}
+
+
+.report-badge-verified {
+
+    background: #d1e7dd;
+
+    border: 1px solid #a3cfbb;
+
+    color: #146c43;
+}
+
+
+/* =====================================================
+   BARANGAY CHART
+===================================================== */
+
+.barangay-chart-container {
+
+    position: relative;
+
+    height: 450px;
+}
+
+
+/* =====================================================
+   FILTER BUTTONS
+===================================================== */
+
+.report-filter-btn {
+
+    border-radius: 6px;
+}
+
+
+/* =====================================================
+   REPORT ACTIONS
+===================================================== */
+
+.report-actions-title {
+
+    color: #172033;
+
+    font-size: 17px;
+
+    font-weight: 700;
+}
+
+
+.report-actions-description {
+
+    color: #6b7280;
+
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   PRINT
+===================================================== */
+
+@media print {
+
+    .admin-sidebar,
+    .sidebar,
+    .navbar,
+    .topbar,
+    .page-header,
+    .no-print,
+    .btn {
+
+        display: none !important;
+    }
+
+
+    .main-content,
+    .content,
+    .container-fluid {
+
+        margin: 0 !important;
+
+        padding: 0 !important;
+
+        width: 100% !important;
+    }
+
+
+    .card,
+    .report-card,
+    .report-filter-card,
+    .report-stat-card,
+    .application-type-card,
+    .status-card,
+    .chart-card,
+    .report-table-card {
+
+        box-shadow: none !important;
+
+        border: 1px solid #dee2e6 !important;
+    }
+
+
+    .chart-container {
+
+        height: 300px;
+    }
+
+
+    .barangay-chart-container {
+
+        height: 400px;
+    }
+
+
+    @page {
+
+        size: A4 landscape;
+
+        margin: 10mm;
+    }
+
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 991px) {
+
+    .chart-container {
+
+        height: 320px;
+    }
+
+
+    .barangay-chart-container {
+
+        height: 400px;
+    }
+
+}
+
+
+@media (max-width: 575px) {
+
+    .report-stat-card .card-body {
+
+        padding: 16px;
+    }
+
+
+    .report-stat-icon {
+
+        width: 42px;
+
+        height: 42px;
+
+        font-size: 18px;
+    }
+
+
+    .report-stat-value {
+
+        font-size: 20px;
+    }
+
+
+    .application-type-card .card-body {
+
+        padding: 15px 16px;
+    }
+
+
+    .status-card .card-body {
+
+        padding: 15px;
+    }
+
+
+    .chart-card .card-body {
+
+        padding: 15px;
+    }
+
+
+    .chart-container {
+
+        height: 280px;
+    }
+
+
+    .barangay-chart-container {
+
+        height: 350px;
+    }
+
+}
+
+
+html body .inline-comelec-reports-1.inline-comelec-reports-1 { max-height: 560px; overflow-y: auto; }
+html body .inline-comelec-reports-2.inline-comelec-reports-2 { min-width: 520px; }
+html body .inline-comelec-reports-3.inline-comelec-reports-3 { position: sticky; top: 0; z-index: 1; background: #e6e6e6; }
+html body .inline-comelec-reports-4.inline-comelec-reports-4 { width: 9%; }
+html body .inline-comelec-reports-5.inline-comelec-reports-5 { width: 51%; }
+html body .inline-comelec-reports-6.inline-comelec-reports-6 { width: 40%; }
+
+html body .inline-comelec-components-report_controls-1.inline-comelec-components-report_controls-1 { min-width: 140px; }
+.report-table-card .report-header { display: grid; grid-template-columns: minmax(180px, 1fr) auto; align-items: center; gap: 20px; }
+.report-header > div:first-child { min-width: 0; }
+.report-header-controls { justify-content: flex-end; margin-left: auto; }
+.report-header-controls form, .report-header-controls > a { flex-shrink: 0; }
+.report-header-controls .btn, .report-header-controls .form-select { min-height: 44px; white-space: nowrap; }
+.report-header-controls .report-filter-btn { margin: 0; }
+@media (max-width: 1199.98px) { .report-table-card .report-header { grid-template-columns: minmax(0, 1fr); gap: 16px; } .report-header-controls { width: 100%; } }
+@media (max-width: 575.98px) { .report-header-controls { justify-content: flex-start; } .report-header-controls form { width: 100%; } }

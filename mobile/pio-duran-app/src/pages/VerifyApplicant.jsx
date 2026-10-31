@@ -55,7 +55,6 @@ function VerifyApplicant() {
         if (
             !formData.lastname.trim() ||
             !formData.firstname.trim() ||
-            !formData.middlename.trim() ||
             !formData.birthdate
         ) {
             setError(
@@ -183,8 +182,8 @@ function VerifyApplicant() {
                     <div className="government-logo">
 
                         <img
-                            src="/images/PIODURAN.png"
-                            alt="Pio Duran Logo"
+                            src="/images/comelec.png"
+                            alt="Commission on Elections logo"
                         />
 
                     </div>

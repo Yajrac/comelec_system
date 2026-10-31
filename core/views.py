@@ -1,3 +1,5 @@
+from Applicants.application_types import APPLICATION_TYPE_LABELS
+from .biometric_state import SIGNATURE_FIELDS, file_exists as biometric_file_exists, signatures_complete, capture_complete, sync_completion
 import base64
 import binascii
 import json
@@ -29,6 +31,7 @@ from Applicants.models import (
 )
 from core.fingerprint.scanner import capture_fingerprint
 from django.utils import timezone
+from django.db.models.deletion import ProtectedError
 from django.db import transaction
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -88,38 +91,14 @@ def admin_login(request):
                 }
             )
 
-        user = authenticate(
-            request,
-            username=username,
-            password=password
-        )
-
-        if user is None:
-            return render(
-                request,
-                "comelec/auth/login.html",
-                {
-                    "error": "Invalid username or password."
-                }
-            )
-
-        if not user.is_active:
-            return render(
-                request,
-                "comelec/auth/login.html",
-                {
-                    "error": "This account is inactive."
-                }
-            )
-
-        if not user.is_superuser:
-            return render(
-                request,
-                "comelec/auth/login.html",
-                {
-                    "error": "You are not authorized to access the administrator area."
-                }
-            )
+        from .admin_security import authenticate_admin
+        user, error = authenticate_admin(request, username, password)
+        if error:
+            response = render(request, "comelec/auth/login.html", {"error": error})
+            if error.startswith("Too many"):
+                response.status_code = 429
+                response["Retry-After"] = "900"
+            return response
 
         login(request, user)
 
@@ -390,6 +369,23 @@ def admin_dashboard(request):
     # RENDER
     # =========================================================
 
+    barangay_distribution = list(
+        Barangay.objects.annotate(total=Count("applicant")).order_by("-total", "name").values("name", "total")
+    )
+    barangay_distribution = [{"brgy__name": item["name"], "total": item["total"]} for item in barangay_distribution]
+    unassigned_count = Applicant.objects.filter(brgy__isnull=True).count()
+    if unassigned_count:
+        barangay_distribution.append({"brgy__name": "Unassigned", "total": unassigned_count})
+    dashboard_chart_data = {
+        "types": {"labels": [item["name"] for item in application_summary], "values": [item["total"] for item in application_summary]},
+        "statuses": {"labels": ["Pending", "In review", "Approved", "Disapproved"], "values": [pending_total, review_total, approved_total, disapproved_total]},
+        "barangays": {"labels": [item["brgy__name"] or "Unassigned" for item in barangay_distribution], "values": [item["total"] for item in barangay_distribution]},
+    }
+
+    from .registration_analytics import registration_analytics
+    dashboard_analytics = registration_analytics(timezone.localdate().year)
+    dashboard_chart_data.update(dashboard_analytics["charts"])
+
     return render(
         request,
         "comelec/dashboard.html",
@@ -415,6 +411,8 @@ def admin_dashboard(request):
 
             # Application summary
             "application_summary": application_summary,
+            "dashboard_chart_data": dashboard_chart_data,
+            "registration_analytics": dashboard_analytics,
         }
     )
 
@@ -427,24 +425,25 @@ def admin_logout(request):
 
 @login_required
 def add_brgy(request):
+    from .barangays import PIO_DURAN_BARANGAYS, canonical_barangay_name, normalize_barangay_name
 
+    existing = {normalize_barangay_name(name) for name in Barangay.objects.values_list("name", flat=True)}
+    available = [name for name in PIO_DURAN_BARANGAYS if normalize_barangay_name(name) not in existing]
+    context = {"available_barangays": available}
     if request.method == "POST":
-        name = request.POST.get("name")
-
-        # Check if barangay already exists
-        if Barangay.objects.filter(name=name).exists():
-            return render(request, "comelec/brgy_form.html", {
-                "error": "Barangay already exists!",
-                "name": name,
-            })
-
-        Barangay.objects.create(
-            name=name
-        )
-
-        return redirect("brgy_list")
-
-    return render(request, "comelec/brgy_form.html")
+        submitted = request.POST.get("name", "").strip()
+        name = canonical_barangay_name(submitted)
+        context["name"] = submitted
+        if name is None:
+            context["error"] = "Select a barangay from the official Pio Duran list."
+        elif normalize_barangay_name(name) in existing:
+            context["error"] = "This barangay is already registered."
+        else:
+            _, created = Barangay.objects.get_or_create(name=name)
+            if created:
+                return redirect("brgy_list")
+            context["error"] = "This barangay is already registered."
+    return render(request, "comelec/brgy_form.html", context)
 
 @login_required
 def brgy_list(request):
@@ -469,44 +468,60 @@ def brgy_list(request):
 
 @login_required
 def barangay_applicants(request, pk):
-
-    barangay = get_object_or_404(
-        Barangay,
-        pk=pk
-    )
-
-    applicants = Applicant.objects.filter(
-        brgy=barangay,
-        status="APPROVED",
-        verification_status="VERIFIED",
-        is_active=True
-    ).order_by(
-        "lastname",
-        "firstname",
-        "middlename"
-    )
-
-    return render(
-        request,
-        "comelec/barangay_applicants.html",
-        {
-            "barangay": barangay,
-            "applicants": applicants
-        }
-    )
+    access = admin_superuser_required(request)
+    if access:
+        return access
+    barangay = get_object_or_404(Barangay, pk=pk)
+    records = Applicant.objects.filter(brgy=barangay, status="APPROVED",
+        verification_status="VERIFIED", is_active=True)
+    selected = request.GET.get("application_type", "").upper()
+    short_labels = [("", "All"), ("NEW", "New Registration"), ("UPDATE", "Correction"),
+        ("TRANSFER", "Transfer"), ("REACTIVATION", "Reactivation"), ("REINSTATEMENT", "Reinstatement")]
+    if selected not in dict(short_labels):
+        selected = ""
+    request_models = {"UPDATE": ApplicantUpdateRequest, "TRANSFER": ApplicantTransferRequest,
+        "REACTIVATION": ApplicantReactivationRequest, "REINSTATEMENT": ApplicantReinstatementRequest}
+    tabs = []
+    filtered = records
+    for code, label in short_labels:
+        subset = records
+        if code in request_models:
+            approved_ids = request_models[code].objects.filter(status="APPROVED").values("applicant_id")
+            subset = records.filter(Q(application_type=code) | Q(pk__in=approved_ids))
+        elif code:
+            subset = records.filter(application_type=code)
+        tabs.append({"code": code, "label": label, "count": subset.count()})
+        if code == selected:
+            filtered = subset
+    return render(request, "comelec/barangay_applicants.html", {
+        "barangay": barangay,
+        "applicants": filtered.order_by("lastname", "firstname", "middlename", "pk"),
+        "application_type_tabs": tabs, "selected_application_type": selected,
+        "selected_application_label": APPLICATION_TYPE_LABELS.get(selected, ""),
+        "total_verified": records.count(),
+    })
 
 @login_required
 def delete_brgy(request, pk):
-
-    barangay = Barangay.objects.get(pk=pk)
-
+    access_error = admin_superuser_required(request)
+    if access_error:
+        return access_error
+    barangay = get_object_or_404(Barangay, pk=pk)
+    error = None
     if request.method == "POST":
-        barangay.delete()
-        return redirect("brgy_list")
-
+        try:
+            barangay.delete()
+        except ProtectedError:
+            error = "This barangay cannot be deleted because it is used by an applicant or registration request."
+            if request.headers.get("Accept") == "application/json":
+                return JsonResponse({"error": error}, status=409)
+        else:
+            if request.headers.get("Accept") == "application/json":
+                return JsonResponse({"deleted": True})
+            return redirect("brgy_list")
     return render(request, "comelec/brgy_delete.html", {
-        "barangay": barangay
-    })
+        "barangay": barangay, "delete_error": error,
+    }, status=409 if error else 200)
 
 @login_required
 def admin_applications(request):
@@ -607,7 +622,7 @@ def admin_applications(request):
                 "applicant": applicant,
                 "applicant_name": str(applicant),
                 "type": "NEW",
-                "type_display": "New Registration",
+                "type_display": APPLICATION_TYPE_LABELS["NEW"],
                 "status": applicant.status,
                 "status_display": applicant.get_status_display(),
                 "date": application_date,
@@ -659,7 +674,7 @@ def admin_applications(request):
                 "applicant": application.applicant,
                 "applicant_name": str(application.applicant),
                 "type": "UPDATE",
-                "type_display": "Update / Correction",
+                "type_display": APPLICATION_TYPE_LABELS["UPDATE"],
                 "status": application.status,
                 "status_display": application.get_status_display(),
                 "date": application.requested_at,
@@ -712,7 +727,7 @@ def admin_applications(request):
                 "applicant": application.applicant,
                 "applicant_name": str(application.applicant),
                 "type": "TRANSFER",
-                "type_display": "Transfer",
+                "type_display": APPLICATION_TYPE_LABELS["TRANSFER"],
                 "status": application.status,
                 "status_display": application.get_status_display(),
                 "date": application.requested_at,
@@ -763,7 +778,7 @@ def admin_applications(request):
                 "applicant": application.applicant,
                 "applicant_name": str(application.applicant),
                 "type": "REACTIVATION",
-                "type_display": "Reactivation",
+                "type_display": APPLICATION_TYPE_LABELS["REACTIVATION"],
                 "status": application.status,
                 "status_display": application.get_status_display(),
                 "date": application.requested_at,
@@ -814,7 +829,7 @@ def admin_applications(request):
                 "applicant": application.applicant,
                 "applicant_name": str(application.applicant),
                 "type": "REINSTATEMENT",
-                "type_display": "Reinstatement",
+                "type_display": APPLICATION_TYPE_LABELS["REINSTATEMENT"],
                 "status": application.status,
                 "status_display": application.get_status_display(),
                 "date": application.requested_at,
@@ -942,7 +957,7 @@ def admin_application_transfer_detail(request, application_id):
 
     return render(
         request,
-        "admin/applications/transfer_detail.html",
+        "comelec/applications/transfer_detail.html",
         {
             "application": application,
         }
@@ -969,7 +984,7 @@ def admin_application_reactivation_detail(request, application_id):
 
     return render(
         request,
-        "admin/applications/reactivation_detail.html",
+        "comelec/applications/reactivation_detail.html",
         {
             "application": application,
         }
@@ -996,7 +1011,7 @@ def admin_application_reinstatement_detail(request, application_id):
 
     return render(
         request,
-        "admin/applications/reinstatement_detail.html",
+        "comelec/applications/reinstatement_detail.html",
         {
             "application": application,
         }
@@ -1022,182 +1037,92 @@ def approve_applicant_for_biometrics(applicant, notification_title, notification
     )
 
 def send_iprog_sms(number, message):
-
-    api_token = getattr(
-        settings,
-        "IPROG_SMS_API_TOKEN",
-        ""
-    )
-
-
-    # =====================================================
-    # CHECK API TOKEN
-    # =====================================================
-
-    if not api_token:
-
-        logger.error(
-            "IPROG SMS failed: IPROG_SMS_API_TOKEN is not configured."
-        )
-
+    """Queue one SMS with iProg; acceptance does not confirm handset delivery."""
+    token = getattr(settings, "IPROG_SMS_API_TOKEN", "").strip()
+    if not token:
+        logger.error("iProg SMS is not configured: missing IPROG_SMS_API_TOKEN.")
         return False
-
-
-    # =====================================================
-    # CHECK MOBILE NUMBER
-    # =====================================================
-
-    if not number:
-
-        logger.error(
-            "IPROG SMS failed: recipient number is empty."
-        )
-
-        return False
-
-
-    # =====================================================
-    # NORMALIZE PHILIPPINE NUMBER
-    # =====================================================
-
-    number = str(number).strip()
-
-
+    number = str(number or "").strip()
     if number.startswith("+63"):
-
         number = number[1:]
-
-
     elif number.startswith("09"):
-
         number = "63" + number[1:]
-
-
     elif number.startswith("9"):
-
         number = "63" + number
-
-
-    # =====================================================
-    # VALIDATE NUMBER
-    # =====================================================
-
-    if not number.startswith("63"):
-
-        logger.error(
-            "IPROG SMS failed: invalid Philippine number: %s",
-            number
-        )
-
+    if not re.fullmatch(r"639[0-9]{9}", number):
+        logger.error("iProg SMS: invalid Philippine mobile number.")
         return False
-
-
-    if len(number) != 12:
-
-        logger.error(
-            "IPROG SMS failed: invalid Philippine number length: %s",
-            number
-        )
-
+    if not isinstance(message, str) or not message.strip():
+        logger.error("iProg SMS: message is empty.")
         return False
-
-
-    # =====================================================
-    # API REQUEST
-    # =====================================================
-
-    url = (
-        "https://iprogsms.com/"
-        "api/v1/sms_messages"
-    )
-
-
-    payload = {
-        "api_token": api_token,
-        "phone_number": number,
-        "message": message,
-    }
-
-
     try:
-
         response = requests.post(
-            url,
-            json=payload,
-            timeout=15
+            "https://www.iprogsms.com/api/v1/sms_messages",
+            json={"api_token": token, "phone_number": number, "message": message},
+            timeout=15,
         )
-
-
-        # =================================================
-        # DEBUG RESPONSE
-        # =================================================
-
-        logger.info(
-            "IPROG SMS HTTP status: %s",
-            response.status_code
-        )
-
-        logger.info(
-            "IPROG SMS response: %s",
-            response.text
-        )
-
-
-        # =================================================
-        # JSON RESPONSE
-        # =================================================
-
-        try:
-
-            result = response.json()
-
-        except ValueError:
-
-            logger.error(
-                "IPROG SMS returned invalid JSON: %s",
-                response.text
-            )
-
+        if not 200 <= response.status_code < 300:
+            logger.error("iProg SMS HTTP failure: %s", response.status_code)
             return False
-
-
-        # =================================================
-        # SUCCESS
-        # =================================================
-
-        if response.status_code == 200:
-
-            if result.get("status") == 200:
-
-                logger.info(
-                    "IPROG SMS successfully queued. "
-                    "Message ID: %s",
-                    result.get("message_id")
-                )
-
-                return True
-
-
-        # =================================================
-        # FAILURE
-        # =================================================
-
-        logger.error(
-            "IPROG SMS failed: %s",
-            result
-        )
-
+        result = response.json()
+        if not isinstance(result, dict) or str(result.get("status")) != "200" or not result.get("message_id"):
+            logger.error("iProg SMS was not accepted.")
+            return False
+        return True
+    except (requests.RequestException, ValueError):
+        # Never log credentials, raw responses, recipient details, or retry sends.
+        logger.error("iProg SMS request failed or returned invalid JSON.")
         return False
 
 
-    except requests.RequestException as exc:
-
-        logger.exception(
-            "IPROG SMS request failed: %s",
-            exc
-        )
-
+def send_semaphore_sms(number, message):
+    """Queue one SMS. True means accepted by Semaphore, not handset delivery."""
+    api_key = getattr(settings, "SEMAPHORE_API_KEY", "").strip()
+    if not api_key:
+        logger.error("Semaphore SMS is not configured: missing SEMAPHORE_API_KEY.")
         return False
+    number = str(number or "").strip()
+    if number.startswith("+63"):
+        number = number[1:]
+    elif number.startswith("09"):
+        number = "63" + number[1:]
+    elif number.startswith("9"):
+        number = "63" + number
+    if not re.fullmatch(r"639[0-9]{9}", number):
+        logger.error("Semaphore SMS: invalid Philippine mobile number.")
+        return False
+    if not isinstance(message, str) or not message.strip():
+        logger.error("Semaphore SMS: message is empty.")
+        return False
+    payload = {"apikey": api_key, "number": number, "message": message}
+    sender_name = getattr(settings, "SEMAPHORE_SENDER_NAME", "").strip()
+    if sender_name:
+        payload["sendername"] = sender_name
+    try:
+        response = requests.post(
+            "https://api.semaphore.co/api/v4/messages",
+            data=payload,
+            timeout=15,
+        )
+        if not 200 <= response.status_code < 300:
+            logger.error("Semaphore SMS HTTP failure: %s", response.status_code)
+            return False
+        result = response.json()
+        if not isinstance(result, list) or len(result) != 1:
+            logger.error("Semaphore SMS returned an unexpected response.")
+            return False
+        entry = result[0]
+        if (not isinstance(entry, dict) or not entry.get("message_id")
+                or str(entry.get("status", "")).lower() not in {"queued", "pending", "sent"}):
+            logger.error("Semaphore SMS was not accepted.")
+            return False
+        logger.info("Semaphore SMS accepted. Message ID: %s", entry["message_id"])
+        return True
+    except (requests.RequestException, ValueError):
+        # Do not log response bodies or request data containing credentials or PII.
+        logger.error("Semaphore SMS request failed or returned invalid JSON.")
+        return False
+
 
 OFFICE_DAILY_CAPACITY = 50
 DISAPPROVED_STATUS = 7
@@ -1452,7 +1377,7 @@ def admin_application_action(
                 )
 
                 # =============================================
-                # IPROG SMS
+                # iProg SMS
                 # =============================================
 
                 send_approval_sms(
@@ -1492,7 +1417,7 @@ def admin_application_action(
                 )
 
                 # =============================================
-                # IPROG SMS
+                # iProg SMS
                 # =============================================
 
                 send_iprog_sms(
@@ -1607,8 +1532,11 @@ def admin_application_action(
                 )
 
                 applicant.email = (
-                    application.email
+                    application.email or None
                 )
+
+                if application.civil_status:
+                    applicant.civil_status = application.civil_status
 
                 applicant.pwd_status = (
                     application.pwd_status
@@ -1671,7 +1599,7 @@ def admin_application_action(
                 )
 
                 # =============================================
-                # IPROG SMS
+                # iProg SMS
                 # =============================================
 
                 send_approval_sms(
@@ -1707,7 +1635,7 @@ def admin_application_action(
                 )
 
                 # =============================================
-                # IPROG SMS
+                # iProg SMS
                 # =============================================
 
                 send_iprog_sms(
@@ -1830,7 +1758,7 @@ def admin_application_action(
                 )
 
                 # =============================================
-                # IPROG SMS
+                # iProg SMS
                 # =============================================
 
                 send_approval_sms(
@@ -1866,7 +1794,7 @@ def admin_application_action(
                 )
 
                 # =============================================
-                # IPROG SMS
+                # iProg SMS
                 # =============================================
 
                 send_iprog_sms(
@@ -1971,7 +1899,7 @@ def admin_application_action(
                 )
 
                 # =============================================
-                # IPROG SMS
+                # iProg SMS
                 # =============================================
 
                 send_approval_sms(
@@ -2007,7 +1935,7 @@ def admin_application_action(
                 )
 
                 # =============================================
-                # IPROG SMS
+                # iProg SMS
                 # =============================================
 
                 send_iprog_sms(
@@ -2112,7 +2040,7 @@ def admin_application_action(
                 )
 
                 # =============================================
-                # IPROG SMS
+                # iProg SMS
                 # =============================================
 
                 send_approval_sms(
@@ -2148,7 +2076,7 @@ def admin_application_action(
                 )
 
                 # =============================================
-                # IPROG SMS
+                # iProg SMS
                 # =============================================
 
                 send_iprog_sms(
@@ -2217,22 +2145,7 @@ def admin_applicant_biometric(request, applicant_id):
         biometric.applicant_signature
     )
 
-    # Only redirect when the stored biometric files and templates
-    # are present and the applicant is already verified.
-    if (
-        biometric.biometrics_completed
-        and biometric.completed
-        and left_image_exists
-        and right_image_exists
-        and biometric.left_finger_template
-        and biometric.right_finger_template
-        and applicant.verification_status == "VERIFIED"
-    ):
-        return redirect(
-            "print-slip-account",
-            applicant_id=applicant.id
-        )
-
+    # Keep the capture screen accessible for reviewing and retaking each sample.
     return render(
         request,
         "comelec/applications/biometric.html",
@@ -2242,372 +2155,14 @@ def admin_applicant_biometric(request, applicant_id):
             "left_image_exists": left_image_exists,
             "right_image_exists": right_image_exists,
             "signature_exists": signature_exists,
+            "signature_slots": [{"slot": slot, "field": getattr(biometric, field), "captured": biometric_file_exists(getattr(biometric, field))} for slot, field in SIGNATURE_FIELDS.items()],
+            "signatures_complete": signatures_complete(biometric),
+            "capture_complete": capture_complete(biometric),
         }
     )
 
 
-@login_required
-@require_POST
-def start_signature_session(request, applicant_id):
-
-    applicant = get_object_or_404(
-        Applicant,
-        id=applicant_id
-    )
-
-    # ---------------------------------------------------------
-    # Cancel previous waiting sessions for this applicant
-    # ---------------------------------------------------------
-
-    SignatureSession.objects.filter(
-        applicant=applicant,
-        status=SignatureSession.STATUS_WAITING
-    ).update(
-        status=SignatureSession.STATUS_CANCELLED,
-        cancelled_at=timezone.now()
-    )
-
-    # ---------------------------------------------------------
-    # Create new session
-    # ---------------------------------------------------------
-
-    session = SignatureSession.objects.create(
-        applicant=applicant,
-        officer=request.user,
-        status=SignatureSession.STATUS_WAITING
-    )
-
-    return JsonResponse({
-        "success": True,
-        "session_id": str(session.session_id),
-        "applicant_id": applicant.id,
-        "applicant_name": str(applicant),
-        "status": session.status,
-    })
-
-@require_GET
-def get_waiting_signature_session(request):
-
-    session = (
-        SignatureSession.objects
-        .filter(
-            status=SignatureSession.STATUS_WAITING
-        )
-        .select_related(
-            "applicant"
-        )
-        .order_by("-created_at")
-        .first()
-    )
-
-    if not session:
-
-        return JsonResponse({
-            "success": True,
-            "session": None
-        })
-
-    return JsonResponse({
-        "success": True,
-        "session": {
-            "session_id": str(
-                session.session_id
-            ),
-            "applicant_id": session.applicant.id,
-            "applicant_name": str(
-                session.applicant
-            ),
-            "status": session.status,
-        }
-    })
-
-# views.py
-# Make sure your Django endpoint accepts PNG exactly like this.
-
-@csrf_exempt
-@require_POST
-def complete_signature_session(request):
-
-    try:
-        body = json.loads(
-            request.body.decode("utf-8")
-        )
-
-    except (
-        json.JSONDecodeError,
-        UnicodeDecodeError
-    ):
-        return JsonResponse(
-            {
-                "success": False,
-                "message": "Invalid request data."
-            },
-            status=400
-        )
-
-    session_id = body.get("session_id")
-    signature_data = body.get("signature")
-
-    if not session_id:
-        return JsonResponse(
-            {
-                "success": False,
-                "message": "Session ID is required."
-            },
-            status=400
-        )
-
-    if not signature_data:
-        return JsonResponse(
-            {
-                "success": False,
-                "message": "Signature is required."
-            },
-            status=400
-        )
-
-    try:
-        session = (
-            SignatureSession.objects
-            .select_related("applicant")
-            .get(
-                session_id=session_id
-            )
-        )
-
-    except SignatureSession.DoesNotExist:
-        return JsonResponse(
-            {
-                "success": False,
-                "message": "Signature session not found."
-            },
-            status=404
-        )
-
-    if (
-        session.status !=
-        SignatureSession.STATUS_WAITING
-    ):
-        return JsonResponse(
-            {
-                "success": False,
-                "message": (
-                    "This signature session is "
-                    "no longer available."
-                )
-            },
-            status=400
-        )
-
-    # =========================================================
-    # PNG ONLY
-    # =========================================================
-
-    match = re.match(
-        r"^data:image/png;base64,"
-        r"(?P<data>.+)$",
-        signature_data
-    )
-
-    if not match:
-        return JsonResponse(
-            {
-                "success": False,
-                "message": (
-                    "Signature must be a PNG image."
-                )
-            },
-            status=400
-        )
-
-    encoded_data = match.group("data")
-
-    try:
-        image_data = base64.b64decode(
-            encoded_data,
-            validate=True
-        )
-
-    except (
-        ValueError,
-        binascii.Error
-    ):
-        return JsonResponse(
-            {
-                "success": False,
-                "message": "Invalid PNG image."
-            },
-            status=400
-        )
-
-    # =========================================================
-    # SAVE PNG
-    # =========================================================
-
-    biometric, created = (
-        ApplicantBiometric.objects
-        .get_or_create(
-            applicant=session.applicant
-        )
-    )
-
-    if biometric.applicant_signature:
-        biometric.applicant_signature.delete(
-            save=False
-        )
-
-    filename = (
-        f"applicant_signature_"
-        f"{session.applicant.id}.png"
-    )
-
-    biometric.applicant_signature.save(
-        filename,
-        ContentFile(image_data),
-        save=False
-    )
-
-    biometric.captured_at = timezone.now()
-
-    biometric.save()
-
-    # =========================================================
-    # COMPLETE SESSION
-    # =========================================================
-
-    session.status = (
-        SignatureSession.STATUS_COMPLETED
-    )
-
-    session.completed_at = timezone.now()
-
-    session.save(
-        update_fields=[
-            "status",
-            "completed_at"
-        ]
-    )
-
-    return JsonResponse({
-        "success": True,
-        "message": (
-            "Applicant PNG signature "
-            "saved successfully."
-        ),
-        "session_id": str(
-            session.session_id
-        ),
-        "applicant_id":
-            session.applicant.id,
-        "signature_url":
-            biometric.applicant_signature.url,
-    })
-
-@require_GET
-def signature_session_status(
-    request,
-    session_id
-):
-
-    # ---------------------------------------------------------
-    # Get session
-    # ---------------------------------------------------------
-
-    try:
-
-        session = (
-            SignatureSession.objects
-            .select_related("applicant")
-            .get(
-                session_id=session_id
-            )
-        )
-
-    except SignatureSession.DoesNotExist:
-
-        return JsonResponse(
-            {
-                "success": False,
-                "message": "Session not found."
-            },
-            status=404
-        )
-
-    # ---------------------------------------------------------
-    # Get biometric
-    # ---------------------------------------------------------
-
-    biometric = (
-        ApplicantBiometric.objects
-        .filter(
-            applicant=session.applicant
-        )
-        .first()
-    )
-
-    signature_url = None
-
-    # ---------------------------------------------------------
-    # ONLY return signature when THIS session
-    # was actually completed.
-    # ---------------------------------------------------------
-
-    if (
-        session.status ==
-        SignatureSession.STATUS_COMPLETED
-        and
-        biometric
-        and
-        biometric.applicant_signature
-    ):
-
-        signature_url = (
-            biometric
-            .applicant_signature
-            .url
-        )
-
-    # ---------------------------------------------------------
-    # Signature captured
-    # ---------------------------------------------------------
-
-    signature_captured = (
-        session.status ==
-        SignatureSession.STATUS_COMPLETED
-        and
-        bool(signature_url)
-    )
-
-    # ---------------------------------------------------------
-    # Response
-    # ---------------------------------------------------------
-
-    return JsonResponse({
-
-        "success": True,
-
-        "session_id": str(
-            session.session_id
-        ),
-
-        "status": session.status,
-
-        "applicant_id": (
-            session.applicant.id
-        ),
-
-        "applicant_name": str(
-            session.applicant
-        ),
-
-        "signature_captured": (
-            signature_captured
-        ),
-
-        "signature_url": (
-            signature_url
-        ),
-    })
+from .signatures import start_signature_session, get_waiting_signature_session, complete_signature_session, signature_session_status
 
 @login_required
 @require_POST
@@ -2615,6 +2170,9 @@ def cancel_signature_session(
     request,
     session_id
 ):
+    access = admin_superuser_required(request)
+    if access:
+        return access
     # ---------------------------------------------------------
     # Get session
     # ---------------------------------------------------------
@@ -2853,10 +2411,7 @@ def admin_capture_fingerprint(request, applicant_id):
         # CHECK BOTH
         # =====================================================
 
-        biometric.biometrics_completed = bool(
-            biometric.left_finger
-            and biometric.right_finger
-        )
+        biometric.biometrics_completed = capture_complete(biometric)
 
         biometric.captured_at = timezone.now()
 
@@ -2875,6 +2430,8 @@ def admin_capture_fingerprint(request, applicant_id):
         else:
 
             biometric.completed = False
+            applicant.verification_status = "BIOMETRICS_PENDING"
+            applicant.save(update_fields=["verification_status"])
 
         biometric.save()
 
@@ -2996,6 +2553,7 @@ def print_slip_account(request, applicant_id):
         applicant.verification_status != "VERIFIED"
         or not biometric.biometrics_completed
         or not biometric.completed
+        or not capture_complete(biometric)
     ):
         return redirect(
             "admin-applicant-biometric",
@@ -3064,6 +2622,12 @@ def admin_applicants(request):
         applicants = applicants.filter(
             brgy_id=barangay_id
         )
+
+    if request.GET.get("format") == "print":
+        from .report_print import render_application_list
+        return render_application_list(request, applicants, ApplicantUpdateRequest.objects.none(),
+            ApplicantTransferRequest.objects.none(), ApplicantReactivationRequest.objects.none(),
+            ApplicantReinstatementRequest.objects.none(), "", "", applicant_only=True)
 
     # =========================================================
     # PAGINATION
@@ -3166,18 +2730,8 @@ def admin_reports(request):
     # FILTERS
     # =========================================================
 
-    date_from = request.GET.get("date_from", "").strip()
-    date_to = request.GET.get("date_to", "").strip()
-
-    application_type = request.GET.get(
-        "application_type",
-        ""
-    ).strip()
-
-    barangay_id = request.GET.get(
-        "barangay",
-        ""
-    ).strip()
+    # Reports show all applications; old filter parameters are ignored.
+    date_from = date_to = application_type = barangay_id = ""
 
     # =========================================================
     # BASE QUERYSETS
@@ -3325,6 +2879,38 @@ def admin_reports(request):
             transfer_requests = transfer_requests.none()
             reactivation_requests = reactivation_requests.none()
 
+    from urllib.parse import urlencode
+    from django.db.models.functions import ExtractYear
+    raw_year = request.GET.get("year", "")
+    report_year = int(raw_year) if raw_year.isascii() and raw_year.isdigit() and len(raw_year) == 4 and 1900 <= int(raw_year) <= 9999 else None
+    available_years = {timezone.localdate().year}
+    sources = [(applicants, "date_joined"), (update_requests, "requested_at"),
+        (transfer_requests, "requested_at"), (reactivation_requests, "requested_at"),
+        (reinstatement_requests, "requested_at")]
+    filtered = []
+    for queryset, field in sources:
+        available_years.update(queryset.order_by().annotate(report_year=ExtractYear(field)).values_list("report_year", flat=True).distinct())
+        if report_year:
+            queryset = queryset.filter(**{field + "__year": report_year})
+        filtered.append(queryset)
+    applicants, update_requests, transfer_requests, reactivation_requests, reinstatement_requests = filtered
+    if report_year:
+        available_years.add(report_year)
+    period_label = str(report_year) if report_year else "All years"
+    period_query = urlencode({'year': report_year}) if report_year else ""
+
+    if request.GET.get("format") == "pdf" and request.GET.get("table", "applicants") == "applicants":
+        from .report_print import application_list_groups
+        from .report_pdf import download_applicant_list
+        return download_applicant_list(application_list_groups(applicants, update_requests,
+            transfer_requests, reactivation_requests, reinstatement_requests), period_label=period_label)
+
+    if request.GET.get("format") == "print" and request.GET.get("table", "applicants") == "applicants":
+        from .report_print import render_application_list
+        return render_application_list(request, applicants, update_requests,
+            transfer_requests, reactivation_requests, reinstatement_requests,
+            date_from, date_to, period_label=period_label)
+
     # =========================================================
     # TOTALS
     # =========================================================
@@ -3411,7 +2997,7 @@ def admin_reports(request):
     application_type_report = [
         {
             "code": "NEW",
-            "name": "New Registration",
+            "name": APPLICATION_TYPE_LABELS["NEW"],
             "total": new_total,
             "pending": applicants.filter(
                 status="PENDING"
@@ -3428,7 +3014,7 @@ def admin_reports(request):
         },
         {
             "code": "UPDATE",
-            "name": "Update Information",
+            "name": APPLICATION_TYPE_LABELS["UPDATE"],
             "total": update_total,
             "pending": update_requests.filter(
                 status="PENDING"
@@ -3445,7 +3031,7 @@ def admin_reports(request):
         },
         {
             "code": "TRANSFER",
-            "name": "Transfer",
+            "name": APPLICATION_TYPE_LABELS["TRANSFER"],
             "total": transfer_total,
             "pending": transfer_requests.filter(
                 status="PENDING"
@@ -3462,7 +3048,7 @@ def admin_reports(request):
         },
         {
             "code": "REACTIVATION",
-            "name": "Reactivation",
+            "name": APPLICATION_TYPE_LABELS["REACTIVATION"],
             "total": reactivation_total,
             "pending": reactivation_requests.filter(
                 status="PENDING"
@@ -3479,7 +3065,7 @@ def admin_reports(request):
         },
         {
             "code": "REINSTATEMENT",
-            "name": "Reinstatement",
+            "name": APPLICATION_TYPE_LABELS["REINSTATEMENT"],
             "total": reinstatement_total,
             "pending": reinstatement_requests.filter(
                 status="PENDING"
@@ -3602,6 +3188,36 @@ def admin_reports(request):
     # RENDER
     # =========================================================
 
+    from .registration_analytics import registration_analytics, TREND_COLUMNS, DEMOGRAPHIC_COLUMNS
+    report_analytics = registration_analytics(report_year)
+
+    if request.GET.get("format") in {"pdf", "print"} and request.GET.get("table") in {"types", "barangays", "trends", "demographics"}:
+        if request.GET["table"] == "types":
+            title, records = "Application Type Report", application_type_report
+            columns = [("name", "Application Type"), ("total", "Total"), ("pending", "Pending"),
+                ("review", "Review"), ("approved", "Approved"), ("disapproved", "Disapproved")]
+        elif request.GET["table"] == "barangays":
+            title, records = "Barangay Report", barangay_report
+            columns = [("name", "Barangay"), ("new", "New"), ("update", "Update"), ("transfer", "Transfer"),
+                ("reactivation", "Reactivation"), ("reinstatement", "Reinstatement"), ("total", "Total"), ("verified", "Verified")]
+        elif request.GET["table"] == "trends":
+            title, records, columns = "Registration Trends", report_analytics["trends"], TREND_COLUMNS
+        else:
+            title, records, columns = "Applicant Demographics", report_analytics["demographics"], DEMOGRAPHIC_COLUMNS
+        summary_note = ("Unique applicants registered in the selected period. Age as of " + str(report_analytics["as_of"]) if request.GET["table"] == "demographics" else "Application submissions by month or year; change is the count difference from the previous period." if request.GET["table"] == "trends" else "")
+        if request.GET["format"] == "pdf":
+            from .report_pdf import download_summary
+            return download_summary(title, records, columns, period_label, note=summary_note)
+        rows = [[record.get(key, "") for key, label in columns] for record in records]
+        pages = [rows[offset:offset + 18] for offset in range(0, len(rows), 18)] or [[]]
+        return render(request, "comelec/reports_summary_print.html", {"report_title": title,
+            "columns": [label for key, label in columns], "pages": pages,
+            "period_label": period_label, "summary_note": summary_note, "generated_at": timezone.localtime()})
+
+    from .report_print import application_list_groups
+    applicant_list_groups = application_list_groups(applicants, update_requests,
+        transfer_requests, reactivation_requests, reinstatement_requests)
+
     return render(
         request,
         "comelec/reports.html",
@@ -3611,6 +3227,10 @@ def admin_reports(request):
             "application_type": application_type,
             "barangay_id": barangay_id,
 
+            "report_year_options": sorted((year for year in available_years if year), reverse=True),
+            "selected_report_year": report_year, "period_label": period_label, "period_query": period_query,
+            "registration_analytics": report_analytics,
+            "applicant_list_groups": applicant_list_groups,
             "total_applications": total_applications,
 
             "new_total": new_total,
@@ -3824,7 +3444,7 @@ def save_fingerprint(request, applicant_id):
     Completion rule:
         COMPLETE when both left and right fingerprint images exist.
 
-    Fingerprint templates and the applicant signature are optional
+    Fingerprint templates are optional; all three applicant signatures are required
     for biometric image completion.
     """
 
@@ -4088,8 +3708,8 @@ def save_fingerprint(request, applicant_id):
     left_template_saved = bool(biometric.left_finger_template)
     right_template_saved = bool(biometric.right_finger_template)
 
-    # Completion depends ONLY on both fingerprint images.
-    completed = left_image_saved and right_image_saved
+    # Completion requires both fingerprints and all three signature files.
+    completed = capture_complete(biometric)
 
     # --------------------------------------------------
     # 11. Persist biometric completion flags

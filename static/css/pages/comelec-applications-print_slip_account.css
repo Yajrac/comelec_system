@@ -1,0 +1,308 @@
+/* =========================================================
+       SCREEN
+    ========================================================= */
+
+    .slip-wrapper {
+        max-width: 950px;
+        margin: 0 auto;
+    }
+
+    .slip-card {
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .slip-copy {
+        position: relative;
+    }
+
+    .slip-header {
+        border-bottom: 2px solid #212529;
+        padding-bottom: 20px;
+    }
+
+    .government-title {
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .office-title {
+        font-size: 22px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .office-subtitle {
+        font-size: 13px;
+        color: #6c757d;
+    }
+
+    .copy-label {
+        display: inline-block;
+        border: 2px solid #212529;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+    }
+
+    .verified-box {
+        border: 1px solid #198754;
+        background: #f1fdf6;
+        color: #146c43;
+    }
+
+    .section-title {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: #495057;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 8px;
+        margin-bottom: 15px;
+    }
+
+    .info-label {
+        font-size: 11px;
+        color: #6c757d;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    .info-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: #212529;
+        word-break: break-word;
+    }
+
+    .verification-item {
+        border: 1px solid #dee2e6;
+        padding: 12px;
+        background: #f8f9fa;
+    }
+
+    .fingerprint-box {
+        height: 120px;
+        border: 1px solid #dee2e6;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .fingerprint-box img {
+        max-width: 90px;
+        max-height: 105px;
+        object-fit: contain;
+    }
+
+    /* =========================================================
+       SIGNATURE AREA
+    ========================================================= */
+
+    .signature-area {
+        margin-top: 35px;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    .signature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 25px;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    .signature-grid .signature-block {
+        min-width: 0;
+        min-height: 120px;
+        text-align: center;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    .electronic-signature-box {
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid #212529;
+        margin-bottom: 8px;
+        padding: 5px;
+    }
+
+    .electronic-signature-image {
+        display: block;
+        max-width: 100%;
+        max-height: 65px;
+        object-fit: contain;
+    }
+
+    .signature-name {
+        font-size: 12px;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    .signature-label {
+        font-size: 10px;
+        color: #6c757d;
+        line-height: 1.4;
+    }
+
+    .signature-date {
+        margin-top: 8px;
+        font-size: 10px;
+        color: #6c757d;
+    }
+
+    .slip-footer {
+        border-top: 1px solid #dee2e6;
+        margin-top: 25px;
+        padding-top: 15px;
+        font-size: 11px;
+        color: #6c757d;
+    }
+
+    .copy-separator {
+        border-top: 2px dashed #adb5bd;
+        margin: 35px 0;
+    }
+
+    .print-actions {
+        max-width: 950px;
+        margin: 20px auto;
+    }
+
+    /* =========================================================
+       PRINT
+    ========================================================= */
+
+    @media print {
+        html,
+        body {
+            background: #ffffff !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .sidebar,
+        .admin-sidebar,
+        .navbar,
+        .topbar,
+        .page-header,
+        .print-actions,
+        .no-print {
+            display: none !important;
+        }
+
+        .main-content,
+        .content,
+        .container,
+        .container-fluid {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .slip-wrapper {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .slip-card {
+            border: 0 !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .slip-copy {
+            width: 100% !important;
+            page-break-after: always;
+            break-after: page;
+        }
+
+        .slip-copy:last-child {
+            page-break-after: auto;
+            break-after: auto;
+        }
+
+        .slip-copy-inner {
+            width: 100% !important;
+            padding: 0 !important;
+        }
+
+        .copy-separator {
+            display: none !important;
+        }
+
+        .slip-header {
+            padding-top: 0 !important;
+        }
+
+        .fingerprint-box {
+            height: 105px !important;
+        }
+
+        .fingerprint-box img {
+            max-width: 80px !important;
+            max-height: 90px !important;
+        }
+
+        .signature-area {
+            margin-top: 25px !important;
+        }
+
+        .signature-grid {
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 12px !important;
+        }
+
+        .signature-grid .signature-block {
+            min-width: 0 !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        .electronic-signature-image {
+            max-width: 100% !important;
+            max-height: 65px !important;
+        }
+
+        @page {
+            size: A4;
+            margin: 12mm;
+        }
+    }
+
+    @media screen and (max-width: 600px) {
+        .signature-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+.printed-signature-samples { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 3px; width: 100%; }
+.printed-signature-samples > div { min-width: 0; }
+.printed-signature-samples img { display: block; width: 100%; height: 40px; object-fit: contain; }
+.printed-signature-samples small { display: block; font-size: 8px; color: #64748b; text-align: center; }
+
+html body .inline-comelec-applications-print_slip_account-1.inline-comelec-applications-print_slip_account-1 { font-size: 32px; }
+html body .inline-comelec-applications-print_slip_account-2.inline-comelec-applications-print_slip_account-2 { font-size: 42px; }
+html body .inline-comelec-applications-print_slip_account-3.inline-comelec-applications-print_slip_account-3 { font-size: 42px; }
+html body .inline-comelec-applications-print_slip_account-4.inline-comelec-applications-print_slip_account-4 { font-size: 32px; }
+html body .inline-comelec-applications-print_slip_account-5.inline-comelec-applications-print_slip_account-5 { font-size: 42px; }
+html body .inline-comelec-applications-print_slip_account-6.inline-comelec-applications-print_slip_account-6 { font-size: 42px; }

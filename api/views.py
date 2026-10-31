@@ -1,3 +1,4 @@
+from Applicants.validation import validate_request
 from django.shortcuts import render
 from datetime import datetime
 import json
@@ -11,6 +12,7 @@ from django.core.validators import validate_email
 
 @csrf_exempt
 @require_POST
+@validate_request(api=True)
 def verify_applicant_for_new_registration(request):
 
     # =========================================================
@@ -61,15 +63,6 @@ def verify_applicant_for_new_registration(request):
             status=400
         )
 
-    if not middlename:
-        return JsonResponse(
-            {
-                "success": False,
-                "exists": False,
-                "message": "Middle name is required."
-            },
-            status=400
-        )
 
     if not birthdate:
         return JsonResponse(
@@ -161,6 +154,7 @@ def barangay_list(request):
     return JsonResponse(data, safe=False)
 
 @csrf_exempt
+@validate_request(api=True)
 def new_registration_api(request):
 
     # =========================================================
@@ -278,14 +272,6 @@ def new_registration_api(request):
             status=400
         )
 
-    if not middlename:
-        return JsonResponse(
-            {
-                "success": False,
-                "error": "Middle name is required."
-            },
-            status=400
-        )
 
     if age in [None, ""]:
         return JsonResponse(
@@ -337,15 +323,6 @@ def new_registration_api(request):
             {
                 "success": False,
                 "error": "Phone number is required."
-            },
-            status=400
-        )
-
-    if not email:
-        return JsonResponse(
-            {
-                "success": False,
-                "error": "Email address is required."
             },
             status=400
         )
@@ -419,7 +396,7 @@ def new_registration_api(request):
     # EMAIL CHECK
     # =========================================================
 
-    if Applicant.objects.filter(
+    if email and Applicant.objects.filter(
         email__iexact=email
     ).exists():
 
@@ -481,7 +458,7 @@ def new_registration_api(request):
 
             phone=phone,
 
-            email=email,
+            email=email or None,
 
             # =================================================
             # FORCE NEW REGISTRATION
@@ -529,6 +506,7 @@ def new_registration_api(request):
             "success": True,
             "message": "New registration submitted successfully.",
             "applicant_id": applicant.id,
+            "registration_reference": applicant.registration_reference,
             "application_type": applicant.application_type,
             "status": applicant.status,
             "verification_status": applicant.verification_status,
@@ -539,6 +517,7 @@ def new_registration_api(request):
 
 @csrf_exempt
 @require_POST
+@validate_request(api=True)
 def create_applicant_update_request(request):
     try:
         data = json.loads(request.body)
@@ -629,7 +608,6 @@ def create_applicant_update_request(request):
         "birthplace": birthplace,
         "brgy": brgy_id,
         "phone": phone,
-        "email": email,
         "father": father,
         "mother": mother,
     }
@@ -658,11 +636,6 @@ def create_applicant_update_request(request):
             "error": "Invalid age."
         }, status=400)
 
-    if age < 18:
-        return JsonResponse({
-            "success": False,
-            "error": "Applicant must be at least 18 years old."
-        }, status=400)
 
     # =========================================================
     # SEX VALIDATION
@@ -738,7 +711,8 @@ def create_applicant_update_request(request):
     # EMAIL VALIDATION
     # =========================================================
     try:
-        validate_email(email)
+        if email:
+            validate_email(email)
     except ValidationError:
         return JsonResponse({
             "success": False,
@@ -757,7 +731,7 @@ def create_applicant_update_request(request):
         .exists()
     )
 
-    if duplicate_email:
+    if email and duplicate_email:
         return JsonResponse({
             "success": False,
             "error": "This email address is already registered to another applicant."
@@ -844,6 +818,7 @@ def create_applicant_update_request(request):
         phone=phone,
         email=email,
 
+        civil_status=str(data.get("civil_status") or applicant.civil_status).strip().title(),
         pwd_status=pwd_status,
         citizenship_status=citizenship_status,
 
@@ -871,6 +846,7 @@ def create_applicant_update_request(request):
 
 @csrf_exempt
 @require_POST
+@validate_request(api=True)
 def find_applicant(request):
 
     # =========================================================
@@ -939,15 +915,6 @@ def find_applicant(request):
         )
 
 
-    if not middlename:
-
-        return JsonResponse(
-            {
-                "success": False,
-                "error": "Middle name is required."
-            },
-            status=400
-        )
 
 
     if not birthdate:
@@ -1110,6 +1077,7 @@ def find_applicant(request):
 
 @csrf_exempt
 @require_POST
+@validate_request(api=True)
 def create_applicant_transfer_request(request):
 
     # =========================================================
@@ -1419,6 +1387,7 @@ def create_applicant_transfer_request(request):
 
 @csrf_exempt
 @require_POST
+@validate_request(api=True)
 def create_applicant_reactivation_request(request):
 
     # =========================================================
@@ -1623,6 +1592,7 @@ def create_applicant_reactivation_request(request):
 
 @csrf_exempt
 @require_POST
+@validate_request(api=True)
 def create_applicant_reinstatement_request(request):
 
     try:

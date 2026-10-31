@@ -1336,3 +1336,4 @@ select.form-control {
         font-size: 12px;
     }
 }
+input[name="age"][readonly] { background: #f1f5f9; color: #536b8d; cursor: default; }

@@ -9,7 +9,6 @@
 keystore.properties
 key.properties
 
-DJANGO_SECRET_KEY=django-insecure-7cfw9c5#!==edzcx5-)md-9*-mrp1n3wful@%v+%4ncodmdmns
 
 # Python environments and caches
 venv/
@@ -57,3 +56,6 @@ local.properties
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Local database and biometric backups
+/.local-backups/

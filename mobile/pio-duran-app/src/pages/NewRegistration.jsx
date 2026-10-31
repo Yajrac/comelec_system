@@ -1,3 +1,4 @@
+import { calculateAge } from "../utils/calculateAge";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +30,18 @@ function NewRegistration() {
 
     const [barangays, setBarangays] = useState([]);
     const [submittedApplicant, setSubmittedApplicant] = useState(null);
+    const [referenceCopyStatus, setReferenceCopyStatus] = useState('');
+    useEffect(() => {
+        const age = calculateAge(formData.birthdate);
+        setFormData(previous => previous.age === age ? previous : { ...previous, age });
+    }, [formData.birthdate]);
+
+    useEffect(() => {
+        if (referenceCopyStatus !== 'Copied!') return;
+        const timeout = setTimeout(() => setReferenceCopyStatus(''), 2500);
+        return () => clearTimeout(timeout);
+    }, [referenceCopyStatus]);
+
 
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -333,6 +346,7 @@ function NewRegistration() {
 
                 const applicant =
                     response.data.applicant || {
+                        registration_reference: response.data.registration_reference,
                         id:
                             response.data
                                 .applicant_id,
@@ -532,6 +546,7 @@ function NewRegistration() {
         });
 
         setSubmittedApplicant(null);
+        setReferenceCopyStatus('');
         setError("");
         setLoading(false);
 
@@ -717,13 +732,30 @@ function NewRegistration() {
 
                     <div className="form-group">
                         <label>
+                            Birthdate
+                            <span>*</span>
+                        </label>
+
+                        <input
+                            type="date"
+                            name="birthdate"
+                            value={
+                                formData.birthdate
+                            }
+                            onChange={
+                                handleChange
+                            }
+                        />
+                    </div>
+<div className="form-group">
+                        <label>
                             Age
                             <span>*</span>
                         </label>
 
                         <input
                             type="number"
-                            name="age"
+                            name="age" readOnly
                             value={
                                 formData.age
                             }
@@ -731,7 +763,7 @@ function NewRegistration() {
                                 handleChange
                             }
                             min="1"
-                            placeholder="Age"
+                            placeholder="Calculated from birthdate"
                         />
                     </div>
 
@@ -764,23 +796,7 @@ function NewRegistration() {
                         </select>
                     </div>
 
-                    <div className="form-group">
-                        <label>
-                            Birthdate
-                            <span>*</span>
-                        </label>
-
-                        <input
-                            type="date"
-                            name="birthdate"
-                            value={
-                                formData.birthdate
-                            }
-                            onChange={
-                                handleChange
-                            }
-                        />
-                    </div>
+                    
 
                     <div className="form-group full-width">
                         <label>
@@ -1682,6 +1698,28 @@ function NewRegistration() {
                     </div>
 
                     <div className="success-card-body">
+                        {applicant.registration_reference && (
+                            <section className="success-section" style={{ background: '#edf3ff', padding: '20px', borderRadius: '10px' }}>
+                                <h3>Your registration reference</h3>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                                <strong style={{ display: 'block', overflowWrap: 'anywhere', color: '#073ba8', fontFamily: 'monospace' }}>{applicant.registration_reference}</strong>
+                                <button type="button" aria-label="Copy registration reference" title="Copy reference" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', border: '1px solid #b9cef3', borderRadius: '7px', background: 'white', color: '#073ba8', cursor: 'pointer', flexShrink: 0 }} onClick={async () => {
+                                    setReferenceCopyStatus('');
+                                    try {
+                                        if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+                                        await navigator.clipboard.writeText(applicant.registration_reference);
+                                        setReferenceCopyStatus('Copied!');
+                                    } catch {
+                                        setReferenceCopyStatus('Unable to copy automatically. Please screenshot or copy the reference manually.');
+                                    }
+                                }}><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg></button>
+                                </div>
+                                <span className={`reference-copy-feedback${referenceCopyStatus && referenceCopyStatus !== 'Copied!' ? ' copy-error' : ''}`} role="status" aria-live="polite">{referenceCopyStatus}</span>
+                                <p>Please take a screenshot and keep this reference for future Update / Correction, Transfer, Reactivation, or Reinstatement requests. Additional identity verification is still required.</p>
+                                <small>Submission does not mean approval. Your application is subject to review.</small>
+                            </section>
+                        )}
+
 
                         {/* APPLICATION */}
 

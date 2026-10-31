@@ -82,7 +82,6 @@ const Reinstatement = () => {
         if (
             !formData.lastname.trim() ||
             !formData.firstname.trim() ||
-            !formData.middlename.trim() ||
             !formData.birthdate ||
             !formData.reason.trim()
         ) {
@@ -274,8 +273,8 @@ const Reinstatement = () => {
                     <div className="government-logo">
 
                         <img
-                            src="/images/PIODURAN.png"
-                            alt="Pio Duran Logo"
+                            src="/images/comelec.png"
+                            alt="Commission on Elections logo"
                         />
 
                     </div>
@@ -542,7 +541,7 @@ const Reinstatement = () => {
                                                 disabled={
                                                     submitting
                                                 }
-                                                required
+                                               
                                             />
 
                                         </div>

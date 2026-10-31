@@ -1,0 +1,12 @@
+button.admin-logout-link { width: 100%; background: transparent; text-align: left; border: 0; font: inherit; cursor: pointer; }
+.admin-logout-dialog { width: min(420px, calc(100% - 32px)); padding: 28px; border: 1px solid #dce5f4; border-radius: 16px; color: #142b54; box-shadow: 0 20px 70px #142b5433; }
+.admin-logout-dialog::backdrop { background: #142b5466; }
+.logout-dialog-icon { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 18px; border-radius: 12px; background: #fff1ef; color: #b54c41; font-size: 24px; }
+.admin-logout-dialog h2 { margin: 0 0 10px; font-size: 23px; font-weight: 750; }
+.admin-logout-dialog p { margin: 0 0 24px; color: #61748c; font-size: 14px; line-height: 1.7; }
+.logout-dialog-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.logout-dialog-actions form { margin: 0; }
+.logout-dialog-actions button { min-height: 44px; padding: 10px 18px; border: 1px solid #dce5f4; border-radius: 8px; background: white; color: #526783; font-size: 13px; font-weight: 700; cursor: pointer; }
+.logout-dialog-actions .logout-confirm { background: #073ba8; border-color: #073ba8; color: white; }
+.logout-dialog-actions .logout-confirm:hover { background: #062e83; }
+.admin-logout-dialog button:focus-visible { outline: 3px solid #d5af3a; outline-offset: 3px; }

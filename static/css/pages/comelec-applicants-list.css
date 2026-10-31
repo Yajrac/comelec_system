@@ -1,0 +1,12 @@
+html body .inline-comelec-applicants-list-1.inline-comelec-applicants-list-1 { width: 70px; }
+html body .inline-comelec-applicants-list-2.inline-comelec-applicants-list-2 { width: 190px; }
+html body .inline-comelec-applicants-list-3.inline-comelec-applicants-list-3 { width: 42px;
+                                            height: 42px; }
+html body .inline-comelec-applicants-list-4.inline-comelec-applicants-list-4 { font-size: 42px; }
+
+.applicant-pagination { padding: 16px 20px; }
+.applicant-pagination .pagination { gap: 6px; }
+.applicant-pagination .pagination .page-link { display: flex; align-items: center; justify-content: center; min-width: 34px; min-height: 34px; padding: 8px 10px; margin: 0; border: 1px solid #dce5f4; background: white; color: #073ba8; font-size: 12px; }
+.applicant-pagination .page-item.active .page-link { background: #073ba8; border-color: #073ba8; color: white; }
+.applicant-pagination .page-item.disabled .page-link { background: white; color: #98a9c5; border-color: #edf1f8; }
+.applicant-pagination .page-item:not(.disabled):not(.active) .page-link:hover { background: #edf3ff; }

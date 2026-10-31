@@ -1,0 +1,288 @@
+/* =====================================================
+   DASHBOARD STAT CARDS
+===================================================== */
+
+.dashboard-stat-card {
+    border: 0 !important;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.dashboard-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 0.6rem 1.2rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.dashboard-stat-card .card-body {
+    padding: 1.35rem;
+}
+
+.dashboard-stat-card .text-muted {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.dashboard-stat-card h2 {
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   STAT ICON
+===================================================== */
+
+.dashboard-stat-icon {
+    width: 52px;
+    height: 52px;
+
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(255, 255, 255, 0.18) !important;
+    color: #ffffff !important;
+
+    backdrop-filter: blur(3px);
+}
+
+
+/* =====================================================
+   MAIN STAT CARD COLORS
+===================================================== */
+
+.dashboard-card-pending {
+    background: #d99a00 !important;
+}
+
+.dashboard-card-approved {
+    background: #198754 !important;
+}
+
+.dashboard-card-disapproved {
+    background: #dc3545 !important;
+}
+
+.dashboard-card-barangays {
+    background: #0d6efd !important;
+}
+
+
+/* =====================================================
+   VERIFICATION CARDS
+===================================================== */
+
+.dashboard-verification-card {
+    border: 0 !important;
+
+    color: #ffffff;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+
+    overflow: hidden;
+}
+
+.dashboard-verification-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0.6rem 1.2rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.dashboard-verification-card .card-body {
+    padding: 1.35rem;
+}
+
+.dashboard-verification-card .text-muted {
+    color: rgba(255, 255, 255, 0.82) !important;
+}
+
+.dashboard-verification-card .fs-4 {
+    color: #ffffff;
+}
+
+.dashboard-verification-card .fs-3 {
+    color: #ffffff !important;
+}
+
+
+/* =====================================================
+   VERIFICATION CARD COLORS
+===================================================== */
+
+.dashboard-card-total {
+    background: #343a40 !important;
+}
+
+.dashboard-card-review {
+    background: #087990 !important;
+}
+
+.dashboard-card-biometrics {
+    background: #c77700 !important;
+}
+
+.dashboard-card-verified {
+    background: #146c43 !important;
+}
+
+
+/* =====================================================
+   SECTION TITLES
+===================================================== */
+
+.dashboard-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.dashboard-table th {
+    font-size: 0.78rem;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.03em;
+
+    color: #6c757d;
+
+    white-space: nowrap;
+}
+
+.dashboard-table td {
+    vertical-align: middle;
+}
+
+
+/* =====================================================
+   STATUS BADGES
+===================================================== */
+
+.status-badge {
+    font-size: 0.75rem;
+
+    padding:
+        0.4rem
+        0.65rem;
+}
+
+
+/* =====================================================
+   CONTENT CARDS
+===================================================== */
+
+.dashboard-content-card {
+    border: 0;
+
+    box-shadow:
+        0 0.125rem
+        0.35rem
+        rgba(0, 0, 0, 0.08);
+}
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.dashboard-action-button {
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 767.98px) {
+
+    .dashboard-stat-card .card-body,
+    .dashboard-verification-card .card-body {
+        padding: 1.1rem;
+    }
+
+    .dashboard-stat-icon {
+        width: 46px;
+        height: 46px;
+    }
+
+}
+
+
+/* Match the applicant palette with white cards and restrained status accents. */
+.dashboard-stat-card, .dashboard-verification-card { background: #fff !important; border: 1px solid var(--admin-border) !important; color: var(--admin-text); box-shadow: 0 4px 18px #243b5304; }
+.dashboard-stat-card:hover, .dashboard-verification-card:hover { box-shadow: 0 6px 20px #243b5312 !important; }
+.dashboard-stat-card .text-muted, .dashboard-verification-card .text-muted { color: var(--admin-muted) !important; }
+.dashboard-stat-card h2, .dashboard-verification-card .fs-4, .dashboard-verification-card .fs-3 { color: var(--admin-text) !important; }
+.dashboard-stat-icon { background: #edf3ff !important; color: var(--admin-blue) !important; }
+.dashboard-card-pending, .dashboard-card-biometrics { border-top: 3px solid #e6bc59 !important; }
+.dashboard-card-pending .dashboard-stat-icon, .dashboard-card-biometrics .dashboard-stat-icon { background: #fff5e8 !important; color: #a57522 !important; }
+.dashboard-card-approved, .dashboard-card-verified { border-top: 3px solid #69b78e !important; }
+.dashboard-card-approved .dashboard-stat-icon, .dashboard-card-verified .dashboard-stat-icon { background: #edf8f2 !important; color: #33956a !important; }
+.dashboard-card-disapproved { border-top: 3px solid #d6877f !important; }
+.dashboard-card-disapproved .dashboard-stat-icon { background: #fff1ef !important; color: #b55045 !important; }
+.dashboard-card-total, .dashboard-card-review, .dashboard-card-barangays { border-top: 3px solid #7399dc !important; }
+.dashboard-table th { background: #f7f9fc; color: var(--admin-muted); }
+.dashboard-table td { border-color: var(--admin-border); }
+
+/* Dashboard cards use consistent surfaces and distinct status icons. */
+.dashboard-stat-card, .dashboard-verification-card { border-radius: 12px !important; box-shadow: 0 3px 14px #243b5306; height: 100%; }
+.dashboard-stat-card .card-body, .dashboard-verification-card .card-body { padding: 22px; }
+.dashboard-stat-card .card-body > .d-flex { gap: 14px; }
+.dashboard-stat-card .card-body > .d-flex > div:first-child, .dashboard-verification-card .card-body > .d-flex > div:last-child { min-width: 0; }
+.dashboard-stat-card p { font-size: 12px; font-weight: 600; line-height: 1.6; }
+.dashboard-stat-card h2 { font-size: 32px; letter-spacing: -1px; margin-top: 7px; }
+.dashboard-verification-card .small { font-size: 11px; line-height: 1.6; }
+.dashboard-verification-card .fw-bold { letter-spacing: -.5px; }
+.dashboard-stat-icon, .dashboard-verification-card .card-body > .d-flex > .fs-3 { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; flex: 0 0 48px; border-radius: 12px; background: var(--icon-bg, #edf3ff) !important; color: var(--icon-color, #073ba8) !important; }
+.dashboard-stat-icon i, .dashboard-verification-card .card-body > .d-flex > .fs-3 i { color: inherit; font-size: 23px; line-height: 1; }
+.dashboard-card-pending, .dashboard-card-biometrics { --icon-bg: #fff3db; --icon-color: #b77916; }
+.dashboard-card-approved, .dashboard-card-verified { --icon-bg: #e6f6ed; --icon-color: #26845a; }
+.dashboard-card-disapproved { --icon-bg: #ffebe8; --icon-color: #c34f42; }
+.dashboard-card-total, .dashboard-card-barangays { --icon-bg: #e9f0ff; --icon-color: #2455bc; }
+.dashboard-card-review { --icon-bg: #f1ebff; --icon-color: #8055bd; }
+.dashboard-stat-card .dashboard-stat-icon { background: var(--icon-bg) !important; color: var(--icon-color) !important; }
+@media (max-width: 575.98px) {
+ .dashboard-stat-card .card-body, .dashboard-verification-card .card-body { padding: 18px; }
+ .dashboard-stat-card h2 { font-size: 29px; }
+ .dashboard-stat-icon, .dashboard-verification-card .card-body > .d-flex > .fs-3 { width: 44px; height: 44px; flex-basis: 44px; border-radius: 10px; }
+}
+
+/* Flexible summary card rows, including compact phone layouts. */
+.dashboard-cards-flex { display: flex; flex-wrap: wrap; }
+.dashboard-cards-flex > .col-12 { flex: 0 0 25%; max-width: 25%; display: flex; }
+.dashboard-cards-flex > .col-12 > .card { width: 100%; }
+.dashboard-stat-card .card-body > .d-flex, .dashboard-verification-card .card-body > .d-flex { display: flex !important; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
+@media (max-width: 1199.98px) { .dashboard-cards-flex > .col-12 { flex-basis: 50%; max-width: 50%; } }
+@media (max-width: 575.98px) {
+ .dashboard-cards-flex { --bs-gutter-x: 10px; --bs-gutter-y: 10px; }
+ .dashboard-cards-flex .card-body { padding: 14px; }
+ .dashboard-cards-flex .dashboard-stat-card p, .dashboard-cards-flex .dashboard-verification-card .small { font-size: 10px; }
+ .dashboard-cards-flex .dashboard-stat-icon, .dashboard-cards-flex .dashboard-verification-card .card-body > .d-flex > .fs-3 { width: 32px; height: 32px; flex-basis: 32px; border-radius: 8px; }
+ .dashboard-cards-flex .dashboard-stat-icon i, .dashboard-cards-flex .dashboard-verification-card .card-body > .d-flex > .fs-3 i { font-size: 18px; }
+ .dashboard-cards-flex .dashboard-stat-card h2 { font-size: 25px; }
+}
+@media (max-width: 359.98px) { .dashboard-cards-flex > .col-12 { flex-basis: 100%; max-width: 100%; } }
+
+/* Compact dashboard introduction. */
+.dashboard-intro-card .card-body { padding: 16px 18px; }
+.dashboard-intro-card .card-body > .d-flex { gap: 12px !important; }
+.dashboard-intro-card h5 { font-size: 17px; line-height: 1.4; }
+.dashboard-intro-card p { font-size: 12px; line-height: 1.7; }
+.dashboard-intro-card .text-primary.fs-3 { font-size: 22px !important; flex-shrink: 0; }
+@media (max-width: 575.98px) {
+ .dashboard-intro-card .card-body { padding: 13px 14px; }
+ .dashboard-intro-card h5 { font-size: 15px; }
+ .dashboard-intro-card p { font-size: 11px; line-height: 1.6; }
+ .dashboard-intro-card .text-primary.fs-3 { font-size: 20px !important; }
+}

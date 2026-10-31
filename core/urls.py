@@ -1,7 +1,14 @@
 from django.urls import path
 from . import views
+from .walk_in import walk_in
+from .admin_security import change_admin_password, password_requirements
 
 urlpatterns = [
+    path("password-requirements/", password_requirements, name="admin-password-requirements"),
+    path("change-password/", change_admin_password, name="admin-change-password"),
+    path("walk-in/", walk_in, name="admin-walk-in"),
+    path("walk-in/<str:service>/", walk_in, name="admin-walk-in-form"),
+    path("walk-in/<str:service>/success/<int:record_id>/", walk_in, name="admin-walk-in-success"),
     path("api/keep-alive/", views.keep_alive, name="keep_alive"),
     path(
         "admin/",

@@ -1,1022 +1,164 @@
 {% load static %}
-
 <!DOCTYPE html>
-
 <html lang="en">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Administrator Login</title>
-
-    <!-- Bootstrap 5 -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/PIODURAN.png' %}">
-    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/PIODURAN.png' %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/PIODURAN.png' %}">
-
-    <style>
-
-        :root {
-            --gov-blue: #0038a8;
-            --gov-dark-blue: #002b7f;
-            --gov-gold: #fcd116;
-            --light-bg: #f4f6f9;
-            --border-color: #d9dee7;
-            --text-dark: #1f2937;
-            --text-muted: #6b7280;
-        }
-
-
-        * {
-            box-sizing: border-box;
-        }
-
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-
-            background: var(--light-bg);
-
-            font-family:
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                Roboto,
-                Arial,
-                sans-serif;
-
-            display: flex;
-            flex-direction: column;
-        }
-
-
-        /* =====================================================
-           HEADER
-        ===================================================== */
-
-        .government-header {
-            background: var(--gov-blue);
-            color: #ffffff;
-
-            border-bottom: 5px solid var(--gov-gold);
-        }
-
-
-        .header-inner {
-            max-width: 1200px;
-
-            margin: 0 auto;
-
-            padding: 18px 24px;
-
-            display: flex;
-            align-items: center;
-
-            gap: 15px;
-        }
-
-
-        .government-seal {
-            width: 58px;
-            height: 58px;
-
-            background: #ffffff;
-            color: var(--gov-blue);
-
-            border: 3px solid var(--gov-gold);
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            font-size: 13px;
-            font-weight: 800;
-
-            text-align: center;
-
-            flex-shrink: 0;
-        }
-
-
-        .header-title {
-            margin: 0;
-
-            font-size: 21px;
-            font-weight: 700;
-        }
-
-
-        .header-subtitle {
-            margin: 3px 0 0;
-
-            font-size: 13px;
-
-            opacity: 0.9;
-        }
-
-
-        /* =====================================================
-           MAIN
-        ===================================================== */
-
-        .login-wrapper {
-            flex: 1;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            padding: 50px 20px;
-        }
-
-
-        .login-container {
-            width: 100%;
-            max-width: 450px;
-        }
-
-
-        /* =====================================================
-           LOGIN CARD
-        ===================================================== */
-
-        .login-card {
-            background: #ffffff;
-
-            border: 1px solid var(--border-color);
-
-            box-shadow:
-                0 8px 25px rgba(0, 0, 0, 0.08);
-        }
-
-
-        .login-card-header {
-            background: var(--gov-dark-blue);
-
-            color: #ffffff;
-
-            padding: 25px 30px;
-
-            border-bottom: 4px solid var(--gov-gold);
-        }
-
-
-        .login-card-header h1 {
-            margin: 0;
-
-            font-size: 24px;
-            font-weight: 700;
-
-            display: flex;
-            align-items: center;
-
-            gap: 10px;
-        }
-
-
-        .login-card-header p {
-            margin: 7px 0 0;
-
-            font-size: 14px;
-
-            opacity: 0.9;
-        }
-
-
-        /* =====================================================
-           HEADER ICON
-        ===================================================== */
-
-        .header-login-icon {
-            width: 28px;
-            height: 28px;
-
-            flex-shrink: 0;
-        }
-
-
-        .header-login-icon svg {
-            width: 100%;
-            height: 100%;
-
-            stroke: currentColor;
-        }
-
-
-        /* =====================================================
-           LOGIN BODY
-        ===================================================== */
-
-        .login-card-body {
-            padding: 30px;
-        }
-
-
-        /* =====================================================
-           ERROR
-        ===================================================== */
-
-        .error-box {
-            background: #fff1f2;
-
-            border: 1px solid #fecdd3;
-
-            border-left: 5px solid #ce1126;
-
-            color: #9f1239;
-
-            padding: 13px 15px;
-
-            margin-bottom: 22px;
-
-            font-size: 14px;
-        }
-
-
-        /* =====================================================
-           FORM
-        ===================================================== */
-
-        .form-label {
-            color: var(--text-dark);
-
-            font-weight: 600;
-
-            font-size: 14px;
-
-            margin-bottom: 7px;
-        }
-
-
-        /* =====================================================
-           INPUT WITH ICON
-        ===================================================== */
-
-        .input-group-custom {
-            position: relative;
-        }
-
-
-        .input-icon {
-            position: absolute;
-
-            left: 13px;
-            top: 50%;
-
-            transform: translateY(-50%);
-
-            width: 20px;
-            height: 20px;
-
-            color: #64748b;
-
-            pointer-events: none;
-
-            z-index: 2;
-        }
-
-
-        .input-icon svg {
-            width: 100%;
-            height: 100%;
-
-            stroke: currentColor;
-        }
-
-
-        .form-control {
-            min-height: 48px;
-
-            border: 1px solid #cbd5e1;
-
-            border-radius: 0;
-
-            padding: 10px 13px 10px 45px;
-
-            font-size: 15px;
-        }
-
-
-        .form-control:focus {
-            border-color: var(--gov-blue);
-
-            box-shadow:
-                0 0 0 0.2rem rgba(0, 56, 168, 0.12);
-        }
-
-
-        /* =====================================================
-           SHOW PASSWORD CHECKBOX
-        ===================================================== */
-
-        .password-option {
-            margin-top: 10px;
-        }
-
-
-        .password-checkbox {
-            display: flex;
-            align-items: center;
-
-            gap: 8px;
-
-            color: var(--text-muted);
-
-            font-size: 13px;
-
-            cursor: pointer;
-
-            user-select: none;
-        }
-
-
-        .password-checkbox input {
-            width: 16px;
-            height: 16px;
-
-            margin: 0;
-
-            accent-color: var(--gov-blue);
-
-            cursor: pointer;
-        }
-
-
-        /* =====================================================
-           LOGIN BUTTON
-        ===================================================== */
-
-        .login-button {
-            width: 100%;
-
-            min-height: 48px;
-
-            background: var(--gov-blue);
-
-            border: 1px solid var(--gov-blue);
-
-            color: #ffffff;
-
-            font-size: 15px;
-            font-weight: 700;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            transition:
-                background 0.2s ease,
-                border-color 0.2s ease,
-                opacity 0.2s ease;
-
-            cursor: pointer;
-        }
-
-
-        .login-button:hover {
-            background: var(--gov-dark-blue);
-
-            border-color: var(--gov-dark-blue);
-
-            color: #ffffff;
-        }
-
-
-        .login-button:focus {
-            outline: none;
-
-            box-shadow:
-                0 0 0 0.2rem rgba(0, 56, 168, 0.18);
-        }
-
-
-        .login-button:disabled {
-            background: var(--gov-dark-blue);
-
-            border-color: var(--gov-dark-blue);
-
-            color: #ffffff;
-
-            opacity: 0.9;
-
-            cursor: not-allowed;
-        }
-
-
-        /* =====================================================
-           BUTTON CONTENT
-        ===================================================== */
-
-        .button-content,
-        .button-loading {
-            display: flex;
-
-            align-items: center;
-            justify-content: center;
-        }
-
-
-        /* =====================================================
-           LOADING SPINNER
-        ===================================================== */
-
-        .loading-spinner {
-            width: 18px;
-            height: 18px;
-
-            margin-right: 9px;
-
-            border: 2px solid rgba(255, 255, 255, 0.35);
-
-            border-top-color: #ffffff;
-
-            border-radius: 50%;
-
-            animation:
-                loginSpinner 0.7s linear infinite;
-        }
-
-
-        @keyframes loginSpinner {
-
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
-
-        }
-
-
-        /* =====================================================
-           BACK LINK
-        ===================================================== */
-
-        .back-link {
-            display: block;
-
-            margin-top: 20px;
-
-            text-align: center;
-
-            color: var(--gov-blue);
-
-            font-size: 14px;
-            font-weight: 600;
-
-            text-decoration: none;
-        }
-
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-
-
-        /* =====================================================
-           FOOTER
-        ===================================================== */
-
-        .government-footer {
-            background: #ffffff;
-
-            border-top: 1px solid var(--border-color);
-
-            padding: 18px 20px;
-
-            text-align: center;
-
-            color: var(--text-muted);
-
-            font-size: 12px;
-        }
-
-
-        /* =====================================================
-           RESPONSIVE
-        ===================================================== */
-
-        @media (max-width: 576px) {
-
-            .header-inner {
-                padding: 15px;
-            }
-
-
-            .government-seal {
-                width: 48px;
-                height: 48px;
-
-                font-size: 11px;
-            }
-
-
-            .header-title {
-                font-size: 17px;
-            }
-
-
-            .header-subtitle {
-                font-size: 11px;
-            }
-
-
-            .login-wrapper {
-                padding: 30px 15px;
-            }
-
-
-            .login-card-header {
-                padding: 22px;
-            }
-
-
-            .login-card-body {
-                padding: 22px;
-            }
-
-
-            .login-card-header h1 {
-                font-size: 21px;
-            }
-
-        }
-
-    </style>
-
-</head>
-
-
-<body>
-
-
-<!-- =====================================================
-     GOVERNMENT HEADER
-===================================================== -->
-
-<header class="government-header">
-
-    <div class="header-inner">
-
-
-        <div class="government-seal">
-            GOV<br>PH
-        </div>
-
-
-        <div>
-
-            <h2 class="header-title">
-                Voter Registration Services
-            </h2>
-
-
-            <p class="header-subtitle">
-                Online Registration and Applicant Services
-            </p>
-
-        </div>
-
-
-    </div>
-
-</header>
-
-
-
-<!-- =====================================================
-     LOGIN
-===================================================== -->
-
-<main class="login-wrapper">
-
-    <div class="login-container">
-
-
-        <div class="login-card">
-
-
-            <!-- =================================================
-                 LOGIN HEADER
-            ================================================== -->
-
-            <div class="login-card-header">
-
-                <h1>
-
-                    <span class="header-login-icon">
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke-width="1.8"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-
-                            <rect
-                                x="3"
-                                y="4"
-                                width="18"
-                                height="16"
-                                rx="2"
-                            />
-
-                            <circle
-                                cx="12"
-                                cy="10"
-                                r="2.5"
-                            />
-
-                            <path
-                                d="M7.5 17c.8-2.1 2.3-3.2 4.5-3.2s3.7 1.1 4.5 3.2"
-                            />
-
-                        </svg>
-
-                    </span>
-
-
-                    Administrator Login
-
-                </h1>
-
-
-                <p>
-                    Authorized personnel access only
-                </p>
-
-            </div>
-
-
-
-            <!-- =================================================
-                 LOGIN BODY
-            ================================================== -->
-
-            <div class="login-card-body">
-
-
-                {% if error %}
-
-                    <div class="error-box">
-                        {{ error }}
-                    </div>
-
-                {% endif %}
-
-
-
-                <form
-                    method="POST"
-                    id="loginForm"
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin Login | COMELEC Pio Duran</title>
+        <link rel="icon" href="{% static 'images/comelec.png' %}">
+        <link rel="stylesheet" href="{% static 'css/admin-login.css' %}">
+        <link rel="stylesheet" href="{% static 'css/scrollbars.css' %}">
+    </head>
+    <body>
+        <header class="login-header">
+            <a class="brand" href="{% url 'home' %}">
+                <img
+                    src="{% static 'images/comelec.png' %}"
+                    alt="Commission on Elections logo"
                 >
-
-                    {% csrf_token %}
-
-
-
-                    <!-- =================================================
-                         USERNAME
-                    ================================================== -->
-
-                    <div class="mb-4">
-
-                        <label
-                            for="username"
-                            class="form-label"
-                        >
-                            Username
-                        </label>
-
-
-                        <div class="input-group-custom">
-
-
-                            <span class="input-icon">
-
+                <span>
+                    <strong>COMMISSION ON ELECTIONS</strong>
+                    <small>Municipality of Pio Duran, Albay</small>
+                </span>
+            </a>
+            <a class="return-link" href="{% url 'home' %}">
+                <span aria-hidden="true">&larr;</span> Back to services</a>
+        </header>
+        <main>
+            <div class="login-layout">
+                <section class="welcome-panel" aria-labelledby="welcome-title">
+                    <span class="panel-label">
+                        <span></span> ADMINISTRATOR PORTAL</span>
+                        <div class="welcome-content">
+                            <img class="welcome-seal" src="{% static 'images/comelec.png' %}" alt="">
+                            <h1 id="welcome-title">
+                                Every record.
+                                <br>
+                                Every request.
+                                <br>
+                                <span>One workspace.</span>
+                            </h1>
+                            <p>Review applications, manage voter records, and keep registration services moving.</p>
+                        </div>
+                        <div class="office-label">
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.6"
+                                aria-hidden="true"
+                            >
+                                <path d="m3 9 9-6 9 6H3ZM5 10v8m5-8v8m4-8v8m5-8v8M3 18h18M2 21h20" />
+                            </svg>
+                            <span>Local voter registration services<strong>Pio Duran, Albay</strong>
+                            </span>
+                        </div>
+                    </section>
+                    <section class="form-panel" aria-labelledby="login-title">
+                        <span class="lock-icon">
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.7"
+                                stroke-linecap="round"
+                                aria-hidden="true"
+                            >
+                                <rect x="5" y="10" width="14" height="11" rx="2" />
+                                <path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2" />
+                            </svg>
+                        </span>
+                        <span class="eyebrow">ADMIN ACCESS</span>
+                        <h2 id="login-title">Welcome back</h2>
+                        <p class="form-intro">Sign in with your administrator account to continue.</p>
+                        {% if error %}
+                            <div class="error-message" role="alert">
+                                <strong>Unable to sign in</strong>
+                                <span>{{ error }}</span>
+                            </div>
+                        {% endif %}
+                        <form method="post" id="loginForm">
+                            {% csrf_token %}
+                            <label for="username">Username</label>
+                            <div class="input-wrap">
                                 <svg
-                                    xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 24 24"
                                     fill="none"
-                                    stroke-width="1.8"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                    aria-hidden="true"
                                 >
-
-                                    <circle
-                                        cx="12"
-                                        cy="8"
-                                        r="4"
-                                    />
-
-                                    <path
-                                        d="M4 21a8 8 0 0 1 16 0"
-                                    />
-
+                                    <circle cx="12" cy="8" r="4" />
+                                    <path d="M4 21v-2a8 8 0 0 1 16 0v2" />
                                 </svg>
-
-                            </span>
-
-
-                            <input
-                                type="text"
-                                id="username"
-                                name="username"
-                                class="form-control"
-                                placeholder="Enter your username"
-                                autocomplete="username"
-                                required
-                            >
-
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- =================================================
-                         PASSWORD
-                    ================================================== -->
-
-                    <div class="mb-3">
-
-                        <label
-                            for="password"
-                            class="form-label"
-                        >
-                            Password
-                        </label>
-
-
-                        <div class="input-group-custom">
-
-
-                            <span class="input-icon">
-
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke-width="1.8"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                >
-
-                                    <rect
-                                        x="4"
-                                        y="10"
-                                        width="16"
-                                        height="11"
-                                        rx="1"
-                                    />
-
-                                    <path
-                                        d="M8 10V7a4 4 0 0 1 8 0v3"
-                                    />
-
-                                    <circle
-                                        cx="12"
-                                        cy="15.5"
-                                        r="1"
-                                    />
-
-                                    <path
-                                        d="M12 16.5v2"
-                                    />
-
-                                </svg>
-
-                            </span>
-
-
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                class="form-control"
-                                placeholder="Enter your password"
-                                autocomplete="current-password"
-                                required
-                            >
-
-
-                        </div>
-
-
-
-                        <!-- =================================================
-                             SHOW PASSWORD CHECKBOX
-                        ================================================== -->
-
-                        <div class="password-option">
-
-                            <label
-                                for="showPassword"
-                                class="password-checkbox"
-                            >
-
                                 <input
-                                    type="checkbox"
-                                    id="showPassword"
+                                    id="username"
+                                    name="username"
+                                    type="text"
+                                    placeholder="Enter your username"
+                                    autocomplete="username"
+                                    autocapitalize="none"
+                                    spellcheck="false"
+                                    value="{{ request.POST.username|default:'' }}"
+                                    required
+                                    autofocus
                                 >
-
-
-                                <span>
-                                    Show password
-                                </span>
-
+                            </div>
+                            <label for="password">Password</label>
+                            <div class="input-wrap">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                    aria-hidden="true"
+                                >
+                                    <rect x="5" y="10" width="14" height="11" rx="2" />
+                                    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+                                </svg>
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    placeholder="Enter your password"
+                                    autocomplete="current-password"
+                                    required
+                                >
+                            </div>
+                            <label class="show-password">
+                                <input type="checkbox" id="showPassword">
+                                Show password
                             </label>
-
-                        </div>
-
+                            <button id="loginButton" type="submit">
+                                <span id="buttonContent">Sign in <span aria-hidden="true">&rarr;</span>
+                                </span>
+                                <span id="buttonLoading" hidden>
+                                    <span class="spinner" aria-hidden="true"></span> Signing in...</span>
+                                </button>
+                                <p id="loginStatus" class="sr-only" role="status"></p>
+                                <p
+                                    class="access-note"
+                                >After 5 unsuccessful attempts, sign-in is locked for 15 minutes.</p>
+                            </form>
+                            <p class="access-note">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                    aria-hidden="true"
+                                >
+                                    <path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z" />
+                                    <path d="m8 12 3 3 5-6" />
+                                </svg>
+                                For authorized administrators only.
+                            </p>
+                        </section>
                     </div>
-
-
-
-                    <!-- =================================================
-                         LOGIN BUTTON
-                    ================================================== -->
-
-                    <button
-                        type="submit"
-                        class="login-button"
-                        id="loginButton"
-                    >
-
-                        <!-- Normal button -->
-
-                        <span
-                            class="button-content"
-                            id="buttonContent"
-                        >
-                            Login
-                        </span>
-
-
-                        <!-- Loading button -->
-
-                        <span
-                            class="button-loading"
-                            id="buttonLoading"
-                            style="display: none;"
-                        >
-
-                            <span class="loading-spinner"></span>
-
-                            Signing in...
-
-                        </span>
-
-                    </button>
-
-
-                </form>
-
-
-
-                <!-- =================================================
-                     BACK
-                ================================================== -->
-
-                <a
-                    href="{% url 'home' %}"
-                    class="back-link"
-                >
-                    Back to Voter Registration Services
-                </a>
-
-
-            </div>
-
-        </div>
-
-
-    </div>
-
-</main>
-
-
-
-<!-- =====================================================
-     FOOTER
-===================================================== -->
-
-<footer class="government-footer">
-
-    Voter Registration Services
-
-    <br>
-
-    Administrator Portal
-
-</footer>
-
-
-
-<!-- =====================================================
-     BOOTSTRAP
-===================================================== -->
-
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-></script>
-
-
-
-<!-- =====================================================
-     SHOW / HIDE PASSWORD
-===================================================== -->
-
-<script>
-
-    const showPassword =
-        document.getElementById("showPassword");
-
-    const passwordInput =
-        document.getElementById("password");
-
-
-    showPassword.addEventListener("change", function () {
-
-        if (this.checked) {
-
-            passwordInput.type = "text";
-
-        } else {
-
-            passwordInput.type = "password";
-
-        }
-
-    });
-
-</script>
-
-
-
-<!-- =====================================================
-     LOGIN LOADING EFFECT
-===================================================== -->
-
-<script>
-
-    const loginForm =
-        document.getElementById("loginForm");
-
-    const loginButton =
-        document.getElementById("loginButton");
-
-    const buttonContent =
-        document.getElementById("buttonContent");
-
-    const buttonLoading =
-        document.getElementById("buttonLoading");
-
-
-    loginForm.addEventListener("submit", function () {
-
-        /*
-         * Disable the button immediately
-         * to prevent multiple submissions.
-         */
-
-        loginButton.disabled = true;
-
-
-        /*
-         * Hide normal button text.
-         */
-
-        buttonContent.style.display = "none";
-
-
-        /*
-         * Show loading spinner and text.
-         */
-
-        buttonLoading.style.display = "flex";
-
-    });
-
-</script>
-
-
-</body>
-
-</html>
+                </main>
+                <footer>
+                    Commission on Elections <span>&bull;</span> Pio Duran, Albay <span class="footer-end">Voter Registration Services</span>
+                </footer>
+                <script src="{% static 'js/admin-login.js' %}" defer></script>
+            </body>
+        </html>

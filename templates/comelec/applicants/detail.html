@@ -1,108 +1,106 @@
 {% extends "admin.html" %}
+{% load static %}
+
+{% block extra_css %}{{ block.super }}<link
+    rel="stylesheet"
+    href="{% static 'css/pages/comelec-applicants-detail.css' %}"
+>{% endblock %}
 
 {% block title %}
-Applicant Details
+    Applicant Details
 {% endblock %}
 
 {% block page_title %}
-Applicant Details
+    Applicant Details
 {% endblock %}
 
 {% block page_subtitle %}
-Complete verified applicant record
+    Complete verified applicant record
 {% endblock %}
 
 {% block content %}
 
-<div class="container-fluid px-0">
+    <div class="container-fluid px-0">
 
-    <!-- =========================================================
+        <!-- =========================================================
          TOP ACTIONS
     ========================================================== -->
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
 
-        <a
-            href="{% url 'admin-applicants' %}"
-            class="btn btn-outline-secondary"
-        >
-            <i class="bi bi-arrow-left me-1"></i>
-            Back to Applicants
-        </a>
-
-        <div class="d-flex gap-2">
-
-            <a
-                href="{% url 'print-slip-account' applicant.id %}"
-                class="btn btn-primary"
-            >
-                <i class="bi bi-printer me-1"></i>
-                Print Slip
+            <a href="{% url 'admin-applicants' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1">
+                </i>
+                Back to Applicants
             </a>
 
-            <form
-                method="POST"
-                action="{% url 'admin-suspend-applicant' applicant.id %}"
-                onsubmit="return confirm(
-                    'Are you sure you want to suspend this applicant?'
-                );"
-            >
+            <div class="d-flex gap-2">
 
-                {% csrf_token %}
-
-                <button
-                    type="submit"
-                    class="btn btn-outline-danger"
+                <a
+                    href="{% url 'print-slip-account' applicant.id %}"
+                    class="btn btn-primary"
                 >
-                    <i class="bi bi-pause-circle me-1"></i>
-                    Suspend Applicant
-                </button>
+                    <i class="bi bi-printer me-1">
+                    </i>
+                    Print Slip
+                </a>
 
-            </form>
+                <form
+                    method="post"
+                    action="{% url 'admin-suspend-applicant' applicant.id %}"
+                    data-confirm-submit="Are you sure you want to suspend this applicant?"
+                >
+
+                    {% csrf_token %}
+
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="bi bi-pause-circle me-1">
+                        </i>
+                        Suspend Applicant
+                    </button>
+
+                </form>
+
+            </div>
 
         </div>
 
-    </div>
-
-
-    <!-- =========================================================
+        <!-- =========================================================
          VERIFIED HEADER
     ========================================================== -->
 
-    <div class="card border-0 shadow-sm mb-4">
+        <div class="card border-0 shadow-sm mb-4">
 
-        <div class="card-body">
+            <div class="card-body">
 
-            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center">
 
-                <div>
+                    <div>
 
-                    <h4 class="mb-1">
+                        <h4 class="mb-1">
 
-                        {{ applicant.lastname }},
-                        {{ applicant.firstname }}
-                        {{ applicant.middlename }}
+                            {{ applicant.lastname }},
+                            {{ applicant.firstname }}
+                            {{ applicant.middlename }}
 
-                    </h4>
+                        </h4>
 
-                    <div class="text-muted">
-
-                        Applicant ID #{{ applicant.id }}
+                        <div class="text-muted">Applicant ID #{{ applicant.id }}</div>
 
                     </div>
 
-                </div>
+                    <div>
 
+                        <span class="badge bg-success fs-6">
 
-                <div>
+                            <i class="bi bi-patch-check-fill me-1">
+                            </i>
 
-                    <span class="badge bg-success fs-6">
+                            VERIFIED
 
-                        <i class="bi bi-patch-check-fill me-1"></i>
+                        </span>
 
-                        VERIFIED
-
-                    </span>
+                    </div>
 
                 </div>
 
@@ -110,171 +108,123 @@ Complete verified applicant record
 
         </div>
 
-    </div>
-
-
-    <!-- =========================================================
+        <!-- =========================================================
          PERSONAL INFORMATION
     ========================================================== -->
 
-    <div class="card border-0 shadow-sm mb-4">
+        <div class="card border-0 shadow-sm mb-4">
 
-        <div class="card-header bg-white border-bottom">
+            <div class="card-header bg-white border-bottom">
 
-            <h6 class="mb-0">
-                Personal Information
-            </h6>
+                <h6 class="mb-0">Personal Information</h6>
 
-        </div>
+            </div>
 
-        <div class="card-body">
+            <div class="card-body">
 
-            <div class="row g-4">
+                <div class="row g-4">
 
-                <div class="col-md-4">
+                    <div class="col-md-4">
 
-                    <div class="text-muted small">
-                        Last Name
-                    </div>
+                        <div class="text-muted small">Last Name</div>
 
-                    <div class="fw-semibold">
-                        {{ applicant.lastname }}
-                    </div>
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <div class="text-muted small">
-                        First Name
-                    </div>
-
-                    <div class="fw-semibold">
-                        {{ applicant.firstname }}
-                    </div>
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <div class="text-muted small">
-                        Middle Name
-                    </div>
-
-                    <div class="fw-semibold">
-                        {{ applicant.middlename }}
-                    </div>
-
-                </div>
-
-
-                <div class="col-md-3">
-
-                    <div class="text-muted small">
-                        Birthdate
-                    </div>
-
-                    <div class="fw-semibold">
-                        {{ applicant.birthdate|date:"F d, Y" }}
-                    </div>
-
-                </div>
-
-
-                <div class="col-md-2">
-
-                    <div class="text-muted small">
-                        Age
-                    </div>
-
-                    <div class="fw-semibold">
-                        {{ applicant.age }}
-                    </div>
-
-                </div>
-
-
-                <div class="col-md-2">
-
-                    <div class="text-muted small">
-                        Sex
-                    </div>
-
-                    <div class="fw-semibold">
-                        {{ applicant.sex }}
-                    </div>
-
-                </div>
-
-
-                <div class="col-md-5">
-
-                    <div class="text-muted small">
-                        Birthplace
-                    </div>
-
-                    <div class="fw-semibold">
-                        {{ applicant.birthplace }}
-                    </div>
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <div class="text-muted small">
-                        Citizenship
-                    </div>
-
-                    <div class="fw-semibold">
-
-                        {% if applicant.citizenship_status == "BY_BIRTH" %}
-
-                            By Birth
-
-                        {% elif applicant.citizenship_status == "NATURALIZED" %}
-
-                            Naturalized
-
-                        {% else %}
-
-                            {{ applicant.citizenship_status }}
-
-                        {% endif %}
+                        <div class="fw-semibold">{{ applicant.lastname }}</div>
 
                     </div>
 
-                </div>
+                    <div class="col-md-4">
 
+                        <div class="text-muted small">First Name</div>
 
-                <div class="col-md-4">
+                        <div class="fw-semibold">{{ applicant.firstname }}</div>
 
-                    <div class="text-muted small">
-                        PWD Status
                     </div>
 
-                    <div class="fw-semibold">
-                        {{ applicant.get_pwd_status_display }}
+                    <div class="col-md-4">
+
+                        <div class="text-muted small">Middle Name</div>
+
+                        <div class="fw-semibold">{{ applicant.middlename }}</div>
+
                     </div>
 
-                </div>
+                    <div class="col-md-3">
 
+                        <div class="text-muted small">Birthdate</div>
 
-                <div class="col-md-4">
+                        <div class="fw-semibold">{{ applicant.birthdate|date:"F d, Y" }}</div>
 
-                    <div class="text-muted small">
-                        Senior Citizen
                     </div>
 
-                    <div class="fw-semibold">
+                    <div class="col-md-2">
 
-                        {% if applicant.is_senior %}
-                            Yes
-                        {% else %}
-                            No
-                        {% endif %}
+                        <div class="text-muted small">Age</div>
+
+                        <div class="fw-semibold">{{ applicant.age }}</div>
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <div class="text-muted small">Sex</div>
+
+                        <div class="fw-semibold">{{ applicant.sex }}</div>
+
+                    </div>
+
+                    <div class="col-md-5">
+
+                        <div class="text-muted small">Birthplace</div>
+
+                        <div class="fw-semibold">{{ applicant.birthplace }}</div>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="text-muted small">Citizenship</div>
+
+                        <div class="fw-semibold">
+
+                            {% if applicant.citizenship_status == "BY_BIRTH" %}
+
+                                By Birth
+
+                            {% elif applicant.citizenship_status == "NATURALIZED" %}
+
+                                Naturalized
+
+                            {% else %}
+
+                                {{ applicant.citizenship_status }}
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="text-muted small">PWD Status</div>
+
+                        <div class="fw-semibold">{{ applicant.get_pwd_status_display }}</div>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="text-muted small">Senior Citizen</div>
+
+                        <div class="fw-semibold">
+
+                            {% if applicant.is_senior %}
+                                Yes
+                            {% else %}
+                                No
+                            {% endif %}
+
+                        </div>
 
                     </div>
 
@@ -284,71 +234,56 @@ Complete verified applicant record
 
         </div>
 
-    </div>
-
-
-    <!-- =========================================================
+        <!-- =========================================================
          ADDRESS
     ========================================================== -->
 
-    <div class="card border-0 shadow-sm mb-4">
+        <div class="card border-0 shadow-sm mb-4">
 
-        <div class="card-header bg-white border-bottom">
+            <div class="card-header bg-white border-bottom">
 
-            <h6 class="mb-0">
-                Registration Address
-            </h6>
+                <h6 class="mb-0">Registration Address</h6>
 
-        </div>
+            </div>
 
-        <div class="card-body">
+            <div class="card-body">
 
-            <div class="row g-4">
+                <div class="row g-4">
 
-                <div class="col-md-4">
+                    <div class="col-md-4">
 
-                    <div class="text-muted small">
-                        Barangay
-                    </div>
+                        <div class="text-muted small">Barangay</div>
 
-                    <div class="fw-semibold">
+                        <div class="fw-semibold">
 
-                        {% if applicant.brgy %}
+                            {% if applicant.brgy %}
 
-                            {{ applicant.brgy.name }}
+                                {{ applicant.brgy.name }}
 
-                        {% else %}
+                            {% else %}
 
-                            —
+                                —
 
-                        {% endif %}
+                            {% endif %}
+
+                        </div>
 
                     </div>
 
-                </div>
+                    <div class="col-md-4">
 
+                        <div class="text-muted small">Municipality</div>
 
-                <div class="col-md-4">
+                        <div class="fw-semibold">{{ applicant.municipality }}</div>
 
-                    <div class="text-muted small">
-                        Municipality
                     </div>
 
-                    <div class="fw-semibold">
-                        {{ applicant.municipality }}
-                    </div>
+                    <div class="col-md-4">
 
-                </div>
+                        <div class="text-muted small">Province</div>
 
+                        <div class="fw-semibold">{{ applicant.province }}</div>
 
-                <div class="col-md-4">
-
-                    <div class="text-muted small">
-                        Province
-                    </div>
-
-                    <div class="fw-semibold">
-                        {{ applicant.province }}
                     </div>
 
                 </div>
@@ -357,48 +292,36 @@ Complete verified applicant record
 
         </div>
 
-    </div>
-
-
-    <!-- =========================================================
+        <!-- =========================================================
          CONTACT
     ========================================================== -->
 
-    <div class="card border-0 shadow-sm mb-4">
+        <div class="card border-0 shadow-sm mb-4">
 
-        <div class="card-header bg-white border-bottom">
+            <div class="card-header bg-white border-bottom">
 
-            <h6 class="mb-0">
-                Contact Information
-            </h6>
+                <h6 class="mb-0">Contact Information</h6>
 
-        </div>
+            </div>
 
-        <div class="card-body">
+            <div class="card-body">
 
-            <div class="row g-4">
+                <div class="row g-4">
 
-                <div class="col-md-6">
+                    <div class="col-md-6">
 
-                    <div class="text-muted small">
-                        Mobile Number
+                        <div class="text-muted small">Mobile Number</div>
+
+                        <div class="fw-semibold">{{ applicant.phone }}</div>
+
                     </div>
 
-                    <div class="fw-semibold">
-                        {{ applicant.phone }}
-                    </div>
+                    <div class="col-md-6">
 
-                </div>
+                        <div class="text-muted small">Email Address</div>
 
+                        <div class="fw-semibold">{{ applicant.email }}</div>
 
-                <div class="col-md-6">
-
-                    <div class="text-muted small">
-                        Email Address
-                    </div>
-
-                    <div class="fw-semibold">
-                        {{ applicant.email }}
                     </div>
 
                 </div>
@@ -407,48 +330,36 @@ Complete verified applicant record
 
         </div>
 
-    </div>
-
-
-    <!-- =========================================================
+        <!-- =========================================================
          FAMILY
     ========================================================== -->
 
-    <div class="card border-0 shadow-sm mb-4">
+        <div class="card border-0 shadow-sm mb-4">
 
-        <div class="card-header bg-white border-bottom">
+            <div class="card-header bg-white border-bottom">
 
-            <h6 class="mb-0">
-                Family Information
-            </h6>
+                <h6 class="mb-0">Family Information</h6>
 
-        </div>
+            </div>
 
-        <div class="card-body">
+            <div class="card-body">
 
-            <div class="row g-4">
+                <div class="row g-4">
 
-                <div class="col-md-6">
+                    <div class="col-md-6">
 
-                    <div class="text-muted small">
-                        Father's Name
+                        <div class="text-muted small">Father's Name</div>
+
+                        <div class="fw-semibold">{{ applicant.father }}</div>
+
                     </div>
 
-                    <div class="fw-semibold">
-                        {{ applicant.father }}
-                    </div>
+                    <div class="col-md-6">
 
-                </div>
+                        <div class="text-muted small">Mother's Name</div>
 
+                        <div class="fw-semibold">{{ applicant.mother }}</div>
 
-                <div class="col-md-6">
-
-                    <div class="text-muted small">
-                        Mother's Name
-                    </div>
-
-                    <div class="fw-semibold">
-                        {{ applicant.mother }}
                     </div>
 
                 </div>
@@ -457,74 +368,52 @@ Complete verified applicant record
 
         </div>
 
-    </div>
-
-
-    <!-- =========================================================
+        <!-- =========================================================
          REGISTRATION
     ========================================================== -->
 
-    <div class="card border-0 shadow-sm mb-4">
+        <div class="card border-0 shadow-sm mb-4">
 
-        <div class="card-header bg-white border-bottom">
+            <div class="card-header bg-white border-bottom">
 
-            <h6 class="mb-0">
-                Registration Information
-            </h6>
+                <h6 class="mb-0">Registration Information</h6>
 
-        </div>
+            </div>
 
-        <div class="card-body">
+            <div class="card-body">
 
-            <div class="row g-4">
+                <div class="row g-4">
 
-                <div class="col-md-4">
+                    <div class="col-md-4">
 
-                    <div class="text-muted small">
-                        Application Type
+                        <div class="text-muted small">Application Type</div>
+
+                        <div class="fw-semibold">{{ applicant.get_application_type_display }}</div>
+
                     </div>
 
-                    <div class="fw-semibold">
-                        {{ applicant.get_application_type_display }}
+                    <div class="col-md-4">
+
+                        <div class="text-muted small">Application Status</div>
+
+                        <div class="fw-semibold text-success">{{ applicant.get_status_display }}</div>
+
                     </div>
 
-                </div>
+                    <div class="col-md-4">
 
+                        <div class="text-muted small">Verification Status</div>
 
-                <div class="col-md-4">
+                        <div class="fw-semibold text-success">{{ applicant.verification_status }}</div>
 
-                    <div class="text-muted small">
-                        Application Status
                     </div>
 
-                    <div class="fw-semibold text-success">
-                        {{ applicant.get_status_display }}
-                    </div>
+                    <div class="col-md-4">
 
-                </div>
+                        <div class="text-muted small">Registration Date</div>
 
+                        <div class="fw-semibold">{{ applicant.date_joined|date:"F d, Y" }}</div>
 
-                <div class="col-md-4">
-
-                    <div class="text-muted small">
-                        Verification Status
-                    </div>
-
-                    <div class="fw-semibold text-success">
-                        {{ applicant.verification_status }}
-                    </div>
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <div class="text-muted small">
-                        Registration Date
-                    </div>
-
-                    <div class="fw-semibold">
-                        {{ applicant.date_joined|date:"F d, Y" }}
                     </div>
 
                 </div>
@@ -533,273 +422,211 @@ Complete verified applicant record
 
         </div>
 
-    </div>
-
-
-    <!-- =========================================================
+        <!-- =========================================================
          BIOMETRIC VERIFICATION
     ========================================================== -->
 
-    <div class="card border-0 shadow-sm mb-4">
+        <div class="card border-0 shadow-sm mb-4">
 
-        <div class="card-header bg-white border-bottom">
+            <div class="card-header bg-white border-bottom">
 
-            <h6 class="mb-0">
-                Biometric Verification
-            </h6>
+                <h6 class="mb-0">Biometric Verification</h6>
 
-        </div>
+            </div>
 
-        <div class="card-body">
+            <div class="card-body">
 
-
-            <!-- =====================================================
+                <!-- =====================================================
                  BIOMETRIC STATUS
             ====================================================== -->
 
-            <div class="row g-3">
+                <div class="row g-3">
 
+                    <!-- LEFT FINGER -->
 
-                <!-- LEFT FINGER -->
+                    <div class="col-md-6">
 
-                <div class="col-md-6">
+                        <div class="border rounded p-3 h-100">
 
-                    <div class="border rounded p-3 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
 
-                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="fw-semibold">Left Finger</span>
 
-                            <span class="fw-semibold">
-                                Left Finger
-                            </span>
+                                {% if biometric.left_finger %}
+
+                                    <span class="badge bg-success">Captured</span>
+
+                                {% else %}
+
+                                    <span class="badge bg-danger">Missing</span>
+
+                                {% endif %}
+
+                            </div>
 
                             {% if biometric.left_finger %}
 
-                                <span class="badge bg-success">
-                                    Captured
-                                </span>
+                                <div
+                                    class="border rounded bg-light text-center p-3 inline-comelec-applicants-detail-1"
+                                >
+
+                                    <img
+                                        src="{{ biometric.left_finger.url }}"
+                                        alt="Left Fingerprint"
+                                        class="inline-comelec-applicants-detail-2"
+                                    >
+
+                                </div>
 
                             {% else %}
 
-                                <span class="badge bg-danger">
-                                    Missing
-                                </span>
+                                <div
+                                    class="border rounded bg-light d-flex align-items-center justify-content-center text-muted inline-comelec-applicants-detail-3"
+                                >
+
+                                    <div class="text-center">
+
+                                        <i class="bi bi-fingerprint inline-comelec-applicants-detail-4">
+                                        </i>
+
+                                        <div class="small mt-2">Left fingerprint not captured</div>
+
+                                    </div>
+
+                                </div>
 
                             {% endif %}
 
                         </div>
 
-
-                        {% if biometric.left_finger %}
-
-                            <div
-                                class="border rounded bg-light text-center p-3"
-                                style="height: 180px;"
-                            >
-
-                                <img
-                                    src="{{ biometric.left_finger.url }}"
-                                    alt="Left Fingerprint"
-                                    style="
-                                        max-width: 100%;
-                                        max-height: 150px;
-                                        object-fit: contain;
-                                    "
-                                >
-
-                            </div>
-
-                        {% else %}
-
-                            <div
-                                class="border rounded bg-light d-flex align-items-center justify-content-center text-muted"
-                                style="height: 180px;"
-                            >
-
-                                <div class="text-center">
-
-                                    <i
-                                        class="bi bi-fingerprint"
-                                        style="font-size: 48px;"
-                                    ></i>
-
-                                    <div class="small mt-2">
-                                        Left fingerprint not captured
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        {% endif %}
-
                     </div>
 
-                </div>
+                    <!-- RIGHT FINGER -->
 
+                    <div class="col-md-6">
 
-                <!-- RIGHT FINGER -->
+                        <div class="border rounded p-3 h-100">
 
-                <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
 
-                    <div class="border rounded p-3 h-100">
+                                <span class="fw-semibold">Right Finger</span>
 
-                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                {% if biometric.right_finger %}
 
-                            <span class="fw-semibold">
-                                Right Finger
-                            </span>
+                                    <span class="badge bg-success">Captured</span>
+
+                                {% else %}
+
+                                    <span class="badge bg-danger">Missing</span>
+
+                                {% endif %}
+
+                            </div>
 
                             {% if biometric.right_finger %}
 
-                                <span class="badge bg-success">
-                                    Captured
-                                </span>
+                                <div
+                                    class="border rounded bg-light text-center p-3 inline-comelec-applicants-detail-5"
+                                >
+
+                                    <img
+                                        src="{{ biometric.right_finger.url }}"
+                                        alt="Right Fingerprint"
+                                        class="inline-comelec-applicants-detail-6"
+                                    >
+
+                                </div>
 
                             {% else %}
 
-                                <span class="badge bg-danger">
-                                    Missing
-                                </span>
+                                <div
+                                    class="border rounded bg-light d-flex align-items-center justify-content-center text-muted inline-comelec-applicants-detail-7"
+                                >
+
+                                    <div class="text-center">
+
+                                        <i class="bi bi-fingerprint inline-comelec-applicants-detail-8">
+                                        </i>
+
+                                        <div class="small mt-2">Right fingerprint not captured</div>
+
+                                    </div>
+
+                                </div>
 
                             {% endif %}
 
                         </div>
 
-
-                        {% if biometric.right_finger %}
-
-                            <div
-                                class="border rounded bg-light text-center p-3"
-                                style="height: 180px;"
-                            >
-
-                                <img
-                                    src="{{ biometric.right_finger.url }}"
-                                    alt="Right Fingerprint"
-                                    style="
-                                        max-width: 100%;
-                                        max-height: 150px;
-                                        object-fit: contain;
-                                    "
-                                >
-
-                            </div>
-
-                        {% else %}
-
-                            <div
-                                class="border rounded bg-light d-flex align-items-center justify-content-center text-muted"
-                                style="height: 180px;"
-                            >
-
-                                <div class="text-center">
-
-                                    <i
-                                        class="bi bi-fingerprint"
-                                        style="font-size: 48px;"
-                                    ></i>
-
-                                    <div class="small mt-2">
-                                        Right fingerprint not captured
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        {% endif %}
-
                     </div>
 
                 </div>
 
-            </div>
-
-
-            <!-- =====================================================
+                <!-- =====================================================
                  BIOMETRIC SUMMARY
             ====================================================== -->
 
-            <div class="mt-4">
+                <div class="mt-4">
 
-                <div class="row g-3">
+                    <div class="row g-3">
 
+                        <div class="col-md-4">
 
-                    <div class="col-md-4">
+                            <div class="border rounded p-3">
 
-                        <div class="border rounded p-3">
+                                <div class="text-muted small">Left Finger</div>
 
-                            <div class="text-muted small">
-                                Left Finger
+                                {% if biometric.left_finger %}
+
+                                    <div class="fw-semibold text-success">Captured</div>
+
+                                {% else %}
+
+                                    <div class="fw-semibold text-danger">Missing</div>
+
+                                {% endif %}
+
                             </div>
-
-                            {% if biometric.left_finger %}
-
-                                <div class="fw-semibold text-success">
-                                    Captured
-                                </div>
-
-                            {% else %}
-
-                                <div class="fw-semibold text-danger">
-                                    Missing
-                                </div>
-
-                            {% endif %}
 
                         </div>
 
-                    </div>
+                        <div class="col-md-4">
 
+                            <div class="border rounded p-3">
 
-                    <div class="col-md-4">
+                                <div class="text-muted small">Right Finger</div>
 
-                        <div class="border rounded p-3">
+                                {% if biometric.right_finger %}
 
-                            <div class="text-muted small">
-                                Right Finger
+                                    <div class="fw-semibold text-success">Captured</div>
+
+                                {% else %}
+
+                                    <div class="fw-semibold text-danger">Missing</div>
+
+                                {% endif %}
+
                             </div>
-
-                            {% if biometric.right_finger %}
-
-                                <div class="fw-semibold text-success">
-                                    Captured
-                                </div>
-
-                            {% else %}
-
-                                <div class="fw-semibold text-danger">
-                                    Missing
-                                </div>
-
-                            {% endif %}
 
                         </div>
 
-                    </div>
+                        <div class="col-md-4">
 
+                            <div class="border rounded p-3">
 
-                    <div class="col-md-4">
+                                <div class="text-muted small">Biometrics Status</div>
 
-                        <div class="border rounded p-3">
+                                {% if biometric.biometrics_completed %}
 
-                            <div class="text-muted small">
-                                Biometrics Status
+                                    <div class="fw-semibold text-success">COMPLETE</div>
+
+                                {% else %}
+
+                                    <div class="fw-semibold text-danger">INCOMPLETE</div>
+
+                                {% endif %}
+
                             </div>
-
-                            {% if biometric.biometrics_completed %}
-
-                                <div class="fw-semibold text-success">
-                                    COMPLETE
-                                </div>
-
-                            {% else %}
-
-                                <div class="fw-semibold text-danger">
-                                    INCOMPLETE
-                                </div>
-
-                            {% endif %}
 
                         </div>
 
@@ -807,35 +634,52 @@ Complete verified applicant record
 
                 </div>
 
-            </div>
-
-
-            <!-- =====================================================
+                <!-- =====================================================
                  COMPLETION STATUS
             ====================================================== -->
 
-            <div class="mt-4">
+                <div class="mt-4">
 
-                {% if biometric.completed %}
+                    {% if biometric.completed %}
 
-                    <div class="alert alert-success mb-0">
+                        <div class="alert alert-success mb-0">
 
-                        <i class="bi bi-patch-check-fill me-2"></i>
+                            <i class="bi bi-patch-check-fill me-2">
+                            </i>
 
-                        <strong>Biometric verification completed.</strong>
+                            <strong>Biometric verification completed.</strong>
 
-                        Both required fingerprint records have been
-                        captured and the applicant is fully verified.
+                            Both required fingerprint records have been
+                            captured and the applicant is fully verified.
 
-                    </div>
+                        </div>
 
-                {% else %}
+                    {% else %}
 
-                    <div class="alert alert-warning mb-0">
+                        <div class="alert alert-warning mb-0">
 
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <i class="bi bi-exclamation-triangle-fill me-2">
+                            </i>
 
-                        Biometric verification is not yet complete.
+                            Biometric verification is not yet complete.
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+                <!-- =====================================================
+                 CAPTURE TIMESTAMP
+            ====================================================== -->
+
+                {% if biometric.captured_at %}
+
+                    <div class="mt-3">
+
+                        <div class="text-muted small">Biometrics Captured At</div>
+
+                        <div class="fw-semibold">{{ biometric.captured_at|date:"F d, Y h:i A" }}</div>
 
                     </div>
 
@@ -843,85 +687,54 @@ Complete verified applicant record
 
             </div>
 
-
-            <!-- =====================================================
-                 CAPTURE TIMESTAMP
-            ====================================================== -->
-
-            {% if biometric.captured_at %}
-
-                <div class="mt-3">
-
-                    <div class="text-muted small">
-                        Biometrics Captured At
-                    </div>
-
-                    <div class="fw-semibold">
-                        {{ biometric.captured_at|date:"F d, Y h:i A" }}
-                    </div>
-
-                </div>
-
-            {% endif %}
-
         </div>
 
-    </div>
-
-
-    <!-- =========================================================
+        <!-- =========================================================
          FINAL ACTION
     ========================================================== -->
 
-    <div class="card border-0 shadow-sm">
+        <div class="card border-0 shadow-sm">
 
-        <div class="card-body">
+            <div class="card-body">
 
-            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center">
 
-                <div>
+                    <div>
 
-                    <h6 class="mb-1">
-                        Applicant Account
-                    </h6>
+                        <h6 class="mb-1">Applicant Account</h6>
 
-                    <small class="text-muted">
-                        This applicant is currently active and fully verified.
-                    </small>
+                        <small class="text-muted">This applicant is currently active and fully verified.</small>
 
-                </div>
+                    </div>
 
+                    <div class="d-flex gap-2">
 
-                <div class="d-flex gap-2">
-
-                    <a
-                        href="{% url 'print-slip-account' applicant.id %}"
-                        class="btn btn-primary"
-                    >
-                        <i class="bi bi-printer me-1"></i>
-                        Print Registration Slip
-                    </a>
-
-
-                    <form
-                        method="POST"
-                        action="{% url 'admin-suspend-applicant' applicant.id %}"
-                        onsubmit="return confirm(
-                            'Are you sure you want to suspend this applicant?'
-                        );"
-                    >
-
-                        {% csrf_token %}
-
-                        <button
-                            type="submit"
-                            class="btn btn-danger"
+                        <a
+                            href="{% url 'print-slip-account' applicant.id %}"
+                            class="btn btn-primary"
                         >
-                            <i class="bi bi-pause-circle me-1"></i>
-                            Suspend Applicant
-                        </button>
+                            <i class="bi bi-printer me-1">
+                            </i>
+                            Print Registration Slip
+                        </a>
 
-                    </form>
+                        <form
+                            method="post"
+                            action="{% url 'admin-suspend-applicant' applicant.id %}"
+                            data-confirm-submit="Are you sure you want to suspend this applicant?"
+                        >
+
+                            {% csrf_token %}
+
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-pause-circle me-1">
+                                </i>
+                                Suspend Applicant
+                            </button>
+
+                        </form>
+
+                    </div>
 
                 </div>
 
@@ -930,7 +743,5 @@ Complete verified applicant record
         </div>
 
     </div>
-
-</div>
 
 {% endblock %}

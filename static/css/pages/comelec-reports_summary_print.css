@@ -1,0 +1,1 @@
+@page { size: A4 landscape; margin: 0; } .report-sheet { width: 297mm; min-height: 210mm; } .report-letterhead img { left: 75mm; } th, td { font-size: 10px; } th:first-child { width: 28%; } td:first-child { text-align: left; }

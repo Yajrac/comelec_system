@@ -1,0 +1,331 @@
+/* =========================================================
+   NEW REGISTRATION DETAIL
+========================================================= */
+
+.registration-detail {
+    width: 100%;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.registration-header {
+    background: #ffffff;
+    border: 1px solid #e1e5ea;
+    padding: 22px 24px;
+    margin-bottom: 20px;
+}
+
+.registration-header h4 {
+    color: #172033;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.registration-header p {
+    font-size: 13px;
+}
+
+.registration-header-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.registration-header-actions .btn {
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* =========================================================
+   STATUS CARD
+========================================================= */
+
+.registration-status-card {
+    background: #ffffff;
+    border: 1px solid #e1e5ea;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, .04);
+    margin-bottom: 20px;
+}
+
+.registration-status-card .card-body {
+    padding: 20px;
+}
+
+.registration-status-label {
+    display: block;
+    color: #6c757d;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+}
+
+.registration-status-date {
+    color: #172033;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.registration-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 11px;
+    font-size: 11px;
+    font-weight: 700;
+    border: 1px solid transparent;
+}
+
+.registration-badge-warning {
+    background: #fff4d6;
+    color: #856404;
+    border-color: #ffe69c;
+}
+
+.registration-badge-info {
+    background: #dff3fa;
+    color: #087990;
+    border-color: #b6effb;
+}
+
+.registration-badge-success {
+    background: #dff6e8;
+    color: #146c43;
+    border-color: #badbcc;
+}
+
+.registration-badge-danger {
+    background: #fbe2e5;
+    color: #b02a37;
+    border-color: #f1aeb5;
+}
+
+.registration-badge-secondary {
+    background: #eef0f2;
+    color: #495057;
+    border-color: #d8dce0;
+}
+
+/* =========================================================
+   VERIFICATION NOTICE
+========================================================= */
+
+.registration-verification-notice {
+    border: 1px solid;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+}
+
+.registration-verification-warning {
+    background: #fff9e6;
+    border-color: #ffe69c;
+    color: #664d03;
+}
+
+.registration-verification-success {
+    background: #edf9f1;
+    border-color: #badbcc;
+    color: #0f5132;
+}
+
+.registration-verification-notice .notice-icon {
+    font-size: 25px;
+    flex-shrink: 0;
+}
+
+.registration-verification-notice h6 {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.registration-verification-notice p {
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* =========================================================
+   INFORMATION CARDS
+========================================================= */
+
+.registration-card {
+    background: #ffffff;
+    border: 1px solid #e1e5ea;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, .04);
+}
+
+.registration-card-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e8ed;
+    padding: 15px 20px;
+}
+
+.registration-card-header h5 {
+    color: #172033;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.registration-card-body {
+    padding: 20px;
+}
+
+/* =========================================================
+   INFORMATION FIELD
+========================================================= */
+
+.registration-field {
+    min-height: 52px;
+}
+
+.registration-field-label {
+    display: block;
+    color: #737b87;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 5px;
+}
+
+.registration-field-value {
+    color: #202733;
+    font-size: 13px;
+    font-weight: 500;
+    word-break: break-word;
+}
+
+.registration-field-value.strong {
+    font-weight: 700;
+}
+
+/* =========================================================
+   ACTION CARD
+========================================================= */
+
+.registration-action-card {
+    background: #ffffff;
+    border: 1px solid #e1e5ea;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, .04);
+    margin-top: 20px;
+}
+
+.registration-action-header {
+    background: #f8f9fb;
+    border-bottom: 1px solid #e5e8ed;
+    padding: 15px 20px;
+}
+
+.registration-action-header h5 {
+    color: #172033;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.registration-action-body {
+    padding: 18px 20px;
+}
+
+.registration-action-body .btn {
+    border-radius: 0;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 115px;
+}
+
+/* =========================================================
+   APPROVED PROCESSING CARD
+========================================================= */
+
+.registration-processing-card {
+    background: #ffffff;
+    border: 1px solid #cbdcff;
+    border-left: 4px solid #0038a8;
+    margin-top: 20px;
+}
+
+.registration-processing-card .card-body {
+    padding: 20px;
+}
+
+.registration-processing-title {
+    color: #172033;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.registration-processing-text {
+    color: #6c757d;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.registration-btn {
+    border-radius: 0 !important;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.registration-btn-primary {
+    background: #0038a8;
+    border-color: #0038a8;
+}
+
+.registration-btn-primary:hover {
+    background: #002b7f;
+    border-color: #002b7f;
+}
+
+.registration-btn-warning {
+    color: #664d03;
+}
+
+.registration-btn-success {
+    color: #ffffff;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 767.98px) {
+
+    .registration-header {
+        padding: 18px;
+    }
+
+    .registration-header-actions {
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .registration-header-actions .btn {
+        width: 100%;
+    }
+
+    .registration-card-body {
+        padding: 16px;
+    }
+
+    .registration-action-body .btn {
+        width: 100%;
+    }
+
+    .registration-action-body form {
+        width: 100%;
+    }
+
+}
