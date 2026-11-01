@@ -24,7 +24,37 @@ A web and Android application for local voter-registration services, with local 
 
 ### Database Configuration
 
-The current configuration in `web/settings.py` uses **SQLite** (`db.sqlite3`). A PostgreSQL configuration is present but commented out, and the Python dependencies include the PostgreSQL driver `psycopg`. MySQL is not the currently configured database.
+The default database is **SQLite** (`db.sqlite3`). Set `DB_ENGINE=mysql` in your local `.env` to use a supported MySQL/MariaDB server. PostgreSQL configuration and dependencies have been removed.
+
+Django 5.2 requires **MySQL 8.0.11+ or MariaDB 10.5+**. XAMPP installations containing MariaDB 10.4 cannot run this project with the MySQL backend; install a supported database server first. Do not bypass Django's version check.
+
+For a fresh database:
+
+1. Start a compatible MySQL/MariaDB server.
+2. Create a database in phpMyAdmin or the database client:
+   ```sql
+   CREATE DATABASE comelec_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+3. Add the connection settings to your existing `.env` (preserve your secret key and SMS settings):
+   ```dotenv
+   DB_ENGINE=mysql
+   DB_NAME=comelec_system
+   DB_USER=root
+   DB_PASSWORD=
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   ```
+   Use the actual configured database credentials and port.
+4. Run these commands from PowerShell:
+   ```powershell
+   .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+   .\.venv\Scripts\python.exe manage.py migrate
+   .\.venv\Scripts\python.exe manage.py createsuperuser
+   .\.venv\Scripts\python.exe manage.py runserver
+   ```
+5. Add the initial barangay records through the admin interface.
+
+This creates fresh tables; it does not copy existing SQLite applicants, accounts, or receipts. Keep `db.sqlite3` as a backup. Apache is not needed for Django's development server. To return to the existing SQLite database, set `DB_ENGINE=sqlite` and restart Django.
 
 ### SMS Provider
 
