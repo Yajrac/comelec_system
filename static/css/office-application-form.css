@@ -1,0 +1,188 @@
+/* One continuous application sheet with ruled section headings. */
+.office-registration-review {
+    background: #fff;
+    border: 1px solid #d5dce5;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.office-registration-review .review-section {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.office-registration-review .review-section-header {
+    padding: 12px 20px;
+    background: #f4f6f8;
+    border-top: 1px solid #d5dce5;
+    border-bottom: 1px solid #d5dce5;
+    font-size: 15px;
+}
+
+.office-registration-review .review-section-header::before {
+    content: "";
+    display: inline-block;
+    width: 3px;
+    height: 20px;
+    vertical-align: middle;
+    margin-right: 12px;
+    background: #0038a8;
+}
+
+.office-registration-review .review-section-body { padding: 20px; }
+.office-registration-review .review-fields-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 20px; }
+.office-registration-review .review-name-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) 120px; gap: 18px 20px; }
+.office-registration-review .review-flags-grid { display: flex; flex-wrap: wrap; gap: 18px 28px; margin: 20px 0; }
+.office-registration-review .review-row { display: block; min-width: 0; padding: 0; border: 0; }
+.office-registration-review .review-label { width: 100%; margin-bottom: 7px; color: #405574; font-size: 12px; }
+.office-registration-review .review-value { width: 100%; min-height: 42px; padding: 9px 12px; border: 1px solid #dce4ef; border-radius: 3px; background: #f8fafc; box-sizing: border-box; }
+.office-registration-review #review_photo_preview { max-width: 100%; height: auto; margin-top: 12px; border-radius: 4px; }
+.office-registration-review .review-actions { margin: 0; padding: 16px 20px; border: 0; border-top: 1px solid #d5dce5; border-radius: 0; background: #f8fafc; }
+
+@media (max-width: 767px) {
+    .office-registration-review .review-fields-grid { grid-template-columns: minmax(0, 1fr); }
+    .office-registration-review .review-name-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 100px); }
+    .office-registration-review .review-name-grid > .review-row:nth-child(-n + 2) { grid-column: 1 / -1; }
+    .office-registration-review .review-section-body { padding: 14px; }
+}
+
+@media (max-width: 359px) {
+    .office-registration-review .review-name-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+form.office-application-form {
+    background: #fff;
+    border: 1px solid #d5dce5;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.office-application-form > :is(.form-section, .form-card, .registration-card) {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: #fff;
+}
+
+form.office-application-form :is(.form-section-header, .form-card-header, .card-header-government) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    min-height: 0;
+    padding: 12px 20px;
+    background: #f4f6f8;
+    border: 0;
+    border-top: 1px solid #d5dce5;
+    border-bottom: 1px solid #d5dce5;
+    border-radius: 0;
+}
+
+.office-application-form > .profile-fields > .form-section-header {
+    border-top: 0;
+}
+
+form.office-application-form :is(.form-section-header, .form-card-header, .card-header-government) h2 {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+form.office-application-form :is(.form-section-header, .form-card-header, .card-header-government) p {
+    flex-basis: 100%;
+    margin: 3px 0 0;
+}
+
+form.office-application-form :is(.form-section-body, .form-card-body, .card-body-government) {
+    padding: 20px;
+}
+
+form.office-application-form :is(.form-section-marker, .card-header-marker) {
+    width: 3px;
+    height: 20px;
+    margin-right: 12px;
+    background: #0038a8;
+    flex-shrink: 0;
+}
+
+form.office-application-form :is(.form-control, .form-select) {
+    min-height: 42px;
+    border-radius: 3px;
+    padding: 9px 12px;
+}
+
+form.office-application-form textarea.form-control {
+    min-height: 100px;
+}
+
+form.office-application-form .row {
+    --bs-gutter-x: 20px;
+    --bs-gutter-y: 18px;
+}
+
+form.office-application-form .profile-name-grid {
+    gap: 18px 20px;
+}
+
+form.office-application-form .form-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px 20px;
+}
+
+form.office-application-form .form-grid > .profile-name-row {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+}
+
+form.office-application-form .profile-additional-field fieldset {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 28px;
+    row-gap: 6px;
+}
+
+form.office-application-form .profile-additional-field legend {
+    float: none;
+    width: 100%;
+    margin-bottom: 6px;
+}
+
+form.office-application-form .profile-additional-field .form-check {
+    margin-bottom: 0;
+}
+
+form.office-application-form > :is(.form-actions, .action-area) {
+    margin: 0;
+    padding: 16px 20px;
+    background: #f8fafc;
+    border: 0;
+    border-top: 1px solid #d5dce5;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+@media (max-width: 991px) {
+    form.office-application-form .form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767px) {
+    form.office-application-form :is(.form-section-header, .form-card-header, .card-header-government,
+                                    .form-section-body, .form-card-body, .card-body-government) {
+        padding: 14px;
+    }
+
+    form.office-application-form .form-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    form.office-application-form .profile-name-grid {
+        gap: 18px 12px;
+    }
+}

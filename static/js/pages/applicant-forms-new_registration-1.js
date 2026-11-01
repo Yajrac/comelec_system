@@ -180,6 +180,16 @@ function showReview() {
     // Optional middle name: display a dash when left blank.
     setReview("review_middlename", getValue("middlename"));
 
+    setReview("review_suffix", getValue("suffix") || "None");
+    setReview("review_is_indigenous", document.getElementById("is_indigenous").checked ? "Yes" : "No");
+    setReview("review_is_illiterate", document.getElementById("is_illiterate").checked ? "Yes" : "No");
+    const photo = document.getElementById("photo").files[0];
+    setReview("review_photo", photo ? photo.name : "No photo selected");
+    const photoPreview = document.getElementById("photoPreview");
+    const reviewPhoto = document.getElementById("review_photo_preview");
+    reviewPhoto.hidden = !photo || photoPreview.hidden;
+    if (!reviewPhoto.hidden) reviewPhoto.src = photoPreview.src;
+    else reviewPhoto.removeAttribute("src");
     setReview("review_age", getValue("age"));
     setReview("review_sex", getSelectedText("sex"));
     setReview("review_birthdate", getValue("birthdate"));

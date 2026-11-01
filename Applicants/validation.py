@@ -11,6 +11,7 @@ from django.core.validators import validate_email
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
+from .profile_details import SUFFIX_CHOICES, validate_photo
 
 NAME_FIELDS = {"firstname", "lastname", "middlename", "father", "mother"}
 LABELS = {"firstname": "First name", "lastname": "Last name", "middlename": "Middle name", "father": "Father's name", "mother": "Mother's name"}
@@ -27,12 +28,18 @@ def validate_inputs(data, files=None):
     for key, raw in data.items():
         if key in {"csrfmiddlewaretoken", "action"}:
             continue
-        if key in NAME_FIELDS:
+        if key == "suffix":
+            if not isinstance(raw, str) or raw.strip() not in {"", *dict(SUFFIX_CHOICES)}:
+                errors[key] = "Select a valid suffix."
+        elif key in {"is_indigenous", "is_illiterate"}:
+            if raw != "on":
+                errors[key] = "Select a valid checkbox value."
+        elif key in NAME_FIELDS:
             if not isinstance(raw, str):
                 errors[key] = "Enter a valid name."
                 continue
             value = raw.strip()
-            if key == "middlename" and not value:
+            if key in {"middlename", "father", "mother"} and not value:
                 continue
             if len(value) > 255 or not name_is_valid(value):
                 errors[key] = LABELS[key] + " must contain letters, spaces, hyphens, apostrophes, or periods only (maximum 255 characters)."
@@ -85,6 +92,12 @@ def validate_inputs(data, files=None):
         if int(data["age"]) != expected:
             errors["age"] = "Age must match the date of birth."
     for key, upload in (files or {}).items():
+        if key == "photo":
+            try:
+                validate_photo(upload)
+            except ValidationError as error:
+                errors[key] = error.messages[0]
+            continue
         if upload.size > 5 * 1024 * 1024:
             errors[key] = "File must be 5 MB or smaller."
         elif Path(upload.name).suffix.lower() not in {".pdf", ".png", ".jpg", ".jpeg"}:
@@ -129,6 +142,13 @@ def validate_request(template=None, api=False):
                 except (ValueError, TypeError):
                     pass
             errors = validate_inputs(data, request.FILES)
+            if api and data.get("profile_details_provided") == "1" and view.__name__ in {
+                "create_applicant_update_request", "create_applicant_transfer_request",
+                "create_applicant_reactivation_request", "create_applicant_reinstatement_request",
+            }:
+                reason = data.get("reason", "")
+                if not isinstance(reason, str) or not 5 <= len(reason.strip()) <= 2000:
+                    errors["reason"] = "Provide a reason between 5 and 2,000 characters."
             if "birthdate" in data and "birthdate" not in errors and view.__name__ in {"new_registration", "update_registration", "new_registration_api", "create_applicant_update_request"}:
                 from .eligibility import age_eligibility, election_date
                 if not age_eligibility(date.fromisoformat(str(data["birthdate"])))['eligible']:

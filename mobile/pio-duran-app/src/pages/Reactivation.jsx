@@ -1,3 +1,6 @@
+import RequestProfileFields from "../components/RequestProfileFields";
+import { initialRequestProfile, requestProfileError } from "../utils/requestProfile";
+import ReferenceLookup from "../components/ReferenceLookup";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -8,16 +11,18 @@ import {
 import "./Reactivation.css";
 
 
-function Reactivation() {
+function Reactivation({ applicant }) {
 
     const navigate = useNavigate();
 
 
+    const [profile, setProfile] = useState(() => initialRequestProfile(applicant));
+
     const [formData, setFormData] = useState({
-        lastname: "",
-        firstname: "",
-        middlename: "",
-        birthdate: "",
+        lastname: applicant.lastname || "",
+        firstname: applicant.firstname || "",
+        middlename: applicant.middlename || "",
+        birthdate: applicant.birthdate || "",
         reason: "",
     });
 
@@ -71,12 +76,13 @@ function Reactivation() {
     // =========================================================
 
     const resetForm = () => {
+        setProfile(initialRequestProfile(applicant));
 
         setFormData({
-            lastname: "",
-            firstname: "",
-            middlename: "",
-            birthdate: "",
+            lastname: applicant.lastname || "",
+            firstname: applicant.firstname || "",
+            middlename: applicant.middlename || "",
+            birthdate: applicant.birthdate || "",
             reason: "",
         });
     };
@@ -89,6 +95,9 @@ function Reactivation() {
     const handleSubmit = async (event) => {
 
         event.preventDefault();
+        const profileError = requestProfileError(profile, applicant);
+        if (profileError) { setError(profileError); return; }
+
 
 
         setError("");
@@ -127,6 +136,8 @@ function Reactivation() {
         try {
 
             const payload = {
+            ...profile,
+                registration_reference: applicant.registration_reference,
 
                 lastname:
                     formData.lastname.trim(),
@@ -357,85 +368,14 @@ function Reactivation() {
                 HEADER
             ================================================= */}
 
-            <header className="government-header">
 
-                <div className="government-header-inner">
-
-                    <div className="government-logo">
-
-                        <img
-                            src="/images/comelec.png"
-                            alt="Commission on Elections logo"
-                        />
-
-                    </div>
-
-
-                    <div className="government-title">
-
-                        <h1>
-                            Pio Duran Registration Office
-                        </h1>
-
-                        <p>
-                            Voter Registration Services
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </header>
 
 
             {/* =================================================
                 NAVIGATION
             ================================================= */}
 
-            <nav className="main-navigation">
 
-                <div className="main-navigation-inner">
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            navigate("/")
-                        }
-                    >
-                        Home
-                    </button>
-
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            navigate("/verify-applicant")
-                        }
-                    >
-                        Verify Applicant
-                    </button>
-
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            navigate("/new-registration")
-                        }
-                    >
-                        New Registration
-                    </button>
-
-
-                    <button
-                        type="button"
-                        className="active"
-                    >
-                        Reactivation
-                    </button>
-
-                </div>
-
-            </nav>
 
 
             {/* =================================================
@@ -595,6 +535,8 @@ function Reactivation() {
                             <form
                                 onSubmit={handleSubmit}
                             >
+<RequestProfileFields profile={profile} setProfile={setProfile} applicant={applicant} />
+
 
 
                                 {/* =================================================
@@ -611,126 +553,16 @@ function Reactivation() {
                                     <div className="form-grid">
 
 
-                                        <div className="form-field">
-
-                                            <label className="form-label">
-
-                                                Last Name
-                                                <span>*</span>
-
-                                            </label>
 
 
-                                            <input
-                                                type="text"
-                                                name="lastname"
-                                                value={
-                                                    formData.lastname
-                                                }
-                                                onChange={
-                                                    handleChange
-                                                }
-                                                className="form-control"
-                                                placeholder="Enter last name"
-                                                autoComplete="family-name"
-                                                disabled={
-                                                    submitting
-                                                }
-                                                required
-                                            />
-
-                                        </div>
 
 
-                                        <div className="form-field">
-
-                                            <label className="form-label">
-
-                                                First Name
-                                                <span>*</span>
-
-                                            </label>
 
 
-                                            <input
-                                                type="text"
-                                                name="firstname"
-                                                value={
-                                                    formData.firstname
-                                                }
-                                                onChange={
-                                                    handleChange
-                                                }
-                                                className="form-control"
-                                                placeholder="Enter first name"
-                                                autoComplete="given-name"
-                                                disabled={
-                                                    submitting
-                                                }
-                                                required
-                                            />
-
-                                        </div>
 
 
-                                        <div className="form-field">
-
-                                            <label className="form-label">
-
-                                                Middle Name
-                                                <span>*</span>
-
-                                            </label>
 
 
-                                            <input
-                                                type="text"
-                                                name="middlename"
-                                                value={
-                                                    formData.middlename
-                                                }
-                                                onChange={
-                                                    handleChange
-                                                }
-                                                className="form-control"
-                                                placeholder="Enter middle name"
-                                                autoComplete="additional-name"
-                                                disabled={
-                                                    submitting
-                                                }
-                                               
-                                            />
-
-                                        </div>
-
-
-                                        <div className="form-field">
-
-                                            <label className="form-label">
-
-                                                Birthdate
-                                                <span>*</span>
-
-                                            </label>
-
-
-                                            <input
-                                                type="date"
-                                                name="birthdate"
-                                                value={
-                                                    formData.birthdate
-                                                }
-                                                onChange={
-                                                    handleChange
-                                                }
-                                                className="form-control"
-                                                disabled={
-                                                    submitting
-                                                }
-                                                required
-                                            />
-
-                                        </div>
 
                                     </div>
 
@@ -763,7 +595,7 @@ function Reactivation() {
 
                                         <textarea
                                             id="reason"
-                                            name="reason"
+                                            name="reason" minLength={5} maxLength={2000}
                                             value={
                                                 formData.reason
                                             }
@@ -835,7 +667,8 @@ function Reactivation() {
                                     ACTIONS
                                 ================================================= */}
 
-                                <div className="form-actions">
+                                <RequestProfileFields part="documents" profile={profile} setProfile={setProfile} applicant={applicant} />
+<div className="form-actions">
 
                                     <button
                                         type="button"
@@ -877,25 +710,12 @@ function Reactivation() {
                 FOOTER
             ================================================= */}
 
-            <footer className="site-footer">
-
-                <div className="site-footer-inner">
-
-                    <div className="footer-title">
-                        Pio Duran Registration Office
-                    </div>
-
-                    <div className="footer-subtitle">
-                        Voter Registration Services
-                    </div>
-
-                </div>
-
-            </footer>
 
         </div>
     );
 }
 
 
-export default Reactivation;
+export default function ReactivationScreen() {
+    return <ReferenceLookup type="REACTIVATION">{applicant => <Reactivation applicant={applicant} />}</ReferenceLookup>;
+}

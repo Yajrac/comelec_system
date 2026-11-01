@@ -1,0 +1,15 @@
+{% if not suffix_in_name_row %}{% include "components/profile_suffix_field.html" %}{% endif %}
+<div class="form-field col-md-12 full-width profile-additional-field">
+    <fieldset>
+        <legend class="form-label">Additional Information (optional)</legend>
+        <div class="form-check">
+            <input type="checkbox" id="is_indigenous" name="is_indigenous" class="form-check-input" {% if form_data.profile_details_provided %}{% if form_data.is_indigenous == "on" %}checked{% endif %}{% elif applicant.is_indigenous %}checked{% endif %}>
+            <label for="is_indigenous" class="form-check-label">Indigenous People</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" id="is_illiterate" name="is_illiterate" class="form-check-input" {% if form_data.profile_details_provided %}{% if form_data.is_illiterate == "on" %}checked{% endif %}{% elif applicant.is_illiterate %}checked{% endif %}>
+            <label for="is_illiterate" class="form-check-label">Illiterate (unable to read and write)</label>
+        </div>
+    </fieldset>
+</div>
+

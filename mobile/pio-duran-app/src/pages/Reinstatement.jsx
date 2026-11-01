@@ -1,3 +1,6 @@
+import RequestProfileFields from "../components/RequestProfileFields";
+import { initialRequestProfile, requestProfileError } from "../utils/requestProfile";
+import ReferenceLookup from "../components/ReferenceLookup";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -7,14 +10,16 @@ import {
 
 import "./Reinstatement.css";
 
-const Reinstatement = () => {
+const Reinstatement = ({ applicant }) => {
     const navigate = useNavigate();
 
+    const [profile, setProfile] = useState(() => initialRequestProfile(applicant));
+
     const [formData, setFormData] = useState({
-        lastname: "",
-        firstname: "",
-        middlename: "",
-        birthdate: "",
+        lastname: applicant.lastname || "",
+        firstname: applicant.firstname || "",
+        middlename: applicant.middlename || "",
+        birthdate: applicant.birthdate || "",
         reason: "",
     });
 
@@ -54,11 +59,12 @@ const Reinstatement = () => {
     // =========================================================
 
     const resetForm = () => {
+        setProfile(initialRequestProfile(applicant));
         setFormData({
-            lastname: "",
-            firstname: "",
-            middlename: "",
-            birthdate: "",
+            lastname: applicant.lastname || "",
+            firstname: applicant.firstname || "",
+            middlename: applicant.middlename || "",
+            birthdate: applicant.birthdate || "",
             reason: "",
         });
     };
@@ -69,6 +75,9 @@ const Reinstatement = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        const profileError = requestProfileError(profile, applicant);
+        if (profileError) { setError(profileError); return; }
+
 
         setError("");
         setSuccess("");
@@ -96,6 +105,8 @@ const Reinstatement = () => {
 
         try {
             const payload = {
+            ...profile,
+                registration_reference: applicant.registration_reference,
                 lastname:
                     formData.lastname.trim(),
 
@@ -266,64 +277,14 @@ const Reinstatement = () => {
                 HEADER
             ================================================= */}
 
-            <header className="government-header">
 
-                <div className="government-header-inner">
-
-                    <div className="government-logo">
-
-                        <img
-                            src="/images/comelec.png"
-                            alt="Commission on Elections logo"
-                        />
-
-                    </div>
-
-                    <div>
-
-                        <h1 className="government-title">
-                            Pio Duran Online Registration
-                            and Applicant Services
-                        </h1>
-
-                        <p className="government-subtitle">
-                            Online Registration and Applicant Services
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </header>
 
 
             {/* =================================================
                 NAVIGATION
             ================================================= */}
 
-            <nav className="main-navigation">
 
-                <div className="main-navigation-inner">
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            navigate("/")
-                        }
-                    >
-                        Home
-                    </button>
-
-                    <button
-                        type="button"
-                        className="active"
-                    >
-                        Reinstatement
-                    </button>
-
-                </div>
-
-            </nav>
 
 
             {/* =================================================
@@ -446,136 +407,14 @@ const Reinstatement = () => {
                             <form
                                 onSubmit={handleSubmit}
                             >
+<RequestProfileFields profile={profile} setProfile={setProfile} applicant={applicant} />
+
 
                                 {/* =================================================
                                     APPLICANT INFORMATION
                                 ================================================= */}
 
-                                <section className="form-section">
 
-                                    <h3 className="section-title">
-                                        Applicant Information
-                                    </h3>
-
-
-                                    <div className="form-grid">
-
-                                        {/* LAST NAME */}
-
-                                        <div className="form-field">
-
-                                            <label className="form-label">
-                                                Last Name
-                                            </label>
-
-                                            <input
-                                                name="lastname"
-                                                type="text"
-                                                className="form-control"
-                                                value={
-                                                    formData.lastname
-                                                }
-                                                onChange={
-                                                    handleChange
-                                                }
-                                                placeholder="Enter last name"
-                                                autoComplete="family-name"
-                                                disabled={
-                                                    submitting
-                                                }
-                                                required
-                                            />
-
-                                        </div>
-
-
-                                        {/* FIRST NAME */}
-
-                                        <div className="form-field">
-
-                                            <label className="form-label">
-                                                First Name
-                                            </label>
-
-                                            <input
-                                                name="firstname"
-                                                type="text"
-                                                className="form-control"
-                                                value={
-                                                    formData.firstname
-                                                }
-                                                onChange={
-                                                    handleChange
-                                                }
-                                                placeholder="Enter first name"
-                                                autoComplete="given-name"
-                                                disabled={
-                                                    submitting
-                                                }
-                                                required
-                                            />
-
-                                        </div>
-
-
-                                        {/* MIDDLE NAME */}
-
-                                        <div className="form-field">
-
-                                            <label className="form-label">
-                                                Middle Name
-                                            </label>
-
-                                            <input
-                                                name="middlename"
-                                                type="text"
-                                                className="form-control"
-                                                value={
-                                                    formData.middlename
-                                                }
-                                                onChange={
-                                                    handleChange
-                                                }
-                                                placeholder="Enter middle name"
-                                                autoComplete="additional-name"
-                                                disabled={
-                                                    submitting
-                                                }
-                                               
-                                            />
-
-                                        </div>
-
-
-                                        {/* BIRTHDATE */}
-
-                                        <div className="form-field">
-
-                                            <label className="form-label">
-                                                Birthdate
-                                            </label>
-
-                                            <input
-                                                name="birthdate"
-                                                type="date"
-                                                className="form-control"
-                                                value={
-                                                    formData.birthdate
-                                                }
-                                                onChange={
-                                                    handleChange
-                                                }
-                                                disabled={
-                                                    submitting
-                                                }
-                                                required
-                                            />
-
-                                        </div>
-
-                                    </div>
-
-                                </section>
 
 
                                 {/* =================================================
@@ -600,7 +439,7 @@ const Reinstatement = () => {
 
                                         <textarea
                                             id="reason"
-                                            name="reason"
+                                            name="reason" minLength={5} maxLength={2000}
                                             rows="6"
                                             className="form-control"
                                             value={
@@ -657,7 +496,8 @@ const Reinstatement = () => {
                                     ACTIONS
                                 ================================================= */}
 
-                                <div className="form-actions">
+                                <RequestProfileFields part="documents" profile={profile} setProfile={setProfile} applicant={applicant} />
+<div className="form-actions">
 
                                     <button
                                         type="submit"
@@ -703,24 +543,11 @@ const Reinstatement = () => {
                 FOOTER
             ================================================= */}
 
-            <footer className="site-footer">
-
-                <div className="site-footer-inner">
-
-                    <div className="footer-title">
-                        Pio Duran Online Registration
-                    </div>
-
-                    <p>
-                        Online Registration and Applicant Services
-                    </p>
-
-                </div>
-
-            </footer>
 
         </div>
     );
 };
 
-export default Reinstatement;
+export default function ReinstatementScreen() {
+    return <ReferenceLookup type="REINSTATEMENT">{applicant => <Reinstatement applicant={applicant} />}</ReferenceLookup>;
+}

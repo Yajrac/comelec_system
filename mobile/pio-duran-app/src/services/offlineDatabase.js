@@ -1,300 +1,48 @@
 import { Preferences } from "@capacitor/preferences";
 
 const SYNC_QUEUE_KEY = "offline_sync_queue";
-
-
-/*
-=========================================================
-INITIALIZE OFFLINE DATABASE
-=========================================================
-*/
-
-export async function initOfflineDatabase() {
-    try {
-        const existingQueue =
-            await getSyncQueue();
-
-        if (!Array.isArray(existingQueue)) {
-            await saveSyncQueue([]);
-        }
-
-        console.log(
-            "Offline database initialized."
-        );
-
-        return true;
-    } catch (error) {
-        console.error(
-            "Failed to initialize offline database:",
-            error
-        );
-
-        return false;
-    }
+const RECEIPTS_KEY = "offline_sync_receipts";
+let mutations = Promise.resolve();
+function mutate(transform, triggerSync = true) {
+    const operation = mutations.then(async () => {
+        const queue = await getSyncQueue();
+        await Preferences.set({ key: SYNC_QUEUE_KEY, value: JSON.stringify(transform(queue)) });
+        const event = new Event("offline-queue-changed");
+        event.triggerSync = triggerSync;
+        window.dispatchEvent(event);
+    });
+    mutations = operation.catch(() => {});
+    return operation;
 }
-
-
-/*
-=========================================================
-GENERATE CLIENT REFERENCE
-=========================================================
-*/
-
-export function generateClientReference(
-    requestType
-) {
-    const prefix =
-        String(requestType || "APPLICATION")
-            .replace(/[^A-Z0-9]/gi, "")
-            .toUpperCase();
-
-    const timestamp = Date.now();
-
-    const randomPart =
-        Math.random()
-            .toString(36)
-            .substring(2, 10)
-            .toUpperCase();
-
-    return `${prefix}-${timestamp}-${randomPart}`;
+export async function initOfflineDatabase() { await getSyncQueue(); return true; }
+export function generateClientReference(type) {
+    return `${String(type).replace(/[^A-Z0-9]/gi, "").toUpperCase()}-${Date.now()}-${crypto.randomUUID()}`;
 }
-
-
-/*
-=========================================================
-GET SYNC QUEUE
-=========================================================
-*/
-
 export async function getSyncQueue() {
-    try {
-        const { value } =
-            await Preferences.get({
-                key: SYNC_QUEUE_KEY,
-            });
-
-        if (!value) {
-            return [];
-        }
-
-        const parsed =
-            JSON.parse(value);
-
-        if (!Array.isArray(parsed)) {
-            return [];
-        }
-
-        return parsed;
-    } catch (error) {
-        console.error(
-            "Failed to read offline queue:",
-            error
-        );
-
-        return [];
-    }
+    const { value } = await Preferences.get({ key: SYNC_QUEUE_KEY });
+    if (!value) return [];
+    const queue = JSON.parse(value);
+    if (!Array.isArray(queue)) throw new Error("Offline request storage could not be read.");
+    return queue;
 }
-
-
-/*
-=========================================================
-SAVE SYNC QUEUE
-=========================================================
-*/
-
-async function saveSyncQueue(queue) {
-    await Preferences.set({
-        key: SYNC_QUEUE_KEY,
-        value: JSON.stringify(queue),
-    });
+export function addToSyncQueue({ requestType, endpoint, payload, clientReference }) {
+    return mutate(queue => queue.some(item => item.clientReference === clientReference) ? queue : [...queue, {
+        id: clientReference, requestType, endpoint, payload, clientReference, status: "WAITING", attempts: 0,
+        createdAt: new Date().toISOString(), lastAttemptAt: null, lastError: null,
+    }]);
 }
-
-
-/*
-=========================================================
-ADD REQUEST TO QUEUE
-=========================================================
-*/
-
-export async function addToSyncQueue({
-    requestType,
-    endpoint,
-    payload,
-    clientReference,
-}) {
-    try {
-        const queue =
-            await getSyncQueue();
-
-        /*
-        Prevent duplicate local requests.
-        */
-
-        const alreadyExists =
-            queue.some(
-                (item) =>
-                    item.clientReference ===
-                    clientReference
-            );
-
-        if (alreadyExists) {
-            console.log(
-                "Request already exists in offline queue:",
-                clientReference
-            );
-
-            return;
-        }
-
-        const queueItem = {
-            id: clientReference,
-
-            requestType,
-
-            endpoint,
-
-            payload,
-
-            clientReference,
-
-            status: "WAITING",
-
-            attempts: 0,
-
-            createdAt:
-                new Date().toISOString(),
-
-            lastAttemptAt: null,
-
-            lastError: null,
-        };
-
-        queue.push(queueItem);
-
-        await saveSyncQueue(queue);
-
-        console.log(
-            `Saved offline request: ${requestType}`
-        );
-
-        console.log(
-            `Reference: ${clientReference}`
-        );
-
-    } catch (error) {
-        console.error(
-            "Failed to save offline request:",
-            error
-        );
-
-        throw error;
-    }
+export function removeFromSyncQueue(reference) { return mutate(queue => queue.filter(item => item.clientReference !== reference)); }
+export function updateQueueItem(reference, updates) { return mutate(queue => queue.map(item => item.clientReference === reference ? { ...item, ...updates } : item), false); }
+export function clearSyncQueue() { return mutate(() => []); }
+export async function getPendingRequestCount() { return (await getSyncQueue()).filter(item => item.status !== "FAILED").length; }
+export async function getFailedRequestCount() { return (await getSyncQueue()).filter(item => item.status === "FAILED").length; }
+export async function getSyncReceipts() {
+    const { value } = await Preferences.get({ key: RECEIPTS_KEY });
+    return value ? JSON.parse(value) : [];
 }
-
-
-/*
-=========================================================
-REMOVE REQUEST
-=========================================================
-*/
-
-export async function removeFromSyncQueue(
-    clientReference
-) {
-    const queue =
-        await getSyncQueue();
-
-    const updatedQueue =
-        queue.filter(
-            (item) =>
-                item.clientReference !==
-                clientReference
-        );
-
-    await saveSyncQueue(
-        updatedQueue
-    );
-}
-
-
-/*
-=========================================================
-UPDATE QUEUE ITEM
-=========================================================
-*/
-
-export async function updateQueueItem(
-    clientReference,
-    updates
-) {
-    const queue =
-        await getSyncQueue();
-
-    const updatedQueue =
-        queue.map((item) => {
-
-            if (
-                item.clientReference ===
-                clientReference
-            ) {
-                return {
-                    ...item,
-                    ...updates,
-                };
-            }
-
-            return item;
-        });
-
-    await saveSyncQueue(
-        updatedQueue
-    );
-}
-
-
-/*
-=========================================================
-CLEAR QUEUE
-=========================================================
-*/
-
-export async function clearSyncQueue() {
-    await Preferences.remove({
-        key: SYNC_QUEUE_KEY,
-    });
-}
-
-
-/*
-=========================================================
-GET PENDING COUNT
-=========================================================
-*/
-
-export async function getPendingRequestCount() {
-    const queue =
-        await getSyncQueue();
-
-    return queue.filter(
-        (item) =>
-            item.status === "WAITING" ||
-            item.status === "RETRYING"
-    ).length;
-}
-
-
-/*
-=========================================================
-GET FAILED COUNT
-=========================================================
-*/
-
-export async function getFailedRequestCount() {
-    const queue =
-        await getSyncQueue();
-
-    return queue.filter(
-        (item) =>
-            item.status === "FAILED"
-    ).length;
+export async function saveSyncReceipt(item, data) {
+    const receipts = await getSyncReceipts();
+    const receipt = { clientReference: item.clientReference, requestType: item.requestType,
+        data, syncedAt: new Date().toISOString() };
+    await Preferences.set({ key: RECEIPTS_KEY, value: JSON.stringify([receipt, ...receipts.filter(value => value.clientReference !== item.clientReference)].slice(0, 50)) });
 }

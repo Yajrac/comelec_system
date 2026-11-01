@@ -3,7 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE_URL = "https://pio-duran-online-registration.onrender.com";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 function VerifyApplicant() {
     const navigate = useNavigate();
@@ -609,21 +609,6 @@ function VerifyApplicant() {
                 FOOTER
             ================================================= */}
 
-            <footer className="site-footer">
-
-                <div className="site-footer-inner">
-
-                    <div className="footer-title">
-                        Pio Duran Online Registration
-                    </div>
-
-                    <p>
-                        Online Registration and Applicant Services
-                    </p>
-
-                </div>
-
-            </footer>
 
         </div>
     );

@@ -1,0 +1,56 @@
+.mobile-birthdate {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    border: 1px solid #d5e0f1;
+    border-radius: 7px;
+    background: #fff;
+}
+.mobile-birthdate:focus-within {
+    border-color: #073ba8;
+    box-shadow: 0 0 0 3px #073ba815;
+}
+.mobile-birthdate-icon { display: grid; place-items: center; flex: 0 0 36px; color: #073ba8; }
+.mobile-birthdate > label {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-width: 0;
+    margin: 4px 0;
+    padding: 0 8px;
+    border-left: 1px solid #e4eaf4;
+}
+.mobile-birthdate > label:first-of-type { flex: 1.5 1 0; }
+.mobile-birthdate > label > span {
+    color: #718096;
+    font-size: 9px;
+    line-height: 12px;
+    font-weight: 700;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+}
+.mobile-app .form-group .mobile-birthdate > label > :is(select, input) {
+    width: 100%;
+    min-width: 0;
+    min-height: 30px;
+    height: 30px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    outline: none;
+    box-shadow: none;
+    background: transparent;
+    color: #142b54;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+}
+.mobile-birthdate > label:focus-within > span { color: #073ba8; }
+.mobile-birthdate-eligibility { display: block; margin-top: 7px; color: #187451; font-size: 11px; line-height: 1.6; }
+.mobile-birthdate-eligibility.is-ineligible { color: #b42318; }
+.mobile-birthdate-pending { display: block; margin-top: 7px; color: #64748b; font-size: 11px; line-height: 1.6; }
+@media (max-width: 380px) {
+    .mobile-birthdate-icon { flex-basis: 28px; }
+    .mobile-birthdate > label { padding: 0 5px; }
+}

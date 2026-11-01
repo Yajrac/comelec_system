@@ -42,6 +42,7 @@
             <form
                 method="post"
                 id="registrationForm"
+                class="office-application-form"
                 enctype="multipart/form-data"
                 novalidate
             >
@@ -49,7 +50,9 @@
                 {% csrf_token %}
                 <input type="hidden" name="application_type" value="NEW">
 
-                <!-- PERSONAL INFORMATION -->
+                
+
+                    <!-- PERSONAL INFORMATION -->
                 <div class="form-section">
                     <div class="form-section-header">
                         <div class="form-section-marker"></div>
@@ -59,7 +62,8 @@
                     <div class="form-section-body">
                         <div class="row g-4">
 
-                            <div class="col-md-4">
+                            <div class="col-12"><div class="profile-name-grid">
+<div class="form-field">
                                 <label for="lastname" class="form-label">
                                     Last Name <span class="required">*</span>
                                 </label>
@@ -75,7 +79,7 @@
                                 >
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="form-field">
                                 <label for="firstname" class="form-label">
                                     First Name <span class="required">*</span>
                                 </label>
@@ -92,7 +96,7 @@
                             </div>
 
                             <!-- MIDDLE NAME: OPTIONAL -->
-                            <div class="col-md-4">
+                            <div class="form-field">
                                 <label for="middlename" class="form-label">
                                     Middle Name <span class="optional">(Optional)</span>
                                 </label>
@@ -106,6 +110,10 @@
                                     autocomplete="additional-name"
                                 >
                             </div>
+
+                            {% include "components/profile_suffix_field.html" %}
+</div></div>
+{% include "components/profile_personal_fields.html" with suffix_in_name_row=True %}
 
                             <div class="col-md-4">
                                 <label for="birthdate" class="form-label">
@@ -382,7 +390,7 @@
 
                             <div class="col-md-6">
                                 <label for="father" class="form-label">
-                                    Father's Name <span class="required">*</span>
+                                    Father's Name <small>(optional)</small>
                                 </label>
                                 <input
                                     type="text"
@@ -392,13 +400,12 @@
                                     value="{{ form_data.father|default:'' }}"
                                     maxlength="255"
                                     placeholder="Lastname, Firstname Middlename"
-                                    required
                                 >
                             </div>
 
                             <div class="col-md-6">
                                 <label for="mother" class="form-label">
-                                    Mother's Maiden Name <span class="required">*</span>
+                                    Mother's Maiden Name <small>(optional)</small>
                                 </label>
                                 <input
                                     type="text"
@@ -408,7 +415,6 @@
                                     value="{{ form_data.mother|default:'' }}"
                                     maxlength="255"
                                     placeholder="Lastname, Firstname Middlename"
-                                    required
                                 >
                             </div>
 
@@ -417,17 +423,18 @@
                 </div>
 
                 <!-- VALID ID / SUPPORTING DOCUMENT -->
-                <div class="form-section">
+                <div class="registration-upload-grid">
+<div class="form-section">
                     <div class="form-section-header">
                         <div class="form-section-marker"></div>
-                        <h2>Valid ID / Supporting Document</h2>
+                        <h2>Upload Valid ID and Birth Certificate</h2>
                     </div>
 
                     <div class="form-section-body">
                         <div class="document-upload-box">
 
                             <label for="valid_id_document" class="form-label">
-                                Upload Valid ID or Supporting Document
+                                Upload Valid ID and Birth Certificate
                                 <span class="required">*</span>
                             </label>
 
@@ -459,6 +466,10 @@
                         </div>
                     </div>
                 </div>
+<div class="registration-photo-column">
+{% include "components/profile_fields.html" %}
+</div>
+</div>
 
                 <!-- FORM ACTIONS -->
                 <div class="form-actions">
@@ -493,121 +504,13 @@
                 Verify that you selected the correct supporting document.
             </div></div>
 
-            <div class="review-section">
-                <div class="review-section-header">Application Information</div>
-                <div class="review-section-body">
-                    <div class="review-row">
-                        <div class="review-label">Application Type</div>
-                        <div class="review-value">New Registration</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="review-section">
-                <div class="review-section-header">Personal Information</div>
-                <div class="review-section-body">
-                    <div class="review-row">
-                        <div class="review-label">Last Name</div>
-                        <div class="review-value" id="review_lastname"></div>
-                    </div>
-                    <div class="review-row">
-                        <div class="review-label">First Name</div>
-                        <div class="review-value" id="review_firstname"></div>
-                    </div>
-                    <div class="review-row">
-                        <div class="review-label">Middle Name</div>
-                        <div class="review-value" id="review_middlename"></div>
-                    </div>
-                    <div class="review-row">
-                        <div class="review-label">Age</div>
-                        <div class="review-value" id="review_age"></div>
-                    </div>
-                    <div class="review-row">
-                        <div class="review-label">Sex</div>
-                        <div class="review-value" id="review_sex"></div>
-                    </div>
-                    <div class="review-row">
-                        <div class="review-label">Birthdate</div>
-                        <div class="review-value" id="review_birthdate"></div>
-                    </div>
-                    <div class="review-row">
-                        <div class="review-label">Birthplace</div>
-                        <div class="review-value" id="review_birthplace"></div>
-                    </div>
-                    <div class="review-row">
-                        <div class="review-label">Civil Status</div>
-                        <div class="review-value" id="review_civil_status"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="review-section">
-                <div class="review-section-header">Address</div>
-                <div class="review-section-body">
-                    <div class="review-row">
-                        <div class="review-label">Barangay</div>
-                        <div class="review-value" id="review_brgy"></div>
-                    </div>
-                    <div class="review-row">
-                        <div class="review-label">Municipality</div>
-                        <div class="review-value">Pio Duran</div>
-                    </div>
-                    <div class="review-row">
-                        <div class="review-label">Province</div>
-                        <div class="review-value">Albay</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="review-section">
-                <div class="review-section-header">Contact Information</div>
-                <div class="review-section-body">
-                    <div class="review-row">
-                        <div class="review-label">Phone Number</div>
-                        <div class="review-value" id="review_phone"></div>
-                    </div>
-                    <div class="review-row">
-                        <div class="review-label">Email Address</div>
-                        <div class="review-value" id="review_email"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="review-section">
-                <div class="review-section-header">Other Information</div>
-                <div class="review-section-body">
-                    <div class="review-row">
-                        <div class="review-label">PWD Status</div>
-                        <div class="review-value" id="review_pwd_status"></div>
-                    </div>
-                    <div class="review-row">
-                        <div class="review-label">Citizenship</div>
-                        <div class="review-value" id="review_citizenship_status"></div>
-                    </div>
-                    <div class="review-row">
-                        <div class="review-label">Father's Name</div>
-                        <div class="review-value" id="review_father"></div>
-                    </div>
-                    <div class="review-row">
-                        <div class="review-label">Mother's Name</div>
-                        <div class="review-value" id="review_mother"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="review-section">
-                <div class="review-section-header">Valid ID / Supporting Document</div>
-                <div class="review-section-body">
-                    <div class="review-row">
-                        <div class="review-label">Selected File</div>
-                        <div class="review-value">
-                            <span id="review_document_name">No document selected</span>
-                            <div id="review_document_size" class="review-document-note"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+<div class="office-registration-review">
+<section class="review-section"><div class="review-section-header">Photo / Selfie</div><div class="review-section-body"><div class="review-row "><div class="review-label">Selected Photo</div><div class="review-value" id="review_photo"></div></div><img id="review_photo_preview" alt="Applicant photo preview" width="160" hidden></div></section>
+<section class="review-section"><div class="review-section-header">Personal Information</div><div class="review-section-body"><div class="review-name-grid"><div class="review-row "><div class="review-label">Last Name</div><div class="review-value" id="review_lastname"></div></div><div class="review-row "><div class="review-label">First Name</div><div class="review-value" id="review_firstname"></div></div><div class="review-row "><div class="review-label">Middle Name</div><div class="review-value" id="review_middlename"></div></div><div class="review-row "><div class="review-label">Suffix</div><div class="review-value" id="review_suffix"></div></div></div><div class="review-flags-grid"><div class="review-row "><div class="review-label">Indigenous People</div><div class="review-value" id="review_is_indigenous"></div></div><div class="review-row "><div class="review-label">Illiterate</div><div class="review-value" id="review_is_illiterate"></div></div></div><div class="review-fields-grid"><div class="review-row "><div class="review-label">Birthdate</div><div class="review-value" id="review_birthdate"></div></div><div class="review-row "><div class="review-label">Age</div><div class="review-value" id="review_age"></div></div><div class="review-row "><div class="review-label">Sex</div><div class="review-value" id="review_sex"></div></div><div class="review-row "><div class="review-label">Birthplace</div><div class="review-value" id="review_birthplace"></div></div><div class="review-row "><div class="review-label">Civil Status</div><div class="review-value" id="review_civil_status"></div></div></div></div></section>
+<section class="review-section"><div class="review-section-header">Address</div><div class="review-section-body"><div class="review-fields-grid"><div class="review-row "><div class="review-label">Barangay</div><div class="review-value" id="review_brgy"></div></div><div class="review-row "><div class="review-label">Municipality</div><div class="review-value">Pio Duran</div></div><div class="review-row "><div class="review-label">Province</div><div class="review-value">Albay</div></div></div></div></section>
+<section class="review-section"><div class="review-section-header">Contact Information</div><div class="review-section-body"><div class="review-fields-grid"><div class="review-row "><div class="review-label">Phone Number</div><div class="review-value" id="review_phone"></div></div><div class="review-row "><div class="review-label">Email Address</div><div class="review-value" id="review_email"></div></div></div></div></section>
+<section class="review-section"><div class="review-section-header">Other Information</div><div class="review-section-body"><div class="review-fields-grid"><div class="review-row "><div class="review-label">PWD Status</div><div class="review-value" id="review_pwd_status"></div></div><div class="review-row "><div class="review-label">Citizenship</div><div class="review-value" id="review_citizenship_status"></div></div><div class="review-row "><div class="review-label">Father?s Name</div><div class="review-value" id="review_father"></div></div><div class="review-row "><div class="review-label">Mother?s Name</div><div class="review-value" id="review_mother"></div></div></div></div></section>
+<section class="review-section"><div class="review-section-header">Valid ID and Birth Certificate</div><div class="review-section-body"><div class="review-row "><div class="review-label">Selected File</div><div class="review-value"><span id="review_document_name">No document selected</span><div id="review_document_size" class="review-document-note"></div></div></div></div></section>
             <div class="review-actions">
 <a href="{% if request.walk_in_base %}{% url 'admin-walk-in' %}{% else %}{% url 'home' %}{% endif %}" class="application-cancel btn-back">Cancel</a>
                 <button type="button" class="btn-back" data-click-action="backToForm">Back to Edit</button>
@@ -620,6 +523,7 @@
                     Submit Registration
                 </button>
             </div>
+</div>
         </div>
 
 {% endblock %}

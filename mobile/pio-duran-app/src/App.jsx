@@ -5,10 +5,13 @@ import {
     BrowserRouter,
     Routes,
     Route,
+    Navigate,
 } from "react-router-dom";
 
 import Home from "./pages/Home";
-import VerifyApplicant from "./pages/VerifyApplicant";
+import OfflineApplications from "./pages/OfflineApplications";
+import BottomNavigation from "./components/BottomNavigation";
+import MobileAppHeader from "./components/MobileAppHeader";
 import NewRegistration from "./pages/NewRegistration";
 import UpdateInformation from "./pages/UpdateInformation";
 import Transfer from "./pages/Transfer";
@@ -29,6 +32,7 @@ import {
 const App = () => {
 
     useEffect(() => {
+        let cancelled = false;
 
         /*
         =====================================================
@@ -61,7 +65,7 @@ const App = () => {
             =================================================
             */
 
-            startSyncManager();
+            if (!cancelled) void startSyncManager();
 
         };
 
@@ -76,8 +80,8 @@ const App = () => {
         */
 
         return () => {
-
-            stopSyncManager();
+            cancelled = true;
+            void stopSyncManager();
 
         };
 
@@ -86,8 +90,10 @@ const App = () => {
 
     return (
         <BrowserRouter>
+            <MobileAppHeader />
 
             <Routes>
+                <Route path="/offline" element={<OfflineApplications />} />
 
                 <Route
                     path="/"
@@ -96,7 +102,7 @@ const App = () => {
 
                 <Route
                     path="/verify-applicant"
-                    element={<VerifyApplicant />}
+                    element={<Navigate to="/new-registration" replace />}
                 />
 
                 <Route
@@ -130,6 +136,7 @@ const App = () => {
                 />
 
             </Routes>
+            <BottomNavigation />
 
         </BrowserRouter>
     );

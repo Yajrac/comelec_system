@@ -1,0 +1,160 @@
+.form-grid > .profile-suffix-field,
+.form-grid > .profile-additional-field {
+    width: 100%;
+}
+
+.profile-additional-field {
+    grid-column: 1 / -1;
+}
+
+.profile-name-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) 120px;
+    gap: 24px;
+    align-items: start;
+}
+
+.profile-name-grid > .profile-suffix-field {
+    width: 100%;
+}
+
+.profile-name-grid > .form-field {
+    min-width: 0;
+}
+
+.profile-name-grid :is(.form-control, .form-select) {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.profile-name-grid .profile-suffix-field .form-label {
+    white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+    .profile-name-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 100px);
+        gap: 20px 16px;
+    }
+
+    .profile-name-grid > .form-field:nth-child(-n + 2) {
+        grid-column: 1 / -1;
+    }
+
+    .profile-name-grid .form-label:is([for="middlename"], [for="suffix"]) {
+        min-height: 44px;
+        line-height: 22px;
+        white-space: normal;
+    }
+
+    .profile-name-grid .form-label:is([for="middlename"], [for="suffix"]) span {
+        display: block;
+        font-size: 12px;
+        font-weight: 400;
+    }
+}
+
+@media (max-width: 359px) {
+    .profile-name-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.profile-additional-field fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.profile-additional-field .form-check {
+    margin-bottom: 0.5rem;
+}
+
+#photoPreview {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-top: 12px;
+}
+
+.selfie-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.profile-fields > .form-section-header {
+    display: flex;
+    align-items: center;
+}
+
+.profile-fields > .form-section-header > .form-section-marker {
+    flex: 0 0 3px;
+    height: 20px;
+    margin-right: 12px;
+    background: #0038a8;
+}
+
+.selfie-actions #takeSelfie {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.selfie-camera {
+    max-width: 480px;
+    margin: 12px 0;
+}
+
+.selfie-camera[hidden] {
+    display: none;
+}
+
+.selfie-camera video {
+    display: block;
+    width: 100%;
+    max-height: 360px;
+    background: #172554;
+    border-radius: 4px;
+    transform: scaleX(-1);
+}
+
+/* Keep supporting documents and the applicant photo together. */
+.office-application-form .registration-upload-grid,
+.office-application-form .registration-upload-grid *,
+.office-application-form .registration-upload-grid *::before,
+.office-application-form .registration-upload-grid *::after,
+.office-application-form .registration-upload-grid input::file-selector-button {
+    border-radius: 0 !important;
+}
+
+.office-application-form .registration-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    align-items: start;
+    grid-column: 1 / -1;
+    margin-bottom: 24px;
+}
+
+.office-application-form .registration-upload-grid > *,
+.office-application-form .registration-photo-column {
+    min-width: 0;
+}
+
+.office-application-form .registration-upload-grid > .form-section,
+.office-application-form .registration-upload-grid > .form-card,
+.office-application-form .registration-upload-grid > .registration-card,
+.office-application-form .registration-photo-column > .profile-fields {
+    margin-bottom: 0;
+}
+
+@media (max-width: 767.98px) {
+    .office-application-form .registration-upload-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

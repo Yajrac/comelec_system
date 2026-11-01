@@ -1,0 +1,314 @@
+/* A continuous office-style sheet for all five administrator application views. */
+.office-review-sheet {
+    background: #fff;
+    border: 1px solid #d5dce5;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.office-review-sheet :is(.registration-header, .transfer-page-header, .update-page-header,
+    .reactivation-page-header, .reinstatement-page-header,
+    .registration-status-card, .status-panel, .update-status-panel,
+    .registration-card, .transfer-card, .update-card, .reactivation-card, .reinstatement-card,
+    .reason-card, .card, .registration-action-card, .registration-processing-card,
+    .action-panel, .update-action-panel, .update-action-card) {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: #fff;
+    min-width: 0;
+}
+
+.office-review-sheet .profile-details-card.mb-4 {
+    margin-bottom: 0 !important;
+}
+
+.office-review-sheet .profile-details-embedded {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.office-review-sheet :is(.registration-header, .transfer-page-header, .update-page-header,
+    .reactivation-page-header, .reinstatement-page-header) {
+    padding: 18px 20px;
+    border-bottom: 1px solid #d5dce5;
+}
+
+.office-review-sheet :is(.registration-card-header, .registration-action-header,
+    .transfer-card-header, .update-card-header, .reactivation-card-header,
+    .reinstatement-card-header, .action-panel-header, .update-action-header, .card-header) {
+    padding: 12px 20px;
+    background: #f4f6f8;
+    border: 0;
+    border-top: 1px solid #d5dce5;
+    border-bottom: 1px solid #d5dce5;
+    border-radius: 0;
+}
+
+.office-review-sheet :is(.registration-card-header, .registration-action-header,
+    .transfer-card-header, .update-card-header, .reactivation-card-header,
+    .reinstatement-card-header, .card-header) :is(h2, h5) {
+    margin: 0;
+    border-left: 3px solid #0038a8;
+    padding-left: 12px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #142b54;
+}
+
+.office-review-sheet :is(.registration-card-body, .registration-action-body,
+    .transfer-card-body, .update-card-body, .reactivation-card-body,
+    .reinstatement-card-body, .action-panel-body, .update-action-body, .card-body) {
+    padding: 20px;
+}
+
+.office-review-sheet .application-review-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+}
+
+.office-review-sheet :is(.review-side-panel, .reason-actions-layout) {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+}
+
+.office-review-sheet .reason-actions-layout > :is(.action-panel, .update-action-card) {
+    border: 0;
+    border-radius: 0;
+    min-width: 0;
+}
+
+.office-review-sheet .review-information > .row {
+    --bs-gutter-x: 0;
+    --bs-gutter-y: 0;
+}
+
+.office-review-sheet .review-information > .row > [class*="col-"] {
+    width: 100%;
+}
+
+.office-review-sheet .profile-details-body {
+    display: grid;
+    grid-template-columns: 144px minmax(0, 1fr);
+    align-items: center;
+    gap: 24px;
+}
+
+.office-review-sheet .profile-details-body .profile-additional-fields {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 0;
+}
+
+.office-review-sheet .profile-detail-field {
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.office-review-sheet .profile-detail-field dt {
+    margin: 0;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.office-review-sheet .profile-detail-field dd {
+    margin: 8px 0 0;
+    color: #142b54;
+    font-size: 15px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.office-review-sheet .profile-photo-panel {
+    text-align: center;
+    min-width: 0;
+}
+
+.office-review-sheet .profile-photo-link {
+    display: inline-block;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #d5dce5;
+}
+
+.office-review-sheet .profile-photo-link img {
+    display: block;
+    width: 120px;
+    height: 144px;
+    object-fit: contain;
+    background: #f8fafc;
+}
+
+.office-review-sheet .profile-photo-placeholder {
+    display: flex;
+    min-height: 128px;
+    padding: 16px 12px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.office-review-sheet .profile-photo-placeholder i {
+    font-size: 32px;
+    color: #94a3b8;
+}
+
+.office-review-sheet .profile-photo-caption {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.office-review-sheet img {
+    max-width: 100%;
+    height: auto;
+}
+
+.office-review-sheet :is(.registration-field-value, .update-data-value, .info-value) {
+    overflow-wrap: anywhere;
+    min-width: 0;
+}
+
+.office-review-sheet .review-biometrics-note {
+    color: #64748b;
+    font-size: 13px;
+    margin: 0 0 16px;
+}
+
+.office-review-sheet .review-signatures-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.office-review-sheet .review-signature-sample {
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.office-review-sheet .review-signature-sample h3 {
+    color: #142b54;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 12px;
+}
+
+.office-review-sheet .review-signature-sample a {
+    display: block;
+    margin-bottom: 12px;
+}
+
+.office-review-sheet .review-signature-sample img {
+    display: block;
+    width: 100%;
+    height: 100px;
+    object-fit: contain;
+}
+
+.office-review-sheet .review-signature-empty {
+    display: grid;
+    place-items: center;
+    height: 100px;
+    margin-bottom: 12px;
+    border-radius: 4px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.office-review-sheet .review-capture-status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.office-review-sheet .review-capture-status.is-captured {
+    background: #eaf7ef;
+    color: #166534;
+}
+
+.office-review-sheet .review-fingerprint-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin: 16px 0 0;
+}
+
+.office-review-sheet .review-fingerprint-grid > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.office-review-sheet .review-fingerprint-grid dt {
+    color: #142b54;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.office-review-sheet .review-fingerprint-grid dd {
+    margin: 0;
+}
+
+@media (max-width: 767px) {
+    .office-review-sheet :is(.review-signatures-grid, .review-fingerprint-grid) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .office-review-sheet :is(.card-header, .card-body, .registration-card-header,
+        .registration-card-body, .transfer-card-header, .transfer-card-body,
+        .update-card-header, .update-card-body, .reactivation-card-header,
+        .reactivation-card-body, .reinstatement-card-header, .reinstatement-card-body) {
+        padding: 14px;
+    }
+
+    .office-review-sheet .profile-details-body {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .office-review-sheet .profile-photo-panel {
+        width: 144px;
+        justify-self: center;
+    }
+
+    .office-review-sheet .profile-details-body .profile-additional-fields {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    .office-review-sheet .transfer-page-header > .d-flex {
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+}

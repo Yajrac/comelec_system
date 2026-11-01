@@ -1,0 +1,23 @@
+<section class="{% if embedded %}profile-details-embedded{% else %}card mb-4 profile-details-card{% endif %}" aria-label="Photo and additional information">
+    {% if not embedded %}<div class="card-header"><h2 class="h5 mb-0">Photo and Additional Information</h2></div>{% endif %}
+    <div class="{% if not embedded %}card-body {% endif %}profile-details-body">
+        <div class="profile-photo-panel">
+            {% if profile.photo %}
+                <a class="profile-photo-link" href="{{ profile.photo.url }}" target="_blank" rel="noopener" aria-label="Open applicant photo in a new tab">
+                    <img src="{{ profile.photo.url }}" alt="Applicant photo" width="120" height="144" loading="lazy">
+                </a>
+            {% else %}
+                <div class="profile-photo-placeholder">
+                    <i class="bi bi-person" aria-hidden="true"></i>
+                    <span>No photo uploaded</span>
+                </div>
+            {% endif %}
+            <span class="profile-photo-caption">Applicant photo</span>
+        </div>
+        <dl class="profile-additional-fields">
+            <div class="profile-detail-field"><dt>Suffix</dt><dd>{{ profile.suffix|default:"None" }}</dd></div>
+            <div class="profile-detail-field"><dt>Indigenous People</dt><dd>{{ profile.is_indigenous|yesno:"Yes,No" }}</dd></div>
+            <div class="profile-detail-field"><dt>Illiterate</dt><dd>{{ profile.is_illiterate|yesno:"Yes,No" }}</dd></div>
+        </dl>
+    </div>
+</section>

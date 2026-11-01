@@ -1,3 +1,5 @@
+import RequestProfileFields from "../components/RequestProfileFields";
+import { initialRequestProfile, requestProfileError } from "../utils/requestProfile";
 import { calculateAge } from "../utils/calculateAge";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -5,9 +7,11 @@ import { useNavigate } from "react-router-dom";
 import { submitWithOfflineSupport } from "../services/apiRequest";
 import "./UpdateInformation.css";
 
+import LookupModal from "../components/LookupModal";
+
 const API_BASE_URL =
     import.meta.env.VITE_API_URL ||
-    "https://pio-duran-online-registration.onrender.com";
+    "http://localhost:8000";
 
 function UpdateInformation() {
     const navigate = useNavigate();
@@ -16,12 +20,9 @@ function UpdateInformation() {
     const [applicant, setApplicant] = useState(null);
     const [barangays, setBarangays] = useState([]);
 
-    const [searchData, setSearchData] = useState({
-        lastname: "",
-        firstname: "",
-        middlename: "",
-        birthdate: "",
-    });
+    const [searchData, setSearchData] = useState({ registration_reference: "" });
+
+    const [profile, setProfile] = useState(() => initialRequestProfile(null));
 
     const [formData, setFormData] = useState({
         lastname: "",
@@ -36,6 +37,7 @@ function UpdateInformation() {
         municipality: "Pio Duran",
         phone: "",
         email: "",
+        civil_status: "Single",
         pwd_status: "NO",
         citizenship_status: "BY_BIRTH",
         father: "",
@@ -123,16 +125,8 @@ function UpdateInformation() {
         setRequestStatus("");
         setIsOfflineRequest(false);
 
-        if (
-            !searchData.lastname.trim() ||
-            !searchData.firstname.trim() ||
-            !searchData.middlename.trim() ||
-            !searchData.birthdate
-        ) {
-            setError(
-                "Please complete all required applicant information."
-            );
-            return;
+        if (!/^PD-[A-F0-9]{32}$/i.test(searchData.registration_reference.trim())) {
+            setError("Enter PD- followed by exactly 32 hexadecimal characters."); return;
         }
 
         setLoading(true);
@@ -140,19 +134,7 @@ function UpdateInformation() {
         try {
             const response = await axios.post(
                 `${API_BASE_URL}/api/applicants/find/`,
-                {
-                    lastname:
-                        searchData.lastname.trim(),
-
-                    firstname:
-                        searchData.firstname.trim(),
-
-                    middlename:
-                        searchData.middlename.trim(),
-
-                    birthdate:
-                        searchData.birthdate,
-                },
+                { registration_reference: searchData.registration_reference.trim().toUpperCase(), request_type: "UPDATE_INFORMATION" },
                 {
                     timeout: 15000,
 
@@ -183,8 +165,10 @@ function UpdateInformation() {
                 responseData.applicant;
 
             setApplicant(foundApplicant);
+            setProfile(initialRequestProfile(foundApplicant));
 
             setFormData({
+                civil_status: foundApplicant.civil_status || "Single",
                 lastname:
                     foundApplicant.lastname || "",
 
@@ -198,7 +182,7 @@ function UpdateInformation() {
                     foundApplicant.age ?? "",
 
                 sex:
-                    foundApplicant.sex || "",
+                    (foundApplicant.sex || "").toUpperCase(),
 
                 birthdate:
                     foundApplicant.birthdate || "",
@@ -279,9 +263,7 @@ function UpdateInformation() {
             return "Please enter the first name.";
         }
 
-        if (!formData.middlename.trim()) {
-            return "Please enter the middle name.";
-        }
+
 
         if (!formData.age) {
             return "Please enter the age.";
@@ -315,17 +297,9 @@ function UpdateInformation() {
             return "Please enter the contact number.";
         }
 
-        if (!formData.email.trim()) {
-            return "Please enter the email address.";
-        }
 
-        if (!formData.father.trim()) {
-            return "Please enter the father's name.";
-        }
 
-        if (!formData.mother.trim()) {
-            return "Please enter the mother's name.";
-        }
+
 
         if (!formData.reason.trim()) {
             return "Please provide the reason for the update.";
@@ -336,15 +310,11 @@ function UpdateInformation() {
 
     const resetForm = () => {
         setApplicant(null);
+        setProfile(initialRequestProfile(null));
 
         setStep(1);
 
-        setSearchData({
-            lastname: "",
-            firstname: "",
-            middlename: "",
-            birthdate: "",
-        });
+        setSearchData({ registration_reference: "" });
 
         setFormData({
             lastname: "",
@@ -359,7 +329,8 @@ function UpdateInformation() {
             municipality: "Pio Duran",
             phone: "",
             email: "",
-            pwd_status: "NO",
+            civil_status: "Single",
+        pwd_status: "NO",
             citizenship_status: "BY_BIRTH",
             father: "",
             mother: "",
@@ -369,6 +340,9 @@ function UpdateInformation() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const profileError = requestProfileError(profile, applicant);
+        if (profileError) { setError(profileError); return; }
+
 
         setError("");
         setSuccess("");
@@ -394,6 +368,8 @@ function UpdateInformation() {
         setLoading(true);
 
         const payload = {
+            ...profile,
+            civil_status: formData.civil_status,
             applicant_id: applicant.id,
 
             lastname:
@@ -544,135 +520,20 @@ function UpdateInformation() {
 
     return (
         <div className="update-page">
+            {step === 1 && <LookupModal checking={loading} message={error} onClose={() => setError("")} />}
 
             {/* =====================================================
                 HEADER
             ===================================================== */}
 
-            <header className="registration-header">
 
-                <div className="registration-header-inner">
-
-                    <div className="registration-header-logo">
-                        <img
-                            src="/images/comelec.png"
-                            alt="Commission on Elections logo"
-                        />
-                    </div>
-
-                    <div className="registration-header-content">
-                        <h1>
-                            Pio Duran Registration System
-                        </h1>
-
-                        <p>
-                            Voter Registration Services
-                        </p>
-                    </div>
-
-                </div>
-
-                <div className="registration-header-main">
-
-                    <h2>
-                        Update Information
-                    </h2>
-
-                    <p>
-                        Request corrections or updates
-                        to your existing voter
-                        registration information.
-                    </p>
-
-                    <div className="application-badge">
-                        Existing Registration Update
-                    </div>
-
-                </div>
-
-            </header>
 
 
             {/* =====================================================
                 NAVIGATION
             ===================================================== */}
 
-            <nav className="main-navigation">
 
-                <div className="main-navigation-inner">
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            navigate("/")
-                        }
-                    >
-                        Home
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            navigate(
-                                "/verify-applicant"
-                            )
-                        }
-                    >
-                        Verify Applicant
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            navigate(
-                                "/new-registration"
-                            )
-                        }
-                    >
-                        New Registration
-                    </button>
-
-                    <button
-                        type="button"
-                        className="active"
-                    >
-                        Update Information
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            navigate("/transfer")
-                        }
-                    >
-                        Transfer
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            navigate(
-                                "/reactivation"
-                            )
-                        }
-                    >
-                        Reactivation
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            navigate(
-                                "/reinstatement"
-                            )
-                        }
-                    >
-                        Reinstatement
-                    </button>
-
-                </div>
-
-            </nav>
 
 
             {/* =====================================================
@@ -818,6 +679,7 @@ function UpdateInformation() {
             ===================================================== */}
 
             <main className="update-main">
+                <div className="page-header"><h1>Update Information</h1><p>Request a correction or update to your registration details.</p></div>
 
                 <div className="form-card">
 
@@ -853,87 +715,10 @@ function UpdateInformation() {
                                         Applicant Information
                                     </div>
 
-                                    <div className="form-grid search-grid">
+                                    <div className="form-grid search-grid"><div className="form-group full-width"><label htmlFor="registration_reference">Registration Reference Number <span>*</span></label><input id="registration_reference" className="form-control" name="registration_reference" value={searchData.registration_reference} onChange={handleSearchChange} placeholder="PD-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" maxLength={35} required autoCapitalize="characters" autoCorrect="off" spellCheck={false} /><p className="form-text">Use the reference number from your registration confirmation.</p></div></div>
 
-                                        <div className="form-group">
-                                            <label>
-                                                Last Name
-                                            </label>
-
-                                            <input
-                                                className="form-control"
-                                                type="text"
-                                                name="lastname"
-                                                value={
-                                                    searchData.lastname
-                                                }
-                                                onChange={
-                                                    handleSearchChange
-                                                }
-                                                placeholder="Enter last name"
-                                            />
-                                        </div>
-
-                                        <div className="form-group">
-                                            <label>
-                                                First Name
-                                            </label>
-
-                                            <input
-                                                className="form-control"
-                                                type="text"
-                                                name="firstname"
-                                                value={
-                                                    searchData.firstname
-                                                }
-                                                onChange={
-                                                    handleSearchChange
-                                                }
-                                                placeholder="Enter first name"
-                                            />
-                                        </div>
-
-                                        <div className="form-group">
-                                            <label>
-                                                Middle Name
-                                            </label>
-
-                                            <input
-                                                className="form-control"
-                                                type="text"
-                                                name="middlename"
-                                                value={
-                                                    searchData.middlename
-                                                }
-                                                onChange={
-                                                    handleSearchChange
-                                                }
-                                                placeholder="Enter middle name"
-                                            />
-                                        </div>
-
-                                        <div className="form-group">
-                                            <label>
-                                                Birthdate
-                                            </label>
-
-                                            <input
-                                                className="form-control"
-                                                type="date"
-                                                name="birthdate"
-                                                value={
-                                                    searchData.birthdate
-                                                }
-                                                onChange={
-                                                    handleSearchChange
-                                                }
-                                            />
-                                        </div>
-
-                                    </div>
-
-
-                                    <div className="information-notice">
+<div className="information-notice mobile-info-notice">
+                                        <svg className="mobile-info-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6m0-10v1" /></svg>
 
                                         <strong>
                                             Important Information
@@ -973,8 +758,10 @@ function UpdateInformation() {
                                         <button
                                             type="submit"
                                             className="btn btn-government"
-                                            disabled={loading}
+                                            disabled={loading || !searchData.registration_reference.trim()}
+                                            aria-busy={loading}
                                         >
+                                            {loading && <span className="mobile-loading-spinner" aria-hidden="true" />}
                                             {loading
                                                 ? "Searching..."
                                                 : "Find Registration"}
@@ -1058,6 +845,8 @@ function UpdateInformation() {
                                         handleSubmit
                                     }
                                 >
+<RequestProfileFields part="photo" profile={profile} setProfile={setProfile} applicant={applicant} />
+
 
                                     {/* =================================================
                                         PERSONAL INFORMATION
@@ -1069,7 +858,7 @@ function UpdateInformation() {
 
                                     <div className="form-grid">
 
-                                        <div className="form-group">
+                                        <div className="mobile-request-name-row"><div className="mobile-name-grid"><div className="form-group">
                                             <label>
                                                 Last Name
                                             </label>
@@ -1077,7 +866,7 @@ function UpdateInformation() {
                                             <input
                                                 className="form-control"
                                                 type="text"
-                                                name="lastname"
+                                                name="lastname" required
                                                 value={
                                                     formData.lastname
                                                 }
@@ -1085,9 +874,7 @@ function UpdateInformation() {
                                                     handleFormChange
                                                 }
                                             />
-                                        </div>
-
-                                        <div className="form-group">
+                                        </div><div className="form-group">
                                             <label>
                                                 First Name
                                             </label>
@@ -1095,7 +882,7 @@ function UpdateInformation() {
                                             <input
                                                 className="form-control"
                                                 type="text"
-                                                name="firstname"
+                                                name="firstname" required
                                                 value={
                                                     formData.firstname
                                                 }
@@ -1103,11 +890,9 @@ function UpdateInformation() {
                                                     handleFormChange
                                                 }
                                             />
-                                        </div>
-
-                                        <div className="form-group">
+                                        </div><div className="form-group">
                                             <label>
-                                                Middle Name
+                                                Middle Name (optional)
                                             </label>
 
                                             <input
@@ -1121,7 +906,7 @@ function UpdateInformation() {
                                                     handleFormChange
                                                 }
                                             />
-                                        </div>
+                                        </div><div className="form-group mobile-suffix"><label htmlFor="request_suffix">Suffix <small>(optional)</small></label><select id="request_suffix" name="suffix" className="form-control" value={profile.suffix} onChange={event => setProfile(previous => ({ ...previous, suffix: event.target.value }))}><option value="">None</option>{["Jr.", "Sr.", "II", "III", "IV", "V"].map(value => <option key={value}>{value}</option>)}</select></div></div><RequestProfileFields part="flags" profile={profile} setProfile={setProfile} applicant={applicant} /></div>
 
                                         <div className="form-group">
                                             <label>
@@ -1131,7 +916,7 @@ function UpdateInformation() {
                                             <input
                                                 className="form-control"
                                                 type="date"
-                                                name="birthdate"
+                                                name="birthdate" required
                                                 value={
                                                     formData.birthdate
                                                 }
@@ -1166,7 +951,7 @@ function UpdateInformation() {
 
                                             <select
                                                 className="form-control"
-                                                name="sex"
+                                                name="sex" required
                                                 value={
                                                     formData.sex
                                                 }
@@ -1188,7 +973,7 @@ function UpdateInformation() {
                                             </select>
                                         </div>
 
-                                        
+
 
                                         <div className="form-group form-group-wide">
                                             <label>
@@ -1198,7 +983,7 @@ function UpdateInformation() {
                                             <input
                                                 className="form-control"
                                                 type="text"
-                                                name="birthplace"
+                                                name="birthplace" required
                                                 value={
                                                     formData.birthplace
                                                 }
@@ -1229,7 +1014,7 @@ function UpdateInformation() {
 
                                             <select
                                                 className="form-control"
-                                                name="brgy"
+                                                name="brgy" required
                                                 value={
                                                     formData.brgy
                                                 }
@@ -1322,7 +1107,7 @@ function UpdateInformation() {
                                             <input
                                                 className="form-control"
                                                 type="tel"
-                                                name="phone"
+                                                name="phone" required
                                                 value={
                                                     formData.phone
                                                 }
@@ -1335,7 +1120,7 @@ function UpdateInformation() {
 
                                         <div className="form-group form-group-wide">
                                             <label>
-                                                Email Address
+                                                Email Address (optional)
                                             </label>
 
                                             <input
@@ -1365,53 +1150,22 @@ function UpdateInformation() {
 
                                     <div className="form-grid">
 
-                                        <div className="form-group form-group-wide">
+                                        <div className="form-group"><label htmlFor="civil_status">Civil Status <span>*</span></label><select id="civil_status" name="civil_status" className="form-control" value={formData.civil_status} onChange={handleFormChange} required>{["Single", "Married", "Widowed", "Separated"].map(value => <option key={value}>{value}</option>)}</select></div>
+<div className="form-group form-group-wide">
                                             <label>
                                                 PWD Status
                                             </label>
 
                                             <select
                                                 className="form-control"
-                                                name="pwd_status"
+                                                name="pwd_status" required
                                                 value={
                                                     formData.pwd_status
                                                 }
                                                 onChange={
                                                     handleFormChange
                                                 }
-                                            >
-                                                <option value="NO">
-                                                    Not PWD
-                                                </option>
-
-                                                <option value="VISUAL">
-                                                    Visual Disability
-                                                </option>
-
-                                                <option value="HEARING">
-                                                    Hearing Disability
-                                                </option>
-
-                                                <option value="PHYSICAL">
-                                                    Physical Disability
-                                                </option>
-
-                                                <option value="INTELLECTUAL">
-                                                    Intellectual Disability
-                                                </option>
-
-                                                <option value="PSYCHOSOCIAL">
-                                                    Psychosocial Disability
-                                                </option>
-
-                                                <option value="MULTIPLE">
-                                                    Multiple Disabilities
-                                                </option>
-
-                                                <option value="OTHER">
-                                                    Other
-                                                </option>
-                                            </select>
+                                            ><option value="NO">Not PWD</option><option value="VISUAL">Visual Disability</option><option value="HEARING">Hearing Disability</option><option value="PHYSICAL">Physical Disability</option><option value="INTELLECTUAL">Intellectual Disability</option><option value="PSYCHOSOCIAL">Psychosocial Disability</option><option value="MULTIPLE">Multiple Disabilities</option><option value="OTHER">Other</option></select>
                                         </div>
 
                                         <div className="form-group form-group-wide">
@@ -1421,7 +1175,7 @@ function UpdateInformation() {
 
                                             <select
                                                 className="form-control"
-                                                name="citizenship_status"
+                                                name="citizenship_status" required
                                                 value={
                                                     formData.citizenship_status
                                                 }
@@ -1441,7 +1195,7 @@ function UpdateInformation() {
 
                                         <div className="form-group form-group-wide">
                                             <label>
-                                                Father's Name
+                                                Father's Name <small>(optional)</small>
                                             </label>
 
                                             <input
@@ -1459,7 +1213,7 @@ function UpdateInformation() {
 
                                         <div className="form-group form-group-wide">
                                             <label>
-                                                Mother's Name
+                                                Mother's Name <small>(optional)</small>
                                             </label>
 
                                             <input
@@ -1495,7 +1249,7 @@ function UpdateInformation() {
 
                                             <textarea
                                                 className="form-control"
-                                                name="reason"
+                                                name="reason" required minLength={5} maxLength={2000}
                                                 value={
                                                     formData.reason
                                                 }
@@ -1513,7 +1267,8 @@ function UpdateInformation() {
                                         INFORMATION NOTICE
                                     ================================================= */}
 
-                                    <div className="information-notice">
+                                    <div className="information-notice mobile-info-notice">
+                                        <svg className="mobile-info-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6m0-10v1" /></svg>
 
                                         <strong>
                                             Important Information
@@ -1548,7 +1303,8 @@ function UpdateInformation() {
                                         BUTTONS
                                     ================================================= */}
 
-                                    <div className="button-row">
+                                    <RequestProfileFields part="documents" profile={profile} setProfile={setProfile} applicant={applicant} />
+<div className="button-row">
 
                                         <button
                                             type="button"
@@ -1588,21 +1344,6 @@ function UpdateInformation() {
                 FOOTER
             ===================================================== */}
 
-            <footer className="site-footer">
-
-                <div className="site-footer-inner">
-
-                    <div className="footer-title">
-                        Pio Duran Registration System
-                    </div>
-
-                    <div className="footer-subtitle">
-                        Voter Registration Services
-                    </div>
-
-                </div>
-
-            </footer>
 
         </div>
     );

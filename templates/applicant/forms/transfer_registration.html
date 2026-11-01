@@ -193,8 +193,11 @@
             </section>
 
             <!-- STEP 2: TRANSFER FORM -->
-            <form method="post" id="transferForm" enctype="multipart/form-data">
+            <form method="post" id="transferForm" class="office-application-form" enctype="multipart/form-data">
                 {% csrf_token %}
+                
+                {% include "components/profile_personal_section.html" %}
+
 
                 <input type="hidden" name="action" value="submit_transfer">
                 <input type="hidden" name="applicant_id" value="{{ applicant.id }}">
@@ -346,9 +349,10 @@
                 </section>
 
                 <!-- VALID ID UPLOAD -->
-                <section class="form-card">
+                <div class="registration-upload-grid">
+<section class="form-card">
                     <div class="form-card-header">
-                        <h2>Valid Identification Document</h2>
+                        <h2>Upload Valid ID and Birth Certificate</h2>
                         <p>
                             Upload a clear copy of your valid ID to support
                             your transfer request.
@@ -363,7 +367,7 @@
                             </p>
                         {% endif %}
                         <label for="valid_id_document" class="form-label">
-                            {% if applicant.valid_id_document %}Upload replacement document (optional){% else %}Upload valid ID <span class="required">*</span>{% endif %}
+                            Upload Valid ID and Birth Certificate{% if applicant.valid_id_document %} (optional){% else %} <span class="required">*</span>{% endif %}
                         </label>
 
                         <input
@@ -393,6 +397,10 @@
                         </div>
                     </div>
                 </section>
+<div class="registration-photo-column">
+{% include "components/profile_fields.html" %}
+</div>
+</div>
 
                 <!-- FINAL NOTICE AND ACTIONS -->
                 <section class="form-card">

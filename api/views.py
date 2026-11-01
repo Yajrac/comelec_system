@@ -1,3 +1,5 @@
+from .mobile_submission import mobile_submission
+from Applicants.profile_details import profile_values
 from Applicants.validation import validate_request
 from django.shortcuts import render
 from datetime import datetime
@@ -9,6 +11,10 @@ from django.db import transaction
 from Applicants.models import Applicant, Barangay, ApplicantUpdateRequest, ApplicantTransferRequest, ApplicantReactivationRequest, ApplicantReinstatementRequest
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+
+def registration_config(request):
+    from Applicants.eligibility import election_date
+    return JsonResponse({"election_date": election_date().isoformat()})
 
 @csrf_exempt
 @require_POST
@@ -155,6 +161,7 @@ def barangay_list(request):
 
 @csrf_exempt
 @validate_request(api=True)
+@mobile_submission
 def new_registration_api(request):
 
     # =========================================================
@@ -175,7 +182,7 @@ def new_registration_api(request):
     # =========================================================
 
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body) if request.content_type == "application/json" else request.POST
 
     except json.JSONDecodeError:
         return JsonResponse(
@@ -327,23 +334,7 @@ def new_registration_api(request):
             status=400
         )
 
-    if not father:
-        return JsonResponse(
-            {
-                "success": False,
-                "error": "Father's name is required."
-            },
-            status=400
-        )
 
-    if not mother:
-        return JsonResponse(
-            {
-                "success": False,
-                "error": "Mother's name is required."
-            },
-            status=400
-        )
 
     # =========================================================
     # AGE VALIDATION
@@ -396,6 +387,17 @@ def new_registration_api(request):
     # EMAIL CHECK
     # =========================================================
 
+    if Applicant.objects.filter(
+        lastname__iexact=lastname,
+        firstname__iexact=firstname,
+        middlename__iexact=middlename,
+        birthdate=birthdate,
+    ).exists():
+        return JsonResponse({
+            "success": False,
+            "error": "A registration with this full name and birthdate already exists. Please choose Update Information, Transfer, Reactivation, or Reinstatement instead.",
+        }, status=400)
+
     if email and Applicant.objects.filter(
         email__iexact=email
     ).exists():
@@ -434,7 +436,16 @@ def new_registration_api(request):
 
     try:
 
+        if request.content_type != "application/json" and not request.FILES.get("valid_id_document"):
+            return JsonResponse({"success": False, "error": "Upload your Valid ID and Birth Certificate."}, status=400)
+
         applicant = Applicant.objects.create(
+            suffix=data.get("suffix", "").strip(),
+            civil_status=data.get("civil_status", "Single").title(),
+            is_indigenous=data.get("is_indigenous") == "on",
+            is_illiterate=data.get("is_illiterate") == "on",
+            photo=request.FILES.get("photo") or "",
+            valid_id_document=request.FILES.get("valid_id_document"),
 
             lastname=lastname,
 
@@ -518,9 +529,10 @@ def new_registration_api(request):
 @csrf_exempt
 @require_POST
 @validate_request(api=True)
+@mobile_submission
 def create_applicant_update_request(request):
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body) if request.content_type == "application/json" else request.POST
     except json.JSONDecodeError:
         return JsonResponse({
             "success": False,
@@ -601,15 +613,12 @@ def create_applicant_update_request(request):
     required_fields = {
         "lastname": lastname,
         "firstname": firstname,
-        "middlename": middlename,
         "age": age,
         "sex": sex,
         "birthdate": birthdate,
         "birthplace": birthplace,
         "brgy": brgy_id,
         "phone": phone,
-        "father": father,
-        "mother": mother,
     }
 
     missing_fields = [
@@ -797,7 +806,12 @@ def create_applicant_update_request(request):
     # This does NOT immediately modify Applicant.
     # The changes will only be applied after admin approval.
     # =========================================================
+    if request.content_type != "application/json" and not request.FILES.get("valid_id_document") and not applicant.valid_id_document:
+        return JsonResponse({"success": False, "error": "Upload your Valid ID and Birth Certificate."}, status=400)
+
     update_request = ApplicantUpdateRequest.objects.create(
+        **profile_values(request, applicant),
+        valid_id_document=request.FILES.get("valid_id_document") or applicant.valid_id_document.name,
         applicant=applicant,
 
         lastname=lastname,
@@ -867,6 +881,30 @@ def find_applicant(request):
             status=400
         )
 
+
+    if "registration_reference" in data:
+        reference = str(data.get("registration_reference", "")).strip().upper()
+        import re
+        if not re.fullmatch(r"PD-[A-F0-9]{32}", reference):
+            return JsonResponse({"success": False, "error": "Enter a valid registration reference number."}, status=400)
+        applicant = Applicant.objects.select_related("brgy").filter(registration_reference=reference).first()
+        if applicant is None:
+            return JsonResponse({"success": False, "exists": False, "error": "No registration was found for this reference number."}, status=404)
+        request_type = data.get("request_type")
+        request_models = {
+            "UPDATE_INFORMATION": (ApplicantUpdateRequest, "update"),
+            "TRANSFER": (ApplicantTransferRequest, "transfer"),
+            "REACTIVATION": (ApplicantReactivationRequest, "reactivation"),
+            "REINSTATEMENT": (ApplicantReinstatementRequest, "reinstatement"),
+        }
+        if request_type in request_models:
+            model, label = request_models[request_type]
+            if model.objects.filter(applicant=applicant, status__in=["PENDING", "REVIEW"]).exists():
+                return JsonResponse({"success": False, "code": "PENDING_REQUEST", "error": f"You already have a {label} request that is pending or currently under review."}, status=409)
+        fields = ("id", "registration_reference", "lastname", "firstname", "middlename", "suffix", "age", "sex", "birthplace", "civil_status", "province", "municipality", "phone", "email", "pwd_status", "citizenship_status", "father", "mother", "status", "verification_status", "is_active", "is_indigenous", "is_illiterate")
+        result = {field: getattr(applicant, field) for field in fields}
+        result.update(has_valid_id_document=bool(applicant.valid_id_document), photo_url=request.build_absolute_uri(applicant.photo.url) if applicant.photo else "", birthdate=applicant.birthdate.isoformat(), brgy=applicant.brgy_id or "", brgy_id=applicant.brgy_id or "", brgy_name=applicant.brgy.name if applicant.brgy else "")
+        return JsonResponse({"success": True, "exists": True, "applicant": result})
 
     # =========================================================
     # GET SEARCH DATA
@@ -1078,6 +1116,7 @@ def find_applicant(request):
 @csrf_exempt
 @require_POST
 @validate_request(api=True)
+@mobile_submission
 def create_applicant_transfer_request(request):
 
     # =========================================================
@@ -1085,7 +1124,7 @@ def create_applicant_transfer_request(request):
     # =========================================================
 
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body) if request.content_type == "application/json" else request.POST
     except json.JSONDecodeError:
         return JsonResponse({
             "success": False,
@@ -1162,7 +1201,6 @@ def create_applicant_transfer_request(request):
     required_fields = {
         "lastname": lastname,
         "firstname": firstname,
-        "middlename": middlename,
         "birthdate": birthdate,
         "current_brgy": current_brgy_id,
         "new_brgy": new_brgy_id,
@@ -1208,6 +1246,7 @@ def create_applicant_transfer_request(request):
         Applicant.objects
         .select_related("brgy")
         .filter(
+            **({"registration_reference": data["registration_reference"].strip().upper()} if data.get("registration_reference") else {}),
             lastname__iexact=lastname,
             firstname__iexact=firstname,
             middlename__iexact=middlename,
@@ -1348,7 +1387,12 @@ def create_applicant_transfer_request(request):
     # administrator approval.
     # =========================================================
 
+    if request.content_type != "application/json" and not request.FILES.get("valid_id_document") and not applicant.valid_id_document:
+        return JsonResponse({"success": False, "error": "Upload your Valid ID and Birth Certificate."}, status=400)
+
     transfer_request = ApplicantTransferRequest.objects.create(
+        **profile_values(request, applicant),
+        valid_id_document=request.FILES.get("valid_id_document") or applicant.valid_id_document.name,
 
         applicant=applicant,
 
@@ -1388,6 +1432,7 @@ def create_applicant_transfer_request(request):
 @csrf_exempt
 @require_POST
 @validate_request(api=True)
+@mobile_submission
 def create_applicant_reactivation_request(request):
 
     # =========================================================
@@ -1395,7 +1440,7 @@ def create_applicant_reactivation_request(request):
     # =========================================================
 
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body) if request.content_type == "application/json" else request.POST
     except json.JSONDecodeError:
         return JsonResponse({
             "success": False,
@@ -1433,7 +1478,6 @@ def create_applicant_reactivation_request(request):
     required_fields = {
         "lastname": lastname,
         "firstname": firstname,
-        "middlename": middlename,
         "birthdate": birthdate,
         "reason": reason,
     }
@@ -1479,6 +1523,7 @@ def create_applicant_reactivation_request(request):
         Applicant.objects
         .select_related("brgy")
         .filter(
+            **({"registration_reference": data["registration_reference"].strip().upper()} if data.get("registration_reference") else {}),
             lastname__iexact=lastname,
             firstname__iexact=firstname,
             middlename__iexact=middlename,
@@ -1494,7 +1539,8 @@ def create_applicant_reactivation_request(request):
         active_applicant = (
             Applicant.objects
             .filter(
-                lastname__iexact=lastname,
+                **({"registration_reference": data["registration_reference"].strip().upper()} if data.get("registration_reference") else {}),
+            lastname__iexact=lastname,
                 firstname__iexact=firstname,
                 middlename__iexact=middlename,
                 birthdate=parsed_birthdate,
@@ -1563,8 +1609,13 @@ def create_applicant_reactivation_request(request):
     # administrator approves the request.
     # =========================================================
 
+    if request.content_type != "application/json" and not request.FILES.get("valid_id_document") and not applicant.valid_id_document:
+        return JsonResponse({"success": False, "error": "Upload your Valid ID and Birth Certificate."}, status=400)
+
     reactivation_request = (
         ApplicantReactivationRequest.objects.create(
+            **profile_values(request, applicant),
+            valid_id_document=request.FILES.get("valid_id_document") or applicant.valid_id_document.name,
             applicant=applicant,
             reason=reason,
             status="PENDING"
@@ -1593,10 +1644,11 @@ def create_applicant_reactivation_request(request):
 @csrf_exempt
 @require_POST
 @validate_request(api=True)
+@mobile_submission
 def create_applicant_reinstatement_request(request):
 
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body) if request.content_type == "application/json" else request.POST
 
     except json.JSONDecodeError:
         return JsonResponse({
@@ -1627,7 +1679,6 @@ def create_applicant_reinstatement_request(request):
     required_fields = {
         "lastname": lastname,
         "firstname": firstname,
-        "middlename": middlename,
         "birthdate": birthdate,
         "reason": reason,
     }
@@ -1665,6 +1716,7 @@ def create_applicant_reinstatement_request(request):
         Applicant.objects
         .select_related("brgy")
         .filter(
+            **({"registration_reference": data["registration_reference"].strip().upper()} if data.get("registration_reference") else {}),
             lastname__iexact=lastname,
             firstname__iexact=firstname,
             middlename__iexact=middlename,
@@ -1680,7 +1732,8 @@ def create_applicant_reinstatement_request(request):
         active_applicant = (
             Applicant.objects
             .filter(
-                lastname__iexact=lastname,
+                **({"registration_reference": data["registration_reference"].strip().upper()} if data.get("registration_reference") else {}),
+            lastname__iexact=lastname,
                 firstname__iexact=firstname,
                 middlename__iexact=middlename,
                 birthdate=parsed_birthdate,
@@ -1733,8 +1786,13 @@ def create_applicant_reinstatement_request(request):
         }, status=400)
 
     # Create reinstatement request.
+    if request.content_type != "application/json" and not request.FILES.get("valid_id_document") and not applicant.valid_id_document:
+        return JsonResponse({"success": False, "error": "Upload your Valid ID and Birth Certificate."}, status=400)
+
     reinstatement_request = (
         ApplicantReinstatementRequest.objects.create(
+            **profile_values(request, applicant),
+            valid_id_document=request.FILES.get("valid_id_document") or applicant.valid_id_document.name,
             applicant=applicant,
             reason=reason,
             status="PENDING"

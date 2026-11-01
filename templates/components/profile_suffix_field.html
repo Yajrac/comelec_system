@@ -1,0 +1,24 @@
+{% with selected_suffix=form_data.suffix|default_if_none:"" %}
+<div class="form-field col-md-4 profile-suffix-field">
+    <label for="suffix" class="form-label">Suffix <span class="optional-mark">(optional)</span></label>
+    <select id="suffix" name="suffix" class="form-select">
+        <option value="">None</option>
+        {% if form_data.profile_details_provided %}
+            <option value="Jr." {% if selected_suffix == "Jr." %}selected{% endif %}>Jr.</option>
+            <option value="Sr." {% if selected_suffix == "Sr." %}selected{% endif %}>Sr.</option>
+            <option value="II" {% if selected_suffix == "II" %}selected{% endif %}>II</option>
+            <option value="III" {% if selected_suffix == "III" %}selected{% endif %}>III</option>
+            <option value="IV" {% if selected_suffix == "IV" %}selected{% endif %}>IV</option>
+            <option value="V" {% if selected_suffix == "V" %}selected{% endif %}>V</option>
+        {% else %}
+            <option value="Jr." {% if applicant.suffix == "Jr." %}selected{% endif %}>Jr.</option>
+            <option value="Sr." {% if applicant.suffix == "Sr." %}selected{% endif %}>Sr.</option>
+            <option value="II" {% if applicant.suffix == "II" %}selected{% endif %}>II</option>
+            <option value="III" {% if applicant.suffix == "III" %}selected{% endif %}>III</option>
+            <option value="IV" {% if applicant.suffix == "IV" %}selected{% endif %}>IV</option>
+            <option value="V" {% if applicant.suffix == "V" %}selected{% endif %}>V</option>
+        {% endif %}
+    </select>
+    {% if field_errors.suffix %}<p class="text-danger">{{ field_errors.suffix }}</p>{% endif %}
+</div>
+{% endwith %}

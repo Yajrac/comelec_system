@@ -1,197 +1,50 @@
+import { Link } from "react-router-dom";
 
-import React from "react";
-import { useNavigate } from "react-router-dom";
+const applications = [
+    { title: "APPLICATION FOR NEW REGISTRATION", route: "/new-registration", icon: "new" },
+    { title: "APPLICATION FOR CHANGE OF NAME DUE TO MARRIAGE OR COURT ORDER / CORRECTION OF ENTRIES / REVERSION TO MAIDEN NAME IN THE VOTER?S REGISTRATION RECORD", route: "/update-information", icon: "edit" },
+    { title: "APPLICATION FOR TRANSFER OF REGISTRATION RECORD", route: "/transfer", icon: "transfer" },
+    { title: "APPLICATION FOR REACTIVATION OF REGISTRATION RECORD", route: "/reactivation", icon: "reactivate" },
+    { title: "APPLICATION FOR INCLUSION OF RECORDS IN THE BOOK OF VOTERS / REINSTATEMENT OF NAME IN THE LIST OF VOTERS", route: "/reinstatement", icon: "restore" },
+];
 
-const Home = () => {
-    const navigate = useNavigate();
-
-    const applications = [
-        {
-            title: "New Registration",
-            description:
-                "Apply for a new registration. Your existing registration status will be verified first.",
-            route: "/verify-applicant",
-        },
-        {
-            title: "Update Information",
-            description:
-                "Request changes or corrections to your existing applicant information.",
-            route: "/update-information",
-        },
-        {
-            title: "Transfer",
-            description:
-                "Request the transfer of your registration to another barangay or locality.",
-            route: "/transfer",
-        },
-        {
-            title: "Reactivation",
-            description:
-                "Request reactivation of an inactive registration.",
-            route: "/reactivation",
-        },
-        {
-            title: "Reinstatement",
-            description:
-                "Request reinstatement of a previously cancelled or inactive registration.",
-            route: "/reinstatement",
-        },
-    ];
-
-    const handleApplicationClick = (route) => {
-        navigate(route);
+function ServiceIcon({ kind }) {
+    const paths = {
+        new: <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M20 8v6m-3-3h6" /></>,
+        edit: <><path d="m16 3 5 5-12 12-6 1 1-6L16 3Z" /><path d="m13 6 5 5" /></>,
+        transfer: <path d="M3 7h17m-5-5 5 5-5 5M21 17H4m5-5-5 5 5 5" />,
+        reactivate: <><path d="M3 11a9 9 0 1 1 2 7M3 4v7h7" /><path d="M12 7v5l3 2" /></>,
+        restore: <path d="M9 14 4 9l5-5M4 9h10a7 7 0 0 1 0 14" />,
     };
+    return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[kind]}</svg>;
+}
 
+export default function Home() {
     return (
-        <div className="verify-page">
+        <div className="verify-page mobile-home">
 
-            {/* =================================================
-                GOVERNMENT HEADER
-            ================================================= */}
-
-            <header className="government-header">
-
-                <div className="government-header-inner">
-
-                    <div className="government-logo">
-                        <img
-                            src="/images/comelec.png"
-                            alt="Commission on Elections logo"
-                        />
-                    </div>
-
-                    <div>
-                        <h1 className="government-title">
-                            Pio Duran Online Registration
-                            and Applicant Services
-                        </h1>
-
-                        <p className="government-subtitle">
-                            Online Registration and Applicant Services
-                        </p>
-                    </div>
-
-                </div>
-
-            </header>
-
-
-            {/* =================================================
-                NAVIGATION
-            ================================================= */}
-
-            <nav className="main-navigation">
-
-                <div className="main-navigation-inner">
-
-                    <button
-                        type="button"
-                        className="active"
-                        onClick={() => navigate("/")}
-                    >
-                        Home
-                    </button>
-
-                </div>
-
-            </nav>
-
-
-            {/* =================================================
-                MAIN CONTENT
-            ================================================= */}
-
-            <main className="verify-main">
-
+            <main className="verify-main" id="main-content">
                 <div className="verify-container">
-
-                    {/* =========================================
-                        PAGE HEADER
-                    ========================================= */}
-
-                    <div className="page-header">
-
-                        <h1>
-                            Applicant Services
-                        </h1>
-
-                        <p>
-                            Select the service you want to access.
-                            New Registration requires applicant
-                            verification before continuing.
-                        </p>
-
+                    <div className="mobile-home-intro">
+                        <span className="mobile-eyebrow">APPLICANT SERVICES</span>
+                        <h2>Your registration,<br />one step closer.</h2>
+                        <p>Choose a service below. Keep your personal details and supporting documents ready.</p>
                     </div>
-
-
-                    {/* =========================================
-                        APPLICATION SERVICES
-                    ========================================= */}
-
-                    <div className="home-services">
-
-                        {applications.map((application) => (
-
-                            <button
-                                key={application.title}
-                                type="button"
-                                className="service-card"
-                                onClick={() =>
-                                    handleApplicationClick(
-                                        application.route
-                                    )
-                                }
-                            >
-
-                                <div className="service-card-content">
-
-                                    <h2>
-                                        {application.title}
-                                    </h2>
-
-                                    <p>
-                                        {application.description}
-                                    </p>
-
-                                </div>
-
-                                <div className="service-card-arrow">
-                                    →
-                                </div>
-
-                            </button>
-
+                    <section className="mobile-application-menu" aria-labelledby="application-menu-heading">
+                    <h2 id="application-menu-heading">SELECT AN APPLICATION TYPE</h2>
+                    <nav className="home-services" aria-label="Application services">
+                        {applications.map(application => (
+                            <Link key={application.route} to={application.route} className="service-card">
+                                <span className="mobile-service-icon"><ServiceIcon kind={application.icon} /></span>
+                                <div className="service-card-content"><h3>{application.title}</h3></div>
+                                <svg className="mobile-service-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M4 12h16m-5-5 5 5-5 5" /></svg>
+                            </Link>
                         ))}
-
-                    </div>
-
+                    </nav>
+                    </section>
+                    <aside className="mobile-help-note"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6m0-10v1" /></svg><p>Already registered? Choose the service that matches the change you need.</p></aside>
                 </div>
-
             </main>
-
-
-            {/* =================================================
-                FOOTER
-            ================================================= */}
-
-            <footer className="site-footer">
-
-                <div className="site-footer-inner">
-
-                    <div className="footer-title">
-                        Pio Duran Online Registration
-                    </div>
-
-                    <p>
-                        Online Registration and Applicant Services
-                    </p>
-
-                </div>
-
-            </footer>
-
         </div>
     );
-};
-
-export default Home;
+}

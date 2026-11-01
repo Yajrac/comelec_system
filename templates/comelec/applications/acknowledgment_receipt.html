@@ -1,0 +1,26 @@
+{% extends "staff/base.html" %}
+{% load static %}
+{% block title %}Acknowledgment Receipt{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/applicant-forms-new_registration.css' %}">
+<link rel="stylesheet" href="{% static 'css/acknowledgment-receipt.css' %}">
+{% endblock %}
+{% block content %}
+<div class="registration-container receipt-page">
+    <div class="registration-header">
+        <h1>ACKNOWLEDGMENT RECEIPT</h1>
+        <p>Prepare the applicant's receipt after biometric capture.</p>
+        <span class="application-badge">BIOMETRICS COMPLETED</span>
+    </div>
+    <div class="receipt-notice"><strong>Biometrics completed</strong><p>Your acknowledgment receipt is ready to download or print.</p></div>
+    <form method="get" id="receiptForm">
+        <section class="form-section editor-panel">
+            <div class="form-section-header"><div class="form-section-marker"></div><h2>Receipt Information</h2></div>
+            <div class="form-section-body receipt-fields">
+                <div class="receipt-field full"><label for="application_type">Type of Application</label><select id="application_type" name="application_type" disabled>{% for type in application_types %}<option {% if type == application_type %}selected{% endif %}>{{ type }}</option>{% endfor %}</select></div>
+                {% for field in fields %}<div class="receipt-field"><label for="{{ field.key }}">{{ field.label }}{% if field.key == 'officer' %} (optional){% endif %}</label><input id="{{ field.key }}" name="{{ field.key }}" type="{{ field.type }}" value="{{ field.value }}" readonly maxlength="{% if field.key == 'application_no' %}12{% else %}100{% endif %}"{% if field.key == 'application_no' %} readonly inputmode="numeric" pattern="[0-9]{12}"{% endif %}></div>{% endfor %}
+                <p class="field-hint full">Download PDF</button><button class="receipt-button secondary" id="printReceipt" type="button">Print Receipt</button></div>
+    </form>
+</div>
+<script src="{% static 'js/acknowledgment-receipt.js' %}" defer></script>
+{% endblock %}

@@ -1,0 +1,5 @@
+.lookup-modal { width: min(420px, calc(100vw - 40px)); padding: 28px; margin: auto; border: 1px solid #dce3ed; border-radius: 12px; color: #17345f; box-shadow: 0 16px 48px #142b5430; }
+.lookup-modal::backdrop { background: #0f172a80; }
+.lookup-modal h2 { font-size: 20px; margin: 12px 0; }
+.lookup-modal p { font-size: 14px; line-height: 1.7; margin: 0 0 24px; }
+.lookup-modal button { width: 100%; min-height: 44px; }

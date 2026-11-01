@@ -174,8 +174,11 @@
             </div>
 
             <div class="form-card-body">
-                <form method="post" enctype="multipart/form-data" id="reinstatementForm">
+                <form method="post" enctype="multipart/form-data" id="reinstatementForm" class="office-application-form">
                     {% csrf_token %}
+                
+                {% include "components/profile_personal_section.html" %}
+
 
                     <input type="hidden" name="action" value="submit_reinstatement">
                     <input type="hidden" name="applicant_id" value="{{ applicant.id }}">
@@ -199,7 +202,8 @@
                         <div class="form-text">Provide a clear and accurate explanation (5â€“2,000 characters).</div>
                     </div>
 
-                    <div class="mb-4">
+                    <div class="registration-upload-grid">
+<div class="mb-4">
                         {% if applicant.valid_id_document %}
                             <p><strong>Existing document on file.</strong>
                                 <a href="{{ applicant.valid_id_document.url }}" target="_blank" rel="noopener">View existing document</a>.
@@ -207,7 +211,7 @@
                             </p>
                         {% endif %}
                         <label for="valid_id_document" class="form-label">
-                            {% if applicant.valid_id_document %}Upload replacement document (optional){% else %}Upload valid ID <span class="required">*</span>{% endif %}
+                            Upload Valid ID and Birth Certificate{% if applicant.valid_id_document %} (optional){% else %} <span class="required">*</span>{% endif %}
                         </label>
 
                         <div class="upload-box">
@@ -228,6 +232,10 @@
                             </div>
                         </div>
                     </div>
+<div class="registration-photo-column">
+{% include "components/profile_fields.html" %}
+</div>
+</div>
 
                     <div class="information-notice">
                         <strong>Before submitting</strong>

@@ -3,6 +3,24 @@ import uuid
 from django.conf import settings
 from django.db import models
 from .application_types import APPLICATION_TYPE_CHOICES
+from .profile_details import SUFFIX_CHOICES, validate_photo, photo_upload_path
+
+
+class ProfileDetails(models.Model):
+    suffix = models.CharField(max_length=5, choices=SUFFIX_CHOICES, blank=True, default="")
+    photo = models.ImageField(upload_to=photo_upload_path, blank=True, validators=[validate_photo])
+    is_indigenous = models.BooleanField(default=False)
+    is_illiterate = models.BooleanField(default=False)
+
+    class Meta:
+        abstract = True
+
+
+class RequestedProfileDetails(ProfileDetails):
+    profile_details_provided = models.BooleanField(default=False)
+
+    class Meta:
+        abstract = True
 
 class Barangay(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -10,11 +28,19 @@ class Barangay(models.Model):
     def __str__(self):
         return self.name
 
+
+class MobileSubmissionReceipt(models.Model):
+    client_reference = models.CharField(max_length=100, unique=True)
+    endpoint = models.CharField(max_length=100)
+    response = models.JSONField()
+    status_code = models.PositiveSmallIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
 def generate_registration_reference():
     return "PD-" + uuid.uuid4().hex.upper()
 
 
-class Applicant(models.Model):
+class Applicant(ProfileDetails):
     registration_reference = models.CharField(
         max_length=35, unique=True, default=generate_registration_reference,
         editable=False,
@@ -129,8 +155,8 @@ class Applicant(models.Model):
         default="BY_BIRTH",
     )
 
-    father = models.CharField(max_length=255)
-    mother = models.CharField(max_length=255)
+    father = models.CharField(max_length=255, blank=True)
+    mother = models.CharField(max_length=255, blank=True)
 
     # Uploaded ID or supporting document
     valid_id_document = models.FileField(
@@ -164,7 +190,7 @@ class Applicant(models.Model):
         return f"{self.lastname}, {self.firstname} {self.middlename}"
 
 
-class ApplicantUpdateRequest(models.Model):
+class ApplicantUpdateRequest(RequestedProfileDetails):
     def get_application_type_display(self):
         return dict(APPLICATION_TYPE_CHOICES)["UPDATE"]
 
@@ -242,11 +268,11 @@ class ApplicantUpdateRequest(models.Model):
     )
 
     father = models.CharField(
-        max_length=255
+        max_length=255, blank=True
     )
 
     mother = models.CharField(
-        max_length=255
+        max_length=255, blank=True
     )
 
     reason = models.TextField(
@@ -282,7 +308,7 @@ class ApplicantUpdateRequest(models.Model):
         )
 
 
-class ApplicantTransferRequest(models.Model):
+class ApplicantTransferRequest(RequestedProfileDetails):
     def get_application_type_display(self):
         return dict(APPLICATION_TYPE_CHOICES)["TRANSFER"]
 
@@ -370,7 +396,7 @@ class ApplicantTransferRequest(models.Model):
 
 
 
-class ApplicantReactivationRequest(models.Model):
+class ApplicantReactivationRequest(RequestedProfileDetails):
     def get_application_type_display(self):
         return dict(APPLICATION_TYPE_CHOICES)["REACTIVATION"]
 
@@ -419,7 +445,7 @@ class ApplicantReactivationRequest(models.Model):
         )
 
 
-class ApplicantReinstatementRequest(models.Model):
+class ApplicantReinstatementRequest(RequestedProfileDetails):
     def get_application_type_display(self):
         return dict(APPLICATION_TYPE_CHOICES)["REINSTATEMENT"]
 
@@ -678,3 +704,11 @@ class FingerprintCaptureRequest(models.Model):
             f"Applicant {self.applicant_id} - "
             f"{self.finger} - {self.status}"
         )
+
+
+class AcknowledgmentReceipt(models.Model):
+    applicant = models.OneToOneField(Applicant, on_delete=models.PROTECT, related_name="acknowledgment_receipt")
+    application_number = models.CharField(max_length=12, unique=True)
+    details = models.JSONField(default=dict)
+    issued_at = models.DateTimeField(auto_now_add=True)
+    issued_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)

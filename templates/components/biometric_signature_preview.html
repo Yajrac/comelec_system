@@ -1,0 +1,12 @@
+<div class="review-signature-sample">
+    <h3>Signature {{ slot }}</h3>
+    {% if sample %}
+        <a href="{{ sample.url }}" target="_blank" rel="noopener" aria-label="Open signature {{ slot }} in a new tab">
+            <img src="{{ sample.url }}" alt="Applicant signature {{ slot }}" loading="lazy" width="240" height="100">
+        </a>
+        <span class="review-capture-status is-captured">Captured</span>
+    {% else %}
+        <div class="review-signature-empty">No signature captured</div>
+        <span class="review-capture-status">Not yet captured</span>
+    {% endif %}
+</div>

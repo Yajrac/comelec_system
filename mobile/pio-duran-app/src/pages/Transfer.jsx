@@ -1,3 +1,6 @@
+import RequestProfileFields from "../components/RequestProfileFields";
+import { initialRequestProfile, requestProfileError } from "../utils/requestProfile";
+import ReferenceLookup from "../components/ReferenceLookup";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -11,10 +14,10 @@ import "./Transfer.css";
 
 const API_BASE_URL =
     import.meta.env.VITE_API_URL ||
-    "https://pio-duran-online-registration.onrender.com";
+    "http://localhost:8000";
 
 
-const Transfer = () => {
+const Transfer = ({ applicant }) => {
 
     const navigate = useNavigate();
 
@@ -25,23 +28,25 @@ const Transfer = () => {
     =========================================================
     */
 
+    const [profile, setProfile] = useState(() => initialRequestProfile(applicant));
+
     const [formData, setFormData] = useState({
 
-        lastname: "",
+        lastname: applicant.lastname || "",
 
-        firstname: "",
+        firstname: applicant.firstname || "",
 
-        middlename: "",
+        middlename: applicant.middlename || "",
 
-        birthdate: "",
+        birthdate: applicant.birthdate || "",
 
-        current_brgy: "",
+        current_brgy: applicant.brgy || "",
 
         new_brgy: "",
 
-        current_municipality: "Pio Duran",
+        current_municipality: applicant.municipality || "Pio Duran",
 
-        current_province: "Albay",
+        current_province: applicant.province || "Albay",
 
         new_municipality: "Pio Duran",
 
@@ -217,18 +222,19 @@ const Transfer = () => {
     */
 
     const resetForm = () => {
+        setProfile(initialRequestProfile(applicant));
 
         setFormData({
 
-            lastname: "",
+            lastname: applicant.lastname || "",
 
-            firstname: "",
+            firstname: applicant.firstname || "",
 
-            middlename: "",
+            middlename: applicant.middlename || "",
 
-            birthdate: "",
+            birthdate: applicant.birthdate || "",
 
-            current_brgy: "",
+            current_brgy: applicant.brgy || "",
 
             new_brgy: "",
 
@@ -258,6 +264,9 @@ const Transfer = () => {
     const handleSubmit = async (event) => {
 
         event.preventDefault();
+        const profileError = requestProfileError(profile, applicant);
+        if (profileError) { setError(profileError); return; }
+
 
 
         setError("");
@@ -328,6 +337,8 @@ const Transfer = () => {
             */
 
             const payload = {
+            ...profile,
+                registration_reference: applicant.registration_reference,
 
                 lastname:
                     formData.lastname.trim(),
@@ -630,74 +641,14 @@ const Transfer = () => {
                 HEADER
             ================================================= */}
 
-            <header className="government-header">
 
-                <div className="government-header-inner">
-
-
-                    <div className="government-logo">
-
-                        <img
-                            src="/images/comelec.png"
-                            alt="Commission on Elections logo"
-                        />
-
-                    </div>
-
-
-                    <div>
-
-                        <h1 className="government-title">
-
-                            Pio Duran Online Registration
-                            and Applicant Services
-
-                        </h1>
-
-
-                        <p className="government-subtitle">
-
-                            Online Registration and Applicant
-                            Services
-
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </header>
 
 
             {/* =================================================
                 NAVIGATION
             ================================================= */}
 
-            <nav className="main-navigation">
 
-                <div className="main-navigation-inner">
-
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            navigate("/")
-                        }
-                    >
-                        Home
-                    </button>
-
-
-                    <button
-                        type="button"
-                        className="active"
-                    >
-                        Transfer
-                    </button>
-
-                </div>
-
-            </nav>
 
 
             {/* =================================================
@@ -885,134 +836,15 @@ const Transfer = () => {
                                     handleSubmit
                                 }
                             >
+<RequestProfileFields profile={profile} setProfile={setProfile} applicant={applicant} />
+
 
 
                                 {/* =================================================
                                     APPLICANT INFORMATION
                                 ================================================= */}
 
-                                <section className="form-section">
 
-                                    <h3 className="section-title">
-
-                                        Applicant Information
-
-                                    </h3>
-
-
-                                    <div className="form-grid">
-
-
-                                        {/* LAST NAME */}
-
-                                        <div className="form-field">
-
-                                            <label className="form-label">
-
-                                                Last Name
-
-                                            </label>
-
-
-                                            <input
-                                                name="lastname"
-                                                className="form-control"
-                                                value={
-                                                    formData.lastname
-                                                }
-                                                onChange={
-                                                    handleChange
-                                                }
-                                                placeholder="Enter last name"
-                                                required
-                                            />
-
-                                        </div>
-
-
-                                        {/* FIRST NAME */}
-
-                                        <div className="form-field">
-
-                                            <label className="form-label">
-
-                                                First Name
-
-                                            </label>
-
-
-                                            <input
-                                                name="firstname"
-                                                className="form-control"
-                                                value={
-                                                    formData.firstname
-                                                }
-                                                onChange={
-                                                    handleChange
-                                                }
-                                                placeholder="Enter first name"
-                                                required
-                                            />
-
-                                        </div>
-
-
-                                        {/* MIDDLE NAME */}
-
-                                        <div className="form-field">
-
-                                            <label className="form-label">
-
-                                                Middle Name
-
-                                            </label>
-
-
-                                            <input
-                                                name="middlename"
-                                                className="form-control"
-                                                value={
-                                                    formData.middlename
-                                                }
-                                                onChange={
-                                                    handleChange
-                                                }
-                                                placeholder="Enter middle name"
-                                               
-                                            />
-
-                                        </div>
-
-
-                                        {/* BIRTHDATE */}
-
-                                        <div className="form-field">
-
-                                            <label className="form-label">
-
-                                                Birthdate
-
-                                            </label>
-
-
-                                            <input
-                                                name="birthdate"
-                                                type="date"
-                                                className="form-control"
-                                                value={
-                                                    formData.birthdate
-                                                }
-                                                onChange={
-                                                    handleChange
-                                                }
-                                                required
-                                            />
-
-                                        </div>
-
-                                    </div>
-
-                                </section>
 
 
                                 {/* =================================================
@@ -1051,9 +883,7 @@ const Transfer = () => {
                                                 onChange={
                                                     handleChange
                                                 }
-                                                disabled={
-                                                    loadingBarangays
-                                                }
+                                                disabled
                                                 required
                                             >
 
@@ -1106,7 +936,7 @@ const Transfer = () => {
 
 
                                             <input
-                                                className="form-control"
+                                                className="form-control" readOnly
                                                 name="current_municipality"
                                                 value={
                                                     formData.current_municipality
@@ -1129,7 +959,7 @@ const Transfer = () => {
 
 
                                             <input
-                                                className="form-control"
+                                                className="form-control" readOnly
                                                 name="current_province"
                                                 value={
                                                     formData.current_province
@@ -1300,7 +1130,7 @@ const Transfer = () => {
 
                                         <textarea
                                             id="reason"
-                                            name="reason"
+                                            name="reason" minLength={5} maxLength={2000}
                                             rows="5"
                                             className="form-control"
                                             value={
@@ -1364,7 +1194,8 @@ const Transfer = () => {
                                     ACTIONS
                                 ================================================= */}
 
-                                <div className="form-actions">
+                                <RequestProfileFields part="documents" profile={profile} setProfile={setProfile} applicant={applicant} />
+<div className="form-actions">
 
 
                                     <button
@@ -1417,30 +1248,12 @@ const Transfer = () => {
                 FOOTER
             ================================================= */}
 
-            <footer className="site-footer">
-
-                <div className="site-footer-inner">
-
-                    <div className="footer-title">
-
-                        Pio Duran Online Registration
-
-                    </div>
-
-
-                    <p>
-
-                        Online Registration and Applicant Services
-
-                    </p>
-
-                </div>
-
-            </footer>
 
         </div>
     );
 };
 
 
-export default Transfer;
+export default function TransferScreen() {
+    return <ReferenceLookup type="TRANSFER">{applicant => <Transfer applicant={applicant} />}</ReferenceLookup>;
+}

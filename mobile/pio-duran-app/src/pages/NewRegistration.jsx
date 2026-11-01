@@ -1,6 +1,11 @@
+import RegistrationPhoto from "../components/RegistrationPhoto";
+import BirthdateInput from "../components/BirthdateInput";
+import { loadRegistrationConfig } from "../services/registrationConfig";
+import { birthdateEligibility } from "../utils/birthdateEligibility";
 import { calculateAge } from "../utils/calculateAge";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { submitWithOfflineSupport } from "../services/apiRequest";
+import { loadCachedBarangays } from "../services/barangayCache";
 import { useNavigate } from "react-router-dom";
 import "./NewRegistration.css";
 
@@ -13,6 +18,10 @@ function NewRegistration() {
         lastname: "",
         firstname: "",
         middlename: "",
+        suffix: "",
+        civil_status: "Single",
+        is_indigenous: false,
+        is_illiterate: false,
         age: "",
         sex: "",
         birthdate: "",
@@ -28,7 +37,18 @@ function NewRegistration() {
         mother: "",
     });
 
+    const [photo, setPhoto] = useState(null);
+    const [document, setDocument] = useState(null);
+
     const [barangays, setBarangays] = useState([]);
+    const [electionDate, setElectionDate] = useState("");
+    useEffect(() => {
+        let active = true;
+        const load = () => loadRegistrationConfig().then(config => { if (active) setElectionDate(config.election_date); }).catch(() => { /* Validation explains how to load settings. */ });
+        void load();
+        window.addEventListener("online", load);
+        return () => { active = false; window.removeEventListener("online", load); };
+    }, []);
     const [submittedApplicant, setSubmittedApplicant] = useState(null);
     const [referenceCopyStatus, setReferenceCopyStatus] = useState('');
     useEffect(() => {
@@ -51,84 +71,24 @@ function NewRegistration() {
     // API URLS
     // =========================================================
 
-    const BARANGAY_API =
-        "https://pio-duran-online-registration.onrender.com/api/barangays/";
-
-    const REGISTRATION_API =
-        "https://pio-duran-online-registration.onrender.com/api/new-registration/";
-
     // =========================================================
     // LOAD BARANGAYS
     // =========================================================
 
     useEffect(() => {
-        loadBarangays();
+        void loadBarangays();
+        const reload = () => void loadBarangays();
+        window.addEventListener("online", reload);
+        return () => window.removeEventListener("online", reload);
     }, []);
 
     const loadBarangays = async () => {
         setBarangayLoading(true);
-
         try {
-            const response = await axios.get(BARANGAY_API);
-
-            console.log(
-                "Barangay API response:",
-                response.data
-            );
-
-            /*
-             * Django barangay_list() returns:
-             *
-             * [
-             *     {
-             *         "id": 1,
-             *         "name": "Barangay Name"
-             *     }
-             * ]
-             */
-
-            if (Array.isArray(response.data)) {
-                setBarangays(response.data);
-                setError("");
-            } else {
-                console.error(
-                    "Invalid barangay response:",
-                    response.data
-                );
-
-                setBarangays([]);
-
-                setError(
-                    "Unable to load barangays. Invalid server response."
-                );
-            }
-
-        } catch (err) {
-            console.error(
-                "Barangay loading error:",
-                err
-            );
-
-            setBarangays([]);
-
-            if (err.response) {
-                console.error(
-                    "Server response:",
-                    err.response.data
-                );
-
-                setError(
-                    "Unable to load barangays. Please check the server."
-                );
-            } else {
-                setError(
-                    "Unable to connect to the server. Please make sure Django is running."
-                );
-            }
-
-        } finally {
-            setBarangayLoading(false);
-        }
+            setBarangays(await loadCachedBarangays());
+            setError("");
+        } catch (error) { setError(error.message || "Unable to load the barangay list."); }
+        finally { setBarangayLoading(false); }
     };
 
     // =========================================================
@@ -136,11 +96,11 @@ function NewRegistration() {
     // =========================================================
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
 
         setFormData((prev) => ({
             ...prev,
-            [name]: value,
+            [name]: type === "checkbox" ? checked : value,
         }));
 
         setError("");
@@ -168,6 +128,22 @@ function NewRegistration() {
     // =========================================================
 
     const validateForm = () => {
+        const eligibility = birthdateEligibility(formData.birthdate, electionDate);
+        if (eligibility && !eligibility.eligible) { setError(eligibility.error); return false; }
+        if (!["", "Jr.", "Sr.", "II", "III", "IV", "V"].includes(formData.suffix)) {
+            setError("Select a valid suffix."); return false;
+        }
+        if (!document) { setError("Upload your Valid ID and Birth Certificate."); return false; }
+        for (const [file, isPhoto] of [[photo, true], [document, false]]) {
+            if (!file) continue;
+            if (file.size > 5 * 1024 * 1024) { setError("Each file must be 5 MB or smaller."); return false; }
+            const allowed = isPhoto ? /\.(jpe?g|png)$/i : /\.(pdf|jpe?g|png)$/i;
+            if (!allowed.test(file.name)) { setError(isPhoto ? "Upload a JPG or PNG photo." : "Upload a PDF, JPG, or PNG document."); return false; }
+        }
+        if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            setError("Enter a valid email address."); return false;
+        }
+
         if (!formData.lastname.trim()) {
             setError("Last name is required.");
             return false;
@@ -178,10 +154,7 @@ function NewRegistration() {
             return false;
         }
 
-        if (!formData.middlename.trim()) {
-            setError("Middle name is required.");
-            return false;
-        }
+
 
         if (!formData.age) {
             setError("Age is required.");
@@ -225,20 +198,9 @@ function NewRegistration() {
             return false;
         }
 
-        if (!formData.email.trim()) {
-            setError("Email address is required.");
-            return false;
-        }
 
-        if (!formData.father.trim()) {
-            setError("Father's name is required.");
-            return false;
-        }
 
-        if (!formData.mother.trim()) {
-            setError("Mother's name is required.");
-            return false;
-        }
+
 
         return true;
     };
@@ -297,34 +259,19 @@ function NewRegistration() {
         setLoading(true);
 
         try {
-            const payload = {
-                ...formData,
-
-                // Always NEW registration
-                application_type: "NEW",
-
-                // Convert age to number
-                age: Number(formData.age),
-
-                // Send barangay ID
-                brgy: formData.brgy,
-            };
-
-            console.log(
-                "Submitting registration:",
-                payload
-            );
-
-            const response = await axios.post(
-                REGISTRATION_API,
-                payload,
-                {
-                    headers: {
-                        "Content-Type":
-                            "application/json",
-                    },
-                }
-            );
+            const result = await submitWithOfflineSupport({
+                requestType: "NEW_REGISTRATION", endpoint: "/api/new-registration/",
+                payload: { ...formData, profile_details_provided: "1", application_type: "NEW",
+                    valid_id_document: document, photo },
+            });
+            if (result.offline) {
+                setSubmittedApplicant({ ...formData, offline: true, client_reference: result.client_reference,
+                    status: "SAVED_OFFLINE", brgy_name: getBarangayName() });
+                setStep(3);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                return;
+            }
+            const response = { data: result.data };
 
             console.log(
                 "Registration API response:",
@@ -346,6 +293,7 @@ function NewRegistration() {
 
                 const applicant =
                     response.data.applicant || {
+                        ...formData,
                         registration_reference: response.data.registration_reference,
                         id:
                             response.data
@@ -506,7 +454,7 @@ function NewRegistration() {
 
                 } else {
                     setError(
-                        "Unable to submit registration."
+                        `The server could not accept the application (HTTP ${err.response.status}). Your form is still here. Please try again or check the server configuration.`
                     );
                 }
 
@@ -530,6 +478,10 @@ function NewRegistration() {
             lastname: "",
             firstname: "",
             middlename: "",
+            suffix: "",
+            civil_status: "Single",
+            is_indigenous: false,
+            is_illiterate: false,
             age: "",
             sex: "",
             birthdate: "",
@@ -544,6 +496,9 @@ function NewRegistration() {
             father: "",
             mother: "",
         });
+
+        setPhoto(null);
+        setDocument(null);
 
         setSubmittedApplicant(null);
         setReferenceCopyStatus('');
@@ -652,12 +607,11 @@ function NewRegistration() {
 
     const renderForm = () => {
         return (
+            <>
+            <RegistrationPhoto file={photo} onChange={setPhoto} />
             <div className="registration-card">
 
                 <div className="section-header">
-                    <div className="section-number">
-                        1
-                    </div>
 
                     <div>
                         <h2>
@@ -671,9 +625,7 @@ function NewRegistration() {
                     </div>
                 </div>
 
-                <div className="form-grid">
-
-                    <div className="form-group">
+                <div className="mobile-name-grid"><div className="form-group">
                         <label>
                             Last Name
                             <span>*</span>
@@ -681,7 +633,7 @@ function NewRegistration() {
 
                         <input
                             type="text"
-                            name="lastname"
+                            name="lastname" required
                             value={
                                 formData.lastname
                             }
@@ -690,9 +642,7 @@ function NewRegistration() {
                             }
                             placeholder="Enter last name"
                         />
-                    </div>
-
-                    <div className="form-group">
+                    </div><div className="form-group">
                         <label>
                             First Name
                             <span>*</span>
@@ -700,7 +650,7 @@ function NewRegistration() {
 
                         <input
                             type="text"
-                            name="firstname"
+                            name="firstname" required
                             value={
                                 formData.firstname
                             }
@@ -709,12 +659,10 @@ function NewRegistration() {
                             }
                             placeholder="Enter first name"
                         />
-                    </div>
-
-                    <div className="form-group">
+                    </div><div className="form-group">
                         <label>
-                            Middle Name
-                            <span>*</span>
+                            Middle Name (optional)
+
                         </label>
 
                         <input
@@ -728,17 +676,15 @@ function NewRegistration() {
                             }
                             placeholder="Enter middle name"
                         />
-                    </div>
-
-                    <div className="form-group">
+                    </div><div className="form-group mobile-suffix"><label htmlFor="suffix">Suffix <small>(optional)</small></label><select id="suffix" name="suffix" value={formData.suffix} onChange={handleChange}><option value="">None</option>{["Jr.", "Sr.", "II", "III", "IV", "V"].map(value => <option key={value} value={value}>{value}</option>)}</select></div></div><fieldset className="mobile-profile-flags"><legend>Additional Information (optional)</legend><label><input type="checkbox" name="is_indigenous" checked={formData.is_indigenous} onChange={handleChange} /> Indigenous People</label><label><input type="checkbox" name="is_illiterate" checked={formData.is_illiterate} onChange={handleChange} /> Illiterate (unable to read and write)</label></fieldset><div className="form-grid"><div className="form-group">
                         <label>
                             Birthdate
                             <span>*</span>
                         </label>
 
-                        <input
-                            type="date"
-                            name="birthdate"
+                        <BirthdateInput
+                            electionDate={electionDate}
+                            required
                             value={
                                 formData.birthdate
                             }
@@ -746,8 +692,7 @@ function NewRegistration() {
                                 handleChange
                             }
                         />
-                    </div>
-<div className="form-group">
+                    </div><div className="form-group">
                         <label>
                             Age
                             <span>*</span>
@@ -763,18 +708,15 @@ function NewRegistration() {
                                 handleChange
                             }
                             min="1"
-                            placeholder="Calculated from birthdate"
                         />
-                    </div>
-
-                    <div className="form-group">
+                    </div><div className="form-group">
                         <label>
                             Sex
                             <span>*</span>
                         </label>
 
                         <select
-                            name="sex"
+                            name="sex" required
                             value={
                                 formData.sex
                             }
@@ -794,11 +736,7 @@ function NewRegistration() {
                                 Female
                             </option>
                         </select>
-                    </div>
-
-                    
-
-                    <div className="form-group full-width">
+                    </div><div className="form-group full-width">
                         <label>
                             Birthplace
                             <span>*</span>
@@ -806,7 +744,7 @@ function NewRegistration() {
 
                         <input
                             type="text"
-                            name="birthplace"
+                            name="birthplace" required
                             value={
                                 formData.birthplace
                             }
@@ -815,19 +753,12 @@ function NewRegistration() {
                             }
                             placeholder="Enter birthplace"
                         />
-                    </div>
-
-                </div>
-
-                {/* ADDRESS */}
+                    </div><div className="form-group"><label htmlFor="civil_status">Civil Status <span>*</span></label><select id="civil_status" name="civil_status" required value={formData.civil_status} onChange={handleChange}>{["Single", "Married", "Widowed", "Separated"].map(value => <option key={value} value={value}>{value}</option>)}</select></div></div>
+{/* ADDRESS */}
 
                 <div className="subsection">
 
                     <div className="subsection-title">
-
-                        <div className="subsection-icon">
-                            A
-                        </div>
 
                         <div>
                             <h3>
@@ -852,7 +783,7 @@ function NewRegistration() {
                             </label>
 
                             <select
-                                name="brgy"
+                                name="brgy" required
                                 value={
                                     formData.brgy
                                 }
@@ -951,10 +882,6 @@ function NewRegistration() {
 
                     <div className="subsection-title">
 
-                        <div className="subsection-icon">
-                            B
-                        </div>
-
                         <div>
                             <h3>
                                 Contact Information
@@ -979,7 +906,7 @@ function NewRegistration() {
 
                             <input
                                 type="text"
-                                name="phone"
+                                name="phone" required
                                 value={
                                     formData.phone
                                 }
@@ -1014,8 +941,7 @@ function NewRegistration() {
                         <div className="form-group">
 
                             <label>
-                                Email Address
-                                <span>*</span>
+                                Email Address (optional)
                             </label>
 
                             <input
@@ -1042,10 +968,6 @@ function NewRegistration() {
 
                     <div className="subsection-title">
 
-                        <div className="subsection-icon">
-                            C
-                        </div>
-
                         <div>
                             <h3>
                                 Additional Information
@@ -1068,7 +990,7 @@ function NewRegistration() {
                             </label>
 
                             <select
-                                name="citizenship_status"
+                                name="citizenship_status" required
                                 value={
                                     formData.citizenship_status
                                 }
@@ -1094,46 +1016,14 @@ function NewRegistration() {
                             </label>
 
                             <select
-                                name="pwd_status"
+                                name="pwd_status" required
                                 value={
                                     formData.pwd_status
                                 }
                                 onChange={
                                     handleChange
                                 }
-                            >
-                                <option value="NO">
-                                    Not PWD
-                                </option>
-
-                                <option value="VISUAL">
-                                    Visual Disability
-                                </option>
-
-                                <option value="HEARING">
-                                    Hearing Disability
-                                </option>
-
-                                <option value="PHYSICAL">
-                                    Physical Disability
-                                </option>
-
-                                <option value="INTELLECTUAL">
-                                    Intellectual Disability
-                                </option>
-
-                                <option value="PSYCHOSOCIAL">
-                                    Psychosocial Disability
-                                </option>
-
-                                <option value="MULTIPLE">
-                                    Multiple Disabilities
-                                </option>
-
-                                <option value="OTHER">
-                                    Other
-                                </option>
-                            </select>
+                            ><option value="NO">Not PWD</option><option value="VISUAL">Visual Disability</option><option value="HEARING">Hearing Disability</option><option value="PHYSICAL">Physical Disability</option><option value="INTELLECTUAL">Intellectual Disability</option><option value="PSYCHOSOCIAL">Psychosocial Disability</option><option value="MULTIPLE">Multiple Disabilities</option><option value="OTHER">Other</option></select>
 
                         </div>
 
@@ -1146,10 +1036,6 @@ function NewRegistration() {
                 <div className="subsection">
 
                     <div className="subsection-title">
-
-                        <div className="subsection-icon">
-                            D
-                        </div>
 
                         <div>
                             <h3>
@@ -1169,8 +1055,7 @@ function NewRegistration() {
                         <div className="form-group">
 
                             <label>
-                                Father's Name
-                                <span>*</span>
+                                Father's Name <small>(optional)</small>
                             </label>
 
                             <input
@@ -1190,8 +1075,7 @@ function NewRegistration() {
                         <div className="form-group">
 
                             <label>
-                                Mother's Name
-                                <span>*</span>
+                                Mother's Name <small>(optional)</small>
                             </label>
 
                             <input
@@ -1212,7 +1096,8 @@ function NewRegistration() {
 
                 </div>
 
-                {/* ERROR */}
+                <div className="subsection"><div className="subsection-title"><h3>Upload Valid ID and Birth Certificate</h3></div><div className="form-group"><label htmlFor="valid_id_document">Upload Valid ID and Birth Certificate <span>*</span></label><input id="valid_id_document" type="file" name="valid_id_document" required={!document} accept=".pdf,.jpg,.jpeg,.png" onChange={event => setDocument(event.target.files[0] || null)} /><p className="form-text">Accepted formats: PDF, JPG, JPEG, and PNG. Maximum file size: 5 MB.</p>{document && <p className="form-text">Selected: {document.name}</p>}</div></div>
+{/* ERROR */}
 
                 {error && (
                     <div className="registration-error">
@@ -1258,6 +1143,7 @@ function NewRegistration() {
                 </div>
 
             </div>
+            </>
         );
     };
 
@@ -1290,7 +1176,8 @@ function NewRegistration() {
 
                 </div>
 
-                <div className="review-notice">
+                <section className="review-section"><div className="review-section-header">Photo and Additional Information</div><div className="review-grid"><ReviewItem label="Suffix" value={formData.suffix || "None"} /><ReviewItem label="Civil Status" value={formData.civil_status} /><ReviewItem label="Indigenous People" value={formData.is_indigenous ? "Yes" : "No"} /><ReviewItem label="Illiterate" value={formData.is_illiterate ? "Yes" : "No"} /><ReviewItem label="Photo / Selfie" value={photo?.name || "No photo selected"} /><ReviewItem label="Valid ID and Birth Certificate" value={document?.name} /></div></section>
+<div className="review-notice">
 
                     <strong>
                         Important
@@ -1657,12 +1544,11 @@ function NewRegistration() {
                 <div className="success-page-header">
 
                     <h1>
-                        Registration Successful
+                        {applicant.offline ? "Registration Saved Offline" : "Registration Successful"}
                     </h1>
 
                     <p>
-                        The applicant has been
-                        successfully registered.
+                        {applicant.offline ? "Saved on this device. Your registration will be submitted when you reconnect." : "Your registration application has been submitted."}
                     </p>
 
                 </div>
@@ -1680,9 +1566,7 @@ function NewRegistration() {
                             <div>
 
                                 <h2>
-                                    Registration
-                                    Successfully
-                                    Submitted
+                                    {applicant.offline ? "Saved on This Device" : "Registration Successfully Submitted"}
                                 </h2>
 
                                 <p>
@@ -1698,6 +1582,7 @@ function NewRegistration() {
                     </div>
 
                     <div className="success-card-body">
+                        {applicant.offline && <section className="offline-registration-receipt"><h3>Waiting to sync</h3><p>Your photo, document, and details are saved on this device. Keep the app open when your connection returns.</p><p>Local reference: <strong>{applicant.client_reference}</strong></p><p>This is not your registration reference number. After syncing, tap the header connection status to find your server-issued reference.</p></section>}
                         {applicant.registration_reference && (
                             <section className="success-section" style={{ background: '#edf3ff', padding: '20px', borderRadius: '10px' }}>
                                 <h3>Your registration reference</h3>
@@ -2118,6 +2003,8 @@ function NewRegistration() {
     // =========================================================
 
     return (
+        <>
+
         <div className="new-registration-page">
 
             <div className="registration-wrapper">
@@ -2125,10 +2012,6 @@ function NewRegistration() {
                 {/* HEADER */}
 
                 <div className="page-header">
-
-                    <div className="header-icon">
-                        NR
-                    </div>
 
                     <div>
 
@@ -2236,6 +2119,7 @@ function NewRegistration() {
             </div>
 
         </div>
+        </>
     );
 }
 

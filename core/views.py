@@ -1,3 +1,4 @@
+from Applicants.profile_details import apply_profile_details
 from Applicants.application_types import APPLICATION_TYPE_LABELS
 from .biometric_state import SIGNATURE_FIELDS, file_exists as biometric_file_exists, signatures_complete, capture_complete, sync_completion
 import base64
@@ -1562,6 +1563,7 @@ def admin_application_action(
                 # APPROVE FOR BIOMETRICS
                 # =============================================
 
+                apply_profile_details(application, applicant)
                 approve_applicant_for_biometrics(
                     applicant=applicant,
                     notification_title="Registration Update Approved",
@@ -1721,6 +1723,7 @@ def admin_application_action(
                 # APPROVE FOR BIOMETRICS
                 # =============================================
 
+                apply_profile_details(application, applicant)
                 approve_applicant_for_biometrics(
                     applicant=applicant,
                     notification_title="Transfer Request Approved",
@@ -1862,6 +1865,7 @@ def admin_application_action(
                 # APPROVE FOR BIOMETRICS
                 # =============================================
 
+                apply_profile_details(application, applicant)
                 approve_applicant_for_biometrics(
                     applicant=applicant,
                     notification_title="Reactivation Approved",
@@ -2003,6 +2007,7 @@ def admin_application_action(
                 # APPROVE FOR BIOMETRICS
                 # =============================================
 
+                apply_profile_details(application, applicant)
                 approve_applicant_for_biometrics(
                     applicant=applicant,
                     notification_title="Reinstatement Approved",

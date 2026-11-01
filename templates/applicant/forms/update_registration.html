@@ -213,10 +213,13 @@
                     method="post"
                     enctype="multipart/form-data"
                     id="updateRegistrationForm"
+                    class="office-application-form"
                 >
                     {% csrf_token %}
                     <input type="hidden" name="action" value="submit_update">
                     <input type="hidden" name="applicant_id" value="{{ applicant.id }}">
+
+                    
 
                     <!-- PERSONAL INFORMATION -->
                     <section class="form-card">
@@ -228,7 +231,8 @@
                         <div class="form-card-body">
                             <div class="form-grid">
 
-                                <div class="form-field">
+                                <div class="form-field full-width profile-name-row"><div class="profile-name-grid">
+<div class="form-field">
                                     <label for="lastname" class="form-label">
                                         Last Name <span class="required-mark">*</span>
                                     </label>
@@ -272,6 +276,10 @@
                                     >
                                     <small class="form-text">Leave blank if you do not have a middle name.</small>
                                 </div>
+
+                                {% include "components/profile_suffix_field.html" %}
+</div></div>
+{% include "components/profile_personal_fields.html" with suffix_in_name_row=True %}
 
                                 <div class="form-field">
                                     <label for="birthdate" class="form-label">
@@ -521,7 +529,7 @@
 
                                 <div class="form-field">
                                     <label for="father" class="form-label">
-                                        Father's Full Name <span class="required-mark">*</span>
+                                        Father's Full Name <small>(optional)</small>
                                     </label>
                                     <input
                                         type="text"
@@ -530,13 +538,12 @@
                                         class="form-control"
                                         value="{% if form_data %}{{ form_data.father }}{% else %}{{ applicant.father }}{% endif %}"
                                         maxlength="255"
-                                        required
                                     >
                                 </div>
 
                                 <div class="form-field">
                                     <label for="mother" class="form-label">
-                                        Mother's Full Name <span class="required-mark">*</span>
+                                        Mother's Full Name <small>(optional)</small>
                                     </label>
                                     <input
                                         type="text"
@@ -545,7 +552,6 @@
                                         class="form-control"
                                         value="{% if form_data %}{{ form_data.mother }}{% else %}{{ applicant.mother }}{% endif %}"
                                         maxlength="255"
-                                        required
                                     >
                                 </div>
 
@@ -554,9 +560,10 @@
                     </section>
 
                     <!-- VALID ID / SUPPORTING DOCUMENT -->
-                    <section class="form-card">
+                    <div class="registration-upload-grid">
+<section class="form-card">
                         <div class="form-card-header">
-                            <h2>5. Valid ID / Supporting Document</h2>
+                            <h2>5. Upload Valid ID and Birth Certificate</h2>
                             <p>Upload a clear document to support your requested correction or update.</p>
                         </div>
 
@@ -588,7 +595,7 @@
                                 </svg>
 
                                 <label for="valid_id_document" class="form-label">
-                                    {% if applicant.valid_id_document %}Upload replacement document (optional){% else %}Select Valid ID / Supporting Document <span class="required-mark">*</span>{% endif %}
+                                    Upload Valid ID and Birth Certificate{% if applicant.valid_id_document %} (optional){% else %} <span class="required-mark">*</span>{% endif %}
                                 </label>
 
                                 <input
@@ -622,6 +629,10 @@
 
                         </div>
                     </section>
+<div class="registration-photo-column">
+{% include "components/profile_fields.html" %}
+</div>
+</div>
 
                     <!-- REASON FOR UPDATE -->
                     <section class="form-card">

@@ -201,8 +201,11 @@
             </section>
 
             <!-- REACTIVATION REQUEST FORM -->
-            <form method="post" enctype="multipart/form-data" id="reactivationForm">
+            <form method="post" enctype="multipart/form-data" id="reactivationForm" class="office-application-form">
                 {% csrf_token %}
+                
+                {% include "components/profile_personal_section.html" %}
+
 
                 <input type="hidden" name="action" value="submit_reactivation">
                 <input type="hidden" name="applicant_id" value="{{ applicant.id }}">
@@ -245,11 +248,12 @@
                 </section>
 
                 <!-- VALID ID UPLOAD -->
-                <section class="registration-card">
+                <div class="registration-upload-grid">
+<section class="registration-card">
                     <div class="card-header-government">
                         <div class="card-header-marker"></div>
                         <div>
-                            <h2>Valid Identification</h2>
+                            <h2>Upload Valid ID and Birth Certificate</h2>
                             <p>
                                 Upload a clear copy of your valid ID for
                                 verification.
@@ -274,7 +278,7 @@
                                 </svg>
                             </div>
 
-                            <p class="upload-panel-title">Upload a Copy of Your Valid ID</p>
+                            <p class="upload-panel-title">Upload Valid ID and Birth Certificate</p>
 
                             <p class="upload-panel-description">
                                 Select a readable image or PDF of your
@@ -289,7 +293,7 @@
                             </p>
                         {% endif %}
                         <label for="valid_id_document" class="form-label">
-                            {% if applicant.valid_id_document %}Upload replacement document (optional){% else %}Upload valid ID <span class="required">*</span>{% endif %}
+                            Upload Valid ID and Birth Certificate{% if applicant.valid_id_document %} (optional){% else %} <span class="required">*</span>{% endif %}
                         </label>
 
                             <input
@@ -318,6 +322,10 @@
                         </div>
                     </div>
                 </section>
+<div class="registration-photo-column">
+{% include "components/profile_fields.html" %}
+</div>
+</div>
 
                 <!-- ACTIONS -->
                 <div class="action-area">

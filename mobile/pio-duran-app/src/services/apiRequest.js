@@ -1,7 +1,9 @@
+import { serializeRequestPayload, toRequestBody } from "./requestPayload";
 import axios from "axios";
 
 import {
     addToSyncQueue,
+    saveSyncReceipt,
     generateClientReference,
 } from "./offlineDatabase";
 
@@ -18,7 +20,7 @@ API BASE URL
 
 const API_URL =
     import.meta.env.VITE_API_URL ||
-    "https://pio-duran-online-registration.onrender.com";
+    "http://localhost:8000";
 
 
 /*
@@ -53,7 +55,7 @@ APPLICATION ENDPOINTS
 
 export const APPLICATION_ENDPOINTS = {
     NEW_REGISTRATION:
-        "/api/registrations/",
+        "/api/new-registration/",
 
     UPDATE_INFORMATION:
         "/api/applicant-update-requests/",
@@ -170,14 +172,11 @@ export async function submitWithOfflineSupport({
             const response =
                 await axios.post(
                     `${API_URL}${endpoint}`,
-                    requestPayload,
+                    toRequestBody(requestPayload),
                     {
                         timeout: 15000,
 
-                        headers: {
-                            "Content-Type":
-                                "application/json",
-                        },
+
                     }
                 );
 
@@ -190,6 +189,8 @@ export async function submitWithOfflineSupport({
                 response.status >= 200 &&
                 response.status < 300
             ) {
+                await saveSyncReceipt({ clientReference, requestType }, response.data);
+                window.dispatchEvent(new Event("offline-queue-changed"));
                 return {
                     success: true,
 
@@ -221,7 +222,7 @@ export async function submitWithOfflineSupport({
             422
             */
 
-            if (error.response) {
+            if (error.response && error.response.status < 500) {
                 throw error;
             }
 
@@ -257,7 +258,7 @@ export async function submitWithOfflineSupport({
 
         endpoint,
 
-        payload: requestPayload,
+        payload: await serializeRequestPayload(requestPayload),
 
         clientReference,
     });

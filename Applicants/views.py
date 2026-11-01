@@ -1,5 +1,6 @@
 from pathlib import Path
 from Applicants.validation import validate_request
+from Applicants.profile_details import profile_values
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
@@ -112,8 +113,8 @@ def new_registration(request):
             (civil_status, "Please select your civil status."),
             (brgy_id, "Please select a barangay."),
             (phone, "Phone number is required."),
-            (father, "Father's name is required."),
-            (mother, "Mother's name is required."),
+
+
         ]
 
         for value, message in required_fields:
@@ -187,6 +188,17 @@ def new_registration(request):
         except ValidationError:
             return render_error(
                 "Please enter a valid email address."
+            )
+
+        if Applicant.objects.filter(
+            lastname__iexact=lastname,
+            firstname__iexact=firstname,
+            middlename__iexact=middlename,
+            birthdate=parsed_birthdate,
+        ).exists():
+            return render_error(
+                "A registration with this full name and birthdate already exists. "
+                "Please choose Update / Correction, Transfer, Reactivation, or Reinstatement instead."
             )
 
         if email and Applicant.objects.filter(email__iexact=email).exists():
@@ -310,6 +322,8 @@ def new_registration(request):
             is_senior=applicant_age >= 60,
         )
 
+        for field, value in profile_values(request).items():
+            setattr(applicant, field, value)
         applicant.save()
 
         # =====================================================
@@ -560,8 +574,8 @@ def update_registration(request):
             "Province": province,
             "Municipality": municipality,
             "Phone": phone,
-            "Father's name": father,
-            "Mother's name": mother,
+
+
             "Reason": reason,
         }
 
@@ -824,6 +838,7 @@ def update_registration(request):
         # -----------------------------------------------------
 
         update_request = ApplicantUpdateRequest.objects.create(
+            **profile_values(request, applicant),
             applicant=applicant,
 
             lastname=lastname,
@@ -1084,6 +1099,7 @@ def transfer_registration(request):
         # SAVE TRANSFER REQUEST AND UPLOADED ID
         # -----------------------------------------------------
         transfer_request = ApplicantTransferRequest.objects.create(
+            **profile_values(request, applicant),
             applicant=applicant,
             current_brgy=applicant.brgy,
             new_brgy=new_barangay,
@@ -1307,6 +1323,7 @@ def reactivate_registration(request):
         # -------------------------------------------------
 
         reactivation_request = ApplicantReactivationRequest.objects.create(
+            **profile_values(request, applicant),
             applicant=applicant,
             reason=reason,
             valid_id_document=valid_id_document or applicant.valid_id_document.name,
@@ -1528,6 +1545,7 @@ def reinstate_registration(request):
 
         reinstatement_request = (
             ApplicantReinstatementRequest.objects.create(
+                **profile_values(request, applicant),
                 applicant=applicant,
                 reason=reason,
                 valid_id_document=valid_id_document or applicant.valid_id_document.name,

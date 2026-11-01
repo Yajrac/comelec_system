@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path("registration-config/", views.registration_config, name="registration-config"),
     path(
         "applicant/verify-new-registration/",
         views.verify_applicant_for_new_registration,

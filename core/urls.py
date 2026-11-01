@@ -1,9 +1,11 @@
 from django.urls import path
 from . import views
+from .receipts import acknowledgment_receipt
 from .walk_in import walk_in
 from .admin_security import change_admin_password, password_requirements
 
 urlpatterns = [
+    path("admin-applicants/<int:applicant_id>/receipt/", acknowledgment_receipt, name="acknowledgment-receipt"),
     path("password-requirements/", password_requirements, name="admin-password-requirements"),
     path("change-password/", change_admin_password, name="admin-change-password"),
     path("walk-in/", walk_in, name="admin-walk-in"),

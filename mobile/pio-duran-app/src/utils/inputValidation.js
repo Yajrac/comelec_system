@@ -10,6 +10,7 @@
     if (key === 'middlename' && !value) return '';
     if (input.required && !value) return 'This field is required.';
     if (!value) return '';
+    if (key === 'suffix' && !['Jr.', 'Sr.', 'II', 'III', 'IV', 'V'].includes(value)) return 'Select a valid suffix.';
     if (names.has(key) && (value.length > 255 || !namePattern.test(value) || !/\p{L}/u.test(value))) return 'Use letters, spaces, hyphens, apostrophes, or periods only (maximum 255 characters).';
     if (key === 'phone' && !/^09[0-9]{9}$/.test(value)) return 'Enter 11 digits starting with 09.';
     if (key === 'email' && (input.validity.typeMismatch || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || value.length > 254)) return 'Enter a valid email address.';
@@ -36,6 +37,7 @@
     if (input.type === 'file' && input.files?.length) {
       const file = input.files[0];
       if (file.size > 5 * 1024 * 1024) return 'File must be 5 MB or smaller.';
+      if (key === 'photo' && !/\.(png|jpe?g)$/i.test(file.name)) return 'Upload a JPG or PNG photo.';
       if (!/\.(pdf|png|jpe?g)$/i.test(file.name)) return 'Upload a PDF, PNG, or JPEG file.';
     }
     if (input.validity.badInput || input.validity.rangeUnderflow || input.validity.rangeOverflow || input.validity.patternMismatch) return 'Enter a valid value.';
@@ -56,7 +58,7 @@
     if (message) input.setAttribute('aria-invalid', 'true'); else input.removeAttribute('aria-invalid');
     return !message;
   }
-  function relevant(input) { return names.has(input.name) || ['phone','email','birthdate','age','registration_reference','reason','brgy','new_brgy','birthplace','province','municipality','sex','civil_status','pwd_status','citizenship_status','valid_id_document'].includes(input.name); }
+  function relevant(input) { return names.has(input.name) || ['phone','email','birthdate','age','registration_reference','reason','brgy','new_brgy','birthplace','province','municipality','sex','civil_status','pwd_status','citizenship_status','valid_id_document','photo','suffix'].includes(input.name); }
   function visible(input) { return input.getClientRects().length > 0; }
   function validateScope(scope) {
     let first;
