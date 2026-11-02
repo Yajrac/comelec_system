@@ -2,10 +2,10 @@ import { Link } from "react-router-dom";
 
 const applications = [
     { title: "APPLICATION FOR NEW REGISTRATION", route: "/new-registration", icon: "new" },
-    { title: "APPLICATION FOR CHANGE OF NAME DUE TO MARRIAGE OR COURT ORDER / CORRECTION OF ENTRIES / REVERSION TO MAIDEN NAME IN THE VOTER?S REGISTRATION RECORD", route: "/update-information", icon: "edit" },
-    { title: "APPLICATION FOR TRANSFER OF REGISTRATION RECORD", route: "/transfer", icon: "transfer" },
-    { title: "APPLICATION FOR REACTIVATION OF REGISTRATION RECORD", route: "/reactivation", icon: "reactivate" },
-    { title: "APPLICATION FOR INCLUSION OF RECORDS IN THE BOOK OF VOTERS / REINSTATEMENT OF NAME IN THE LIST OF VOTERS", route: "/reinstatement", icon: "restore" },
+    { title: "APPLICATION FOR CHANGE OF NAME/CORRECTION", route: "/update-information", icon: "edit" },
+    { title: "APPLICATION FOR TRANSFER", route: "/transfer", icon: "transfer" },
+    { title: "APPLICATION FOR REACTIVATION", route: "/reactivation", icon: "reactivate" },
+    { title: "APPLICATION FOR INCLUSION/REINSTATEMENT", route: "/reinstatement", icon: "restore" },
 ];
 
 function ServiceIcon({ kind }) {
@@ -42,7 +42,6 @@ export default function Home() {
                         ))}
                     </nav>
                     </section>
-                    <aside className="mobile-help-note"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6m0-10v1" /></svg><p>Already registered? Choose the service that matches the change you need.</p></aside>
                 </div>
             </main>
         </div>

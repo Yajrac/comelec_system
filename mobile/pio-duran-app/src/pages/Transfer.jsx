@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../services/apiConfig";
 import RequestProfileFields from "../components/RequestProfileFields";
 import { initialRequestProfile, requestProfileError } from "../utils/requestProfile";
 import ReferenceLookup from "../components/ReferenceLookup";
@@ -12,9 +13,7 @@ import {
 import "./Transfer.css";
 
 
-const API_BASE_URL =
-    import.meta.env.VITE_API_URL ||
-    "http://localhost:8000";
+
 
 
 const Transfer = ({ applicant }) => {

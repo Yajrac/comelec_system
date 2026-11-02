@@ -1,8 +1,9 @@
+import { API_BASE_URL as API } from "../services/apiConfig";
 import { useState } from "react";
 import axios from "axios";
 import LookupModal from "./LookupModal";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 
 export default function ReferenceLookup({ type, children }) {
     const [reference, setReference] = useState("");

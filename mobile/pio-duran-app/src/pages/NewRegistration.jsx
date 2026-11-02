@@ -608,7 +608,6 @@ function NewRegistration() {
     const renderForm = () => {
         return (
             <>
-            <RegistrationPhoto file={photo} onChange={setPhoto} />
             <div className="registration-card">
 
                 <div className="section-header">
@@ -1096,7 +1095,10 @@ function NewRegistration() {
 
                 </div>
 
-                <div className="subsection"><div className="subsection-title"><h3>Upload Valid ID and Birth Certificate</h3></div><div className="form-group"><label htmlFor="valid_id_document">Upload Valid ID and Birth Certificate <span>*</span></label><input id="valid_id_document" type="file" name="valid_id_document" required={!document} accept=".pdf,.jpg,.jpeg,.png" onChange={event => setDocument(event.target.files[0] || null)} /><p className="form-text">Accepted formats: PDF, JPG, JPEG, and PNG. Maximum file size: 5 MB.</p>{document && <p className="form-text">Selected: {document.name}</p>}</div></div>
+                <div className="registration-uploads">
+                    <div className="subsection"><div className="subsection-title"><h3>Upload Valid ID and Birth Certificate</h3></div><div className="form-group"><label htmlFor="valid_id_document">Upload Valid ID and Birth Certificate <span>*</span></label><input id="valid_id_document" type="file" name="valid_id_document" required={!document} accept=".pdf,.jpg,.jpeg,.png" onChange={event => setDocument(event.target.files[0] || null)} /><p className="form-text">Accepted formats: PDF, JPG, JPEG, and PNG. Maximum file size: 5 MB.</p>{document && <p className="form-text">Selected: {document.name}</p>}</div></div>
+                    <RegistrationPhoto file={photo} onChange={setPhoto} />
+                </div>
 {/* ERROR */}
 
                 {error && (

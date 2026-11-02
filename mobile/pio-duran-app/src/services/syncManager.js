@@ -1,3 +1,4 @@
+import { API_BASE_URL as API_URL } from "./apiConfig";
 import axios from "axios";
 import { Network } from "@capacitor/network";
 import { toRequestBody } from "./requestPayload";
@@ -5,7 +6,7 @@ import { getSyncQueue, removeFromSyncQueue, updateQueueItem, getSyncReceipts, sa
 import { publishSyncState } from "./syncState";
 import { loadCachedBarangays } from "./barangayCache";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 let onlineStatus = navigator.onLine;
 let running = false;
 let generation = 0;

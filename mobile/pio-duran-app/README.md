@@ -1,3 +1,25 @@
+# Mobile API connection
+
+All mobile requests use `src/services/apiConfig.js`. Set `VITE_API_URL` in
+`mobile/pio-duran-app/.env.local` (copy `.env.example` first):
+
+```dotenv
+VITE_API_URL=https://your-domain.example
+```
+
+Use your actual Django server origin without `/api`. The root Django `.env`
+does not configure the mobile app. A physical phone cannot reach your laptop
+or VPS through `localhost`; use the live HTTPS domain, or your laptop's LAN
+address for local development.
+
+After changing this setting, run `npm run build`. For Android, run
+`npx cap sync android`, then rebuild and reinstall the APK. Changing the VPS
+environment alone does not update an already installed app.
+
+Check the server's `/api/registration-config/` and `/api/barangays/` endpoints
+before testing submissions. Without a setting the app uses
+`http://localhost:8000` for local development.
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

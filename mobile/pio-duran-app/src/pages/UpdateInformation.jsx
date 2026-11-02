@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../services/apiConfig";
 import RequestProfileFields from "../components/RequestProfileFields";
 import { initialRequestProfile, requestProfileError } from "../utils/requestProfile";
 import { calculateAge } from "../utils/calculateAge";
@@ -9,9 +10,7 @@ import "./UpdateInformation.css";
 
 import LookupModal from "../components/LookupModal";
 
-const API_BASE_URL =
-    import.meta.env.VITE_API_URL ||
-    "http://localhost:8000";
+
 
 function UpdateInformation() {
     const navigate = useNavigate();

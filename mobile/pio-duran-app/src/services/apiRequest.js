@@ -1,3 +1,4 @@
+import { API_BASE_URL as API_URL } from "./apiConfig";
 import { serializeRequestPayload, toRequestBody } from "./requestPayload";
 import axios from "axios";
 
@@ -18,9 +19,7 @@ API BASE URL
 =========================================================
 */
 
-const API_URL =
-    import.meta.env.VITE_API_URL ||
-    "http://localhost:8000";
+
 
 
 /*

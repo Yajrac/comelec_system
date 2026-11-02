@@ -1,8 +1,9 @@
+import { API_BASE_URL as API } from "./apiConfig";
 import axios from "axios";
 import { Preferences } from "@capacitor/preferences";
 import { Network } from "@capacitor/network";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 const KEY = `barangays:${API}`;
 export async function loadCachedBarangays() {
     const { value } = await Preferences.get({ key: KEY });
