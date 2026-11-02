@@ -312,7 +312,7 @@
          REASON
     ====================================================== -->
 
-            
+
 
             <!-- =====================================================
          ACTIONS
@@ -359,22 +359,9 @@
 
                         <div class="action-buttons">
 
-                            <!-- REVIEW -->
 
-                            <form
-                                method="post"
-                                action="{% url 'admin-application-action' 'reactivation' application.id 'review' %}"
-                            >
 
-                                {% csrf_token %}
 
-                                <button data-confirm-click="Mark this application as in review?" type="submit" class="btn btn-info text-white">
-                                    <i class="bi bi-eye me-1">
-                                    </i>
-                                    Review
-                                </button>
-
-                            </form>
 
                             <!-- DISAPPROVE -->
 
@@ -432,10 +419,10 @@
             <div class="card-header"><h2 class="h5 mb-0">Valid ID and Birth Certificate</h2></div>
             <div class="card-body">
                 {% if application.valid_id_document %}
-                    <a class="btn btn-outline-primary" href="{{ application.valid_id_document.url }}" target="_blank" rel="noopener"><i class="bi bi-file-earmark-text" aria-hidden="true"></i> View request document</a>
+                    {% include "components/document_preview.html" with document=application.valid_id_document document_label="View full document" only %}
                 {% else %}<p>No Valid ID and Birth Certificate were attached to this request.</p>{% endif %}
                 {% if application.applicant.valid_id_document %}
-                    <a class="btn btn-outline-secondary" href="{{ application.applicant.valid_id_document.url }}" target="_blank" rel="noopener">View original document</a>
+                    {% include "components/document_preview.html" with document=application.applicant.valid_id_document document_label="View original document" only %}
                 {% endif %}
             </div>
         </section>

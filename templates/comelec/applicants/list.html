@@ -35,7 +35,7 @@
 
                         <!-- SEARCH -->
 
-                        <div class="col-md-6">
+                        <div class="col-md-4">
 
                             <label class="form-label fw-semibold">Search Applicant</label>
 
@@ -60,7 +60,7 @@
 
                         <!-- BARANGAY -->
 
-                        <div class="col-md-5">
+                        <div class="col-md-3">
 
                             <label class="form-label fw-semibold">Barangay</label>
 
@@ -79,6 +79,16 @@
 
                             </select>
 
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="applicationTypeFilter" class="form-label fw-semibold">Type of Application</label>
+                            <select id="applicationTypeFilter" name="application_type" class="form-select">
+                                <option value="">All Application Types</option>
+                                {% for code, label in application_type_choices %}
+                                    <option value="{{ code }}"{% if application_type == code %} selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
 
                         <!-- ACTION -->
@@ -404,7 +414,7 @@
 
                                         <a
                                             class="page-link"
-                                            href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}{% if barangay_id %}&barangay={{ barangay_id }}{% endif %}"
+                                            href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}{% if barangay_id %}&barangay={{ barangay_id }}{% endif %}{% if application_type %}&application_type={{ application_type|urlencode }}{% endif %}"
                                         >Previous</a>
 
                                     </li>
@@ -429,7 +439,7 @@
 
                                             <a
                                                 class="page-link"
-                                                href="?page={{ num }}{% if search %}&search={{ search|urlencode }}{% endif %}{% if barangay_id %}&barangay={{ barangay_id }}{% endif %}"
+                                                href="?page={{ num }}{% if search %}&search={{ search|urlencode }}{% endif %}{% if barangay_id %}&barangay={{ barangay_id }}{% endif %}{% if application_type %}&application_type={{ application_type|urlencode }}{% endif %}"
                                             >{{ num }}</a>
 
                                         </li>
@@ -444,7 +454,7 @@
 
                                         <a
                                             class="page-link"
-                                            href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}{% if barangay_id %}&barangay={{ barangay_id }}{% endif %}"
+                                            href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}{% if barangay_id %}&barangay={{ barangay_id }}{% endif %}{% if application_type %}&application_type={{ application_type|urlencode }}{% endif %}"
                                         >Next</a>
 
                                     </li>
@@ -470,5 +480,5 @@
 {% endblock %}
 
 {% block extra_js %}
-    <script src="{% static 'js/applicant-search.js' %}" defer></script>
+    <script src="{% static 'js/applicant-search.js' %}?v=application-type" defer></script>
 {% endblock %}

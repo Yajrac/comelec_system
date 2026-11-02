@@ -1,0 +1,19 @@
+{% if document %}
+<div class="submitted-document-preview">
+    <div class="submitted-document-thumbnail">
+        {% if document.name|lower|slice:"-4:" == ".pdf" %}
+            <div class="submitted-pdf-pages" data-pdf-preview="{{ document.url }}" tabindex="0" role="region" aria-label="Submitted PDF preview">
+                <p class="submitted-pdf-status" role="status">Loading preview…</p>
+            </div>
+            <noscript>Use View full document below to open this PDF.</noscript>
+        {% else %}
+            <a href="{{ document.url }}" target="_blank" rel="noopener noreferrer" aria-label="View {{ document_label|default:'submitted document' }} in a new tab">
+                <img src="{{ document.url }}" alt="{{ document_label|default:'Submitted document' }} preview" loading="lazy" width="240" height="180">
+            </a>
+        {% endif %}
+    </div>
+    <a class="btn btn-outline-primary submitted-document-view" href="{{ document.url }}" target="_blank" rel="noopener noreferrer">
+        <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> {{ document_label|default:"View full document" }}
+    </a>
+</div>
+{% endif %}

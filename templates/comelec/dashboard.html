@@ -17,7 +17,7 @@
 
     <link
         rel="stylesheet"
-        href="{% static 'css/pages/comelec-dashboard.css' %}"
+        href="{% static 'css/pages/comelec-dashboard.css' %}?v=colorful-card-surfaces"
     >
     <link
         rel="stylesheet"
@@ -221,7 +221,7 @@
          VERIFICATION STATISTICS
     ====================================================== -->
 
-        <div class="row g-4 mt-1 dashboard-cards-flex">
+        <div class="row g-4 mt-1 dashboard-cards-flex dashboard-verification-summary">
 
             <!-- =================================================
              TOTAL APPLICATIONS
@@ -247,41 +247,6 @@
                                 <div class="text-muted small">Total Applications</div>
 
                                 <div class="fs-4 fw-bold">{{ total_applications }}</div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- =================================================
-             REVIEW
-        ================================================== -->
-
-            <div class="col-12 col-md-6 col-xl-3">
-
-                <div class="card dashboard-verification-card dashboard-card-review">
-
-                    <div class="card-body">
-
-                        <div class="d-flex align-items-center gap-3">
-
-                            <div class="fs-3">
-
-                                <i class="bi bi-eye">
-                                </i>
-
-                            </div>
-
-                            <div>
-
-                                <div class="text-muted small">Under Review</div>
-
-                                <div class="fs-4 fw-bold">{{ review_total }}</div>
 
                             </div>
 

@@ -547,6 +547,11 @@
 
 }
 
+.application-date-field { position: relative; }
+.application-date-field > .form-control { padding-right: 44px; }
+.application-date-icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #073ba8; }
+.application-date-picker { position: absolute; right: 0; top: 0; width: 40px; height: 100%; opacity: 0; cursor: pointer; }
+.application-date-field:focus-within { outline: 2px solid #073ba8; outline-offset: 2px; border-radius: 7px; }
 .application-type-summary { position: relative; display: inline-block; max-width: 280px; vertical-align: middle; }
 .application-table .application-type-summary .application-badge { max-width: 280px; box-sizing: border-box; overflow: hidden; white-space: nowrap; overflow-wrap: normal; justify-content: flex-start; }
 .application-table .application-badge-text { display: block; min-width: 0; flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }

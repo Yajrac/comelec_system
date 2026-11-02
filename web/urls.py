@@ -19,6 +19,7 @@ from core.views import admin_login
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 urlpatterns = [
     path('developer/login/', admin_login),
@@ -30,5 +31,9 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    media_patterns = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    for media_pattern in media_patterns:
+        # Allow document previews within this site while keeping other views protected.
+        media_pattern.callback = xframe_options_sameorigin(media_pattern.callback)
+    urlpatterns += media_patterns
 handler404 = "core.error_pages.page_not_found"

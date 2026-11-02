@@ -2,6 +2,7 @@ const applicantFilters = document.getElementById('applicantFilters');
 if (applicantFilters) {
   const search = applicantFilters.elements.search;
   const barangay = applicantFilters.elements.barangay;
+  const applicationType = applicantFilters.elements.application_type;
   const status = document.getElementById('applicantSearchStatus');
   let timeout;
   let controller;
@@ -47,5 +48,6 @@ if (applicantFilters) {
     if (event.key === 'Enter' && !event.isComposing) { event.preventDefault(); runSearch(); }
   });
   barangay.addEventListener('change', runSearch);
+  applicationType.addEventListener('change', runSearch);
   applicantFilters.addEventListener('submit', event => { event.preventDefault(); runSearch(); });
 }

@@ -2628,6 +2628,21 @@ def admin_applicants(request):
             brgy_id=barangay_id
         )
 
+    application_type = request.GET.get("application_type", "").strip().upper()
+    type_choices = [("NEW", "New Registration"), ("UPDATE", "Correction / Update"),
+                    ("TRANSFER", "Transfer"), ("REACTIVATION", "Reactivation"),
+                    ("REINSTATEMENT", "Reinstatement")]
+    if application_type not in dict(type_choices):
+        application_type = ""
+    request_models = {"UPDATE": ApplicantUpdateRequest, "TRANSFER": ApplicantTransferRequest,
+                      "REACTIVATION": ApplicantReactivationRequest,
+                      "REINSTATEMENT": ApplicantReinstatementRequest}
+    if application_type in request_models:
+        approved_ids = request_models[application_type].objects.filter(status="APPROVED").values("applicant_id")
+        applicants = applicants.filter(Q(application_type=application_type) | Q(pk__in=approved_ids))
+    elif application_type:
+        applicants = applicants.filter(application_type=application_type)
+
     if request.GET.get("format") == "print":
         from .report_print import render_application_list
         return render_application_list(request, applicants, ApplicantUpdateRequest.objects.none(),
@@ -2664,6 +2679,8 @@ def admin_applicants(request):
             "barangays": barangays,
             "search": search,
             "barangay_id": barangay_id,
+            "application_type": application_type,
+            "application_type_choices": type_choices,
         }
     )
 

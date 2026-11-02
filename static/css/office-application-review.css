@@ -1,4 +1,91 @@
 /* A continuous office-style sheet for all five administrator application views. */
+.submitted-document-preview {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    max-width: 100%;
+    margin: 0 20px 12px 0;
+    vertical-align: top;
+}
+
+.submitted-document-thumbnail {
+    width: 240px;
+    max-width: 100%;
+    height: 180px;
+    padding: 6px;
+    border: 1px solid #d5dce5;
+    border-radius: 6px;
+    background: #f8fafc;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.submitted-document-thumbnail a {
+    display: block;
+    height: 100%;
+}
+
+.office-review-sheet .submitted-document-thumbnail img,
+.submitted-document-thumbnail object {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border: 0;
+    color-scheme: light;
+}
+
+.submitted-document-view {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    padding: 8px 12px;
+}
+
+.submitted-pdf-pages {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 5px;
+    scrollbar-width: thin;
+    scrollbar-color: #a9bad3 #edf2f8;
+    color-scheme: light;
+}
+.submitted-pdf-pages::-webkit-scrollbar { width: 6px; }
+.submitted-pdf-pages::-webkit-scrollbar-track { background: #edf2f8; border-radius: 8px; }
+.submitted-pdf-pages::-webkit-scrollbar-thumb { background: #a9bad3; border-radius: 8px; }
+.submitted-pdf-pages::-webkit-scrollbar-thumb:hover { background: #718db8; }
+.submitted-pdf-pages::-webkit-scrollbar-button { display: none; }
+.submitted-pdf-pages:focus-visible { outline: 2px solid #0038a8; outline-offset: -2px; }
+.submitted-pdf-pages canvas { display: block; width: 100%; height: auto; margin-bottom: 6px; background: #fff; }
+.submitted-pdf-status { padding: 8px; margin: 0; font-size: 11px; color: #64748b; }
+
+.office-review-sheet .registration-action-body > .d-flex,
+.office-review-sheet :is(.action-buttons, .update-action-buttons) {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.office-review-sheet .review-side-panel .registration-action-body form,
+.office-review-sheet :is(.registration-action-body, .action-buttons, .update-action-buttons) form {
+    flex: 0 1 auto;
+    width: auto;
+    margin: 0;
+}
+
+.office-review-sheet .review-side-panel .registration-action-body button,
+.office-review-sheet :is(.registration-action-body, .action-buttons, .update-action-buttons) button {
+    width: auto;
+    min-width: 136px;
+    min-height: 42px;
+    padding: 10px 20px;
+}
+
 .office-review-sheet {
     background: #fff;
     border: 1px solid #d5dce5;
@@ -29,6 +116,31 @@
     margin-top: 20px;
     padding-top: 20px;
     border-top: 1px solid #e2e8f0;
+}
+
+.office-review-sheet .profile-details-section {
+    padding: 0;
+}
+
+.profile-personal-header {
+    padding: 12px 20px;
+    background: #f4f6f8;
+    border-top: 1px solid #d5dce5;
+    border-bottom: 1px solid #d5dce5;
+}
+
+.profile-personal-header h3 {
+    margin: 0;
+    border-left: 3px solid #0038a8;
+    padding-left: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: #142b54;
+}
+
+.office-review-sheet .profile-details-body {
+    padding: 20px;
 }
 
 .office-review-sheet :is(.registration-header, .transfer-page-header, .update-page-header,
@@ -84,6 +196,12 @@
     min-width: 0;
 }
 
+.office-review-sheet .request-review-page .reason-actions-layout > :is(.update-card, .reason-card, .action-panel, .update-action-card) {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+}
+
 .office-review-sheet .review-information > .row {
     --bs-gutter-x: 0;
     --bs-gutter-y: 0;
@@ -94,44 +212,76 @@
 }
 
 .office-review-sheet .profile-details-body {
-    display: grid;
-    grid-template-columns: 144px minmax(0, 1fr);
-    align-items: center;
+    display: flex;
+    align-items: flex-start;
     gap: 24px;
 }
 
 .office-review-sheet .profile-details-body .profile-additional-fields {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 22px 24px;
     margin: 0;
+}
+
+.office-review-sheet .profile-personal-information {
+    min-width: 0;
+    width: auto !important;
+}
+
+.office-review-sheet .profile-personal-information h3 {
+    color: #142b54;
+    font-weight: 600;
+}
+
+.office-review-sheet .profile-additional-fields > .profile-detail-field {
+    width: auto;
+    margin: 0;
+    grid-column: span 3;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+.office-review-sheet .profile-additional-fields > .profile-detail-field:nth-child(n + 5):nth-child(-n + 7) {
+    grid-column: span 3;
+}
+
+.office-review-sheet .profile-additional-fields > .profile-detail-birthplace {
+    grid-column: 1 / span 6;
+}
+
+.office-review-sheet .profile-additional-fields > .profile-detail-field:nth-last-child(-n + 2) {
+    grid-column: span 3;
 }
 
 .office-review-sheet .profile-detail-field {
     min-width: 0;
-    padding: 16px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    background: #f8fafc;
+    padding: 0;
+    border: 0;
+    background: transparent;
 }
 
 .office-review-sheet .profile-detail-field dt {
     margin: 0;
     color: #64748b;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
     line-height: 1.5;
 }
 
 .office-review-sheet .profile-detail-field dd {
-    margin: 8px 0 0;
+    margin: 6px 0 0;
     color: #142b54;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     overflow-wrap: anywhere;
 }
 
 .office-review-sheet .profile-photo-panel {
+    flex: 0 0 144px;
     text-align: center;
     min-width: 0;
 }
@@ -293,18 +443,27 @@
     }
 
     .office-review-sheet .profile-details-body {
-        grid-template-columns: minmax(0, 1fr);
+        flex-direction: column;
         gap: 16px;
     }
 
     .office-review-sheet .profile-photo-panel {
+        flex-basis: auto;
         width: 144px;
-        justify-self: center;
+        align-self: center;
+    }
+
+    .office-review-sheet .profile-personal-information {
+        width: 100% !important;
     }
 
     .office-review-sheet .profile-details-body .profile-additional-fields {
         grid-template-columns: minmax(0, 1fr);
         gap: 8px;
+    }
+
+    .office-review-sheet .profile-additional-fields > .profile-detail-field:nth-child(n) {
+        grid-column: auto;
     }
 
     .office-review-sheet .transfer-page-header > .d-flex {

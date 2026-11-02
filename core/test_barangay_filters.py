@@ -2,7 +2,7 @@ from datetime import date
 from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from Applicants.models import Applicant, Barangay, ApplicantTransferRequest
+from Applicants.models import Applicant, Barangay, ApplicantTransferRequest, ApplicantBiometric
 
 @override_settings(STORAGES={'default': {'BACKEND': 'django.core.files.storage.InMemoryStorage'}, 'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'}})
 class BarangayTypeFilterTests(TestCase):
@@ -36,3 +36,17 @@ class BarangayTypeFilterTests(TestCase):
         response = self.client.get(self.url, {'application_type': 'UPDATE'})
         self.assertEqual(response.context['applicants'].count(), 0)
         self.assertContains(response, 'No Matching Verified Applicants')
+
+    def test_admin_applicants_type_filter_combines_history_search_and_barangay(self):
+        for applicant in self.records:
+            ApplicantBiometric.objects.create(applicant=applicant, biometrics_completed=True, completed=True)
+        url = reverse('admin-applicants')
+        response = self.client.get(url, {'application_type': 'TRANSFER', 'barangay': self.barangay.pk})
+        self.assertEqual(list(response.context['applicants']), [self.records[0]])
+        self.assertContains(response, 'value="TRANSFER" selected')
+        response = self.client.get(url, {'application_type': 'TRANSFER', 'search': 'Pending'})
+        self.assertEqual(list(response.context['applicants']), [])
+        response = self.client.get(url, {'application_type': 'UPDATE'})
+        self.assertEqual(list(response.context['applicants']), [])
+        response = self.client.get(url, {'application_type': 'unknown'})
+        self.assertEqual(response.context['page_obj'].paginator.count, 3)

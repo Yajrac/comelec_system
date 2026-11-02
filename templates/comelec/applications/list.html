@@ -160,10 +160,11 @@
 
                             <div class="col-12 col-md-6 col-lg-2">
 
-                                <label class="form-label fw-semibold">From</label>
+                                <label for="applicationDateFrom" class="form-label fw-semibold">From</label>
 
                                 <input
                                     type="date"
+                                    id="applicationDateFrom"
                                     name="date_from"
                                     class="form-control"
                                     value="{{ date_from }}"
@@ -175,9 +176,9 @@
 
                             <div class="col-12 col-md-6 col-lg-2">
 
-                                <label class="form-label fw-semibold">To</label>
+                                <label for="applicationDateTo" class="form-label fw-semibold">To</label>
 
-                                <input type="date" name="date_to" class="form-control" value="{{ date_to }}">
+                                <input id="applicationDateTo" type="date" name="date_to" class="form-control" value="{{ date_to }}">
 
                             </div>
 
@@ -630,5 +631,6 @@
 
 {% endblock %}
 {% block extra_js %}
+    <script src="{% static 'js/application-date-filters.js' %}" defer></script>
     <script src="{% static 'js/application-search.js' %}" defer></script>
 {% endblock %}

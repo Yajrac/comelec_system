@@ -2,6 +2,39 @@
 
 const MAX_DOCUMENT_SIZE = 5 * 1024 * 1024;
 const ALLOWED_EXTENSIONS = [".pdf", ".jpg", ".jpeg", ".png"];
+const reviewAttachmentUrls = new Map();
+
+function updateReviewAttachment(kind, file) {
+    const image = document.getElementById(`review_${kind}_preview`);
+    const empty = document.getElementById(`review_${kind}_empty`);
+    const pdf = document.getElementById(`review_${kind}_pdf`);
+    const link = document.getElementById(`review_${kind}_link`);
+    image.hidden = true;
+    image.removeAttribute('src');
+    if (pdf) { pdf.hidden = true; pdf.removeAttribute('data'); }
+    if (link) { link.hidden = true; link.removeAttribute('href'); }
+    if (reviewAttachmentUrls.has(kind)) {
+        URL.revokeObjectURL(reviewAttachmentUrls.get(kind));
+        reviewAttachmentUrls.delete(kind);
+    }
+    empty.hidden = Boolean(file);
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    reviewAttachmentUrls.set(kind, url);
+    const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+    if (pdf && isPdf) {
+        pdf.data = `${url}#toolbar=0&navpanes=0&view=FitH`;
+        pdf.hidden = false;
+    }
+    else { image.src = url; image.hidden = false; }
+    if (link) { link.href = url; link.hidden = false; }
+}
+
+window.addEventListener('pagehide', event => {
+    if (event.persisted) return;
+    for (const url of reviewAttachmentUrls.values()) URL.revokeObjectURL(url);
+    reviewAttachmentUrls.clear();
+});
 
 function getValue(id) {
     const element = document.getElementById(id);
@@ -185,11 +218,7 @@ function showReview() {
     setReview("review_is_illiterate", document.getElementById("is_illiterate").checked ? "Yes" : "No");
     const photo = document.getElementById("photo").files[0];
     setReview("review_photo", photo ? photo.name : "No photo selected");
-    const photoPreview = document.getElementById("photoPreview");
-    const reviewPhoto = document.getElementById("review_photo_preview");
-    reviewPhoto.hidden = !photo || photoPreview.hidden;
-    if (!reviewPhoto.hidden) reviewPhoto.src = photoPreview.src;
-    else reviewPhoto.removeAttribute("src");
+    updateReviewAttachment("photo", photo);
     setReview("review_age", getValue("age"));
     setReview("review_sex", getSelectedText("sex"));
     setReview("review_birthdate", getValue("birthdate"));
@@ -218,6 +247,7 @@ function showReview() {
         "review_document_name",
         file ? file.name : "No document selected"
     );
+    updateReviewAttachment("document", file);
 
     setReview(
         "review_document_size",

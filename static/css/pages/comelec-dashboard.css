@@ -219,14 +219,13 @@
 }
 
 
-/* Match the applicant palette with white cards and restrained status accents. */
-.dashboard-stat-card, .dashboard-verification-card { background: #fff !important; border: 1px solid var(--admin-border) !important; color: var(--admin-text); box-shadow: 0 4px 18px #243b5304; }
+/* Soft status surfaces with dark, readable text. */
+.dashboard-stat-card, .dashboard-verification-card { background: var(--card-bg, #f0f5fc) !important; border: 1px solid var(--admin-border) !important; color: var(--admin-text); box-shadow: 0 4px 18px #243b5304; }
 .dashboard-stat-card:hover, .dashboard-verification-card:hover { box-shadow: 0 6px 20px #243b5312 !important; }
 .dashboard-stat-card .text-muted, .dashboard-verification-card .text-muted { color: var(--admin-muted) !important; }
 .dashboard-stat-card h2, .dashboard-verification-card .fs-4, .dashboard-verification-card .fs-3 { color: var(--admin-text) !important; }
 .dashboard-stat-icon { background: #edf3ff !important; color: var(--admin-blue) !important; }
-.dashboard-card-pending, .dashboard-card-biometrics { border-top: 3px solid #e6bc59 !important; }
-.dashboard-card-pending .dashboard-stat-icon, .dashboard-card-biometrics .dashboard-stat-icon { background: #fff5e8 !important; color: #a57522 !important; }
+.dashboard-card-pending, .dashboard-card-biometrics { border-top: 3px solid #a39acb !important; }
 .dashboard-card-approved, .dashboard-card-verified { border-top: 3px solid #69b78e !important; }
 .dashboard-card-approved .dashboard-stat-icon, .dashboard-card-verified .dashboard-stat-icon { background: #edf8f2 !important; color: #33956a !important; }
 .dashboard-card-disapproved { border-top: 3px solid #d6877f !important; }
@@ -250,7 +249,15 @@
 .dashboard-card-approved, .dashboard-card-verified { --icon-bg: #e6f6ed; --icon-color: #26845a; }
 .dashboard-card-disapproved { --icon-bg: #ffebe8; --icon-color: #c34f42; }
 .dashboard-card-total, .dashboard-card-barangays { --icon-bg: #e9f0ff; --icon-color: #2455bc; }
-.dashboard-card-review { --icon-bg: #f1ebff; --icon-color: #8055bd; }
+.dashboard-card-review { --card-bg: #eee5ad; --icon-bg: #dfd28b; --icon-color: #62591f; border-top-color: #b4a650 !important; }
+.dashboard-card-pending { --card-bg: #ddd0f3; --icon-bg: #c6b1e8; --icon-color: #543581; border-top-color: #9b7bc3 !important; }
+.dashboard-card-biometrics { --card-bg: #b8e2df; --icon-bg: #96cec9; --icon-color: #235f5c; border-top-color: #58a39c !important; }
+.dashboard-card-approved { --card-bg: #bfe2cd; --icon-bg: #9dceb1; --icon-color: #205c3c; border-top-color: #62a57c !important; }
+.dashboard-card-verified { --card-bg: #d7e2b7; --icon-bg: #becf94; --icon-color: #485f26; border-top-color: #94ab65 !important; }
+.dashboard-card-disapproved { --card-bg: #efc3ce; --icon-bg: #e5a5b6; --icon-color: #81334b; border-top-color: #c47a91 !important; }
+.dashboard-card-barangays { --card-bg: #bed5f3; --icon-bg: #9fbee8; --icon-color: #254d83; border-top-color: #6e99ce !important; }
+.dashboard-card-total { --card-bg: #bce2ee; --icon-bg: #99cddd; --icon-color: #265b71; border-top-color: #67a8bd !important; }
+.dashboard-stat-card .text-muted, .dashboard-verification-card .text-muted { color: #34445b !important; }
 .dashboard-stat-card .dashboard-stat-icon { background: var(--icon-bg) !important; color: var(--icon-color) !important; }
 @media (max-width: 575.98px) {
  .dashboard-stat-card .card-body, .dashboard-verification-card .card-body { padding: 18px; }
@@ -262,6 +269,7 @@
 .dashboard-cards-flex { display: flex; flex-wrap: wrap; }
 .dashboard-cards-flex > .col-12 { flex: 0 0 25%; max-width: 25%; display: flex; }
 .dashboard-cards-flex > .col-12 > .card { width: 100%; }
+.dashboard-verification-summary > .col-12 { flex: 1 1 240px; max-width: 100%; }
 .dashboard-stat-card .card-body > .d-flex, .dashboard-verification-card .card-body > .d-flex { display: flex !important; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
 @media (max-width: 1199.98px) { .dashboard-cards-flex > .col-12 { flex-basis: 50%; max-width: 50%; } }
 @media (max-width: 575.98px) {
