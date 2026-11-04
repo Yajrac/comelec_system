@@ -17,7 +17,7 @@
 
     <link
         rel="stylesheet"
-        href="{% static 'css/pages/comelec-applications-list.css' %}?v=unified-card-5"
+        href="{% static 'css/pages/comelec-applications-list.css' %}?v=responsive-table-10"
     >
 
 {% endblock %}
@@ -85,7 +85,7 @@
 
                             <!-- APPLICATION TYPE -->
 
-                            <div class="col-12 col-md-6 col-lg-2">
+                            <div class="col-6 col-lg-2">
 
                                 <label class="form-label fw-semibold">Application</label>
 
@@ -124,7 +124,7 @@
 
                             <!-- STATUS -->
 
-                            <div class="col-12 col-md-6 col-lg-2">
+                            <div class="col-6 col-lg-2">
 
                                 <label class="form-label fw-semibold">Status</label>
 
@@ -158,7 +158,7 @@
 
                             <!-- DATE FROM -->
 
-                            <div class="col-12 col-md-6 col-lg-2">
+                            <div class="col-6 col-lg-2">
 
                                 <label for="applicationDateFrom" class="form-label fw-semibold">From</label>
 
@@ -174,7 +174,7 @@
 
                             <!-- DATE TO -->
 
-                            <div class="col-12 col-md-6 col-lg-2">
+                            <div class="col-6 col-lg-2">
 
                                 <label for="applicationDateTo" class="form-label fw-semibold">To</label>
 
@@ -395,7 +395,7 @@
 
                                             <span class="application-date">{{ application.date|date:"M d, Y" }}</span>
 
-                                            <span class="application-time">{{ application.date|date:"M d, Y" }}</span>
+                                            <span class="application-time">{{ application.date|date:"g:i A" }}</span>
 
                                         {% else %}
 

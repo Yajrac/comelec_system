@@ -4,7 +4,10 @@
 
 .applications-page {
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
 }
+
 
 
 /* =========================================================
@@ -575,7 +578,7 @@
 .application-table .applicant-icon { width: 34px; height: 34px; min-width: 34px; flex: 0 0 34px; font-size: 15px; }
 .application-table .applicant-wrapper { gap: 10px; }
 
-.applications-workspace { background: white; border: 1px solid #d9e1ec; border-radius: 14px; box-shadow: 0 4px 14px #0f172a0f; }
+.applications-workspace { background: white; border: 1px solid #d9e1ec; border-radius: 14px; box-shadow: 0 4px 14px #0f172a0f; box-sizing: border-box; contain: inline-size; overflow: hidden; }
 .applications-workspace .application-filter-card, .applications-workspace .application-list-card { border: 0; border-radius: 0; box-shadow: none; margin: 0; }
 .applications-workspace .application-filter-card { border-radius: 14px 14px 0 0; }
 .applications-workspace .application-list-card { border-radius: 0 0 14px 14px; }
@@ -589,3 +592,36 @@
 #applicationResults[aria-busy="true"] .application-refresh-button i { animation: application-refresh-spin .7s linear infinite; }
 @keyframes application-refresh-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { #applicationResults[aria-busy="true"] .application-refresh-button i { animation: none; } }
+/* Keep the table scroll contained on small screens. */
+.applications-workspace :is(.application-filter-card, .application-list-card, #applicationResults) { min-width: 0; max-width: 100%; }
+.applications-workspace #applicationResults { width: 100%; }
+.applications-workspace .table-responsive { position: relative; min-width: 0; max-width: 100%; overflow-x: auto; }
+.applications-workspace .application-action-group .admin-icon-action { position: relative; }
+.applications-workspace .application-list-header-inner { flex-wrap: wrap; gap: 12px; }
+.applications-workspace .application-pagination .pagination { flex-wrap: wrap; }
+.applications-workspace .application-pagination nav { min-width: 0; max-width: 100%; }
+@media (max-width: 767.98px) {
+    .applications-workspace #applicationFilters .row > * { min-width: 0; }
+    .applications-workspace #applicationFilters :is(input, select) { min-width: 0; width: 100%; }
+    .applications-workspace #applicationFilters .application-date-picker { width: 40px; }
+    .applications-workspace #applicationFilters .admin-search-field > input { width: 1%; }
+    .applications-workspace .application-filter-body { padding: 16px; }
+    .applications-workspace .application-filter-header { padding: 14px 16px; }
+    .applications-workspace .application-filter-header-inner { gap: 12px; min-width: 0; }
+    .applications-workspace .application-filter-title { font-size: 15px; }
+    .applications-workspace .application-filter-subtitle { font-size: 12px; }
+    .applications-workspace .application-filter-actions { padding-top: 0; }
+    .applications-workspace .application-list-header { padding: 16px; }
+    .applications-workspace .table-responsive { width: 100%; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+    .admin-content .applications-workspace .application-table { width: 100%; min-width: 820px; margin: 0; }
+    .applications-workspace .applicant-wrapper > div:last-child { min-width: 0; }
+    .applications-workspace .applicant-email { max-width: 220px; overflow-wrap: anywhere; }
+    .applications-workspace .application-action-group { flex-direction: row; align-items: center; justify-content: flex-end; flex-wrap: nowrap; gap: 8px; }
+    .applications-workspace .application-action-group form { display: flex !important; flex: 0 0 auto; margin: 0; }
+    .applications-workspace .application-action-group .admin-icon-action { width: 44px; min-width: 44px; height: 44px; min-height: 44px; flex: 0 0 44px; padding: 0 !important; }
+    .applications-workspace .application-pagination { padding: 16px; }
+    .applications-workspace .application-pagination > div { gap: 12px !important; }
+}
+@media (max-width: 359.98px) {
+    .applications-workspace #applicationFilters .col-6 { width: 100%; }
+}
