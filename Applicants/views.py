@@ -1,5 +1,6 @@
 from pathlib import Path
 from Applicants.validation import validate_request
+from Applicants.submission_lock import registration_identity_lock
 from Applicants.profile_details import profile_values
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.validators import validate_email
@@ -16,6 +17,7 @@ def home(request):
 
 
 @validate_request(template="applicant/forms/new_registration.html")
+@registration_identity_lock
 def new_registration(request):
     barangays = Barangay.objects.all().order_by("name")
 

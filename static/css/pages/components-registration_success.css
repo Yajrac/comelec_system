@@ -1,6 +1,36 @@
 /* =========================================================
    PAGE HEADER
 ========================================================= */
+.registration-confirmation { width: 100%; min-width: 0; }
+.registration-confirmation .success-body { padding: 0; }
+.registration-confirmation .action-area { padding: 20px; }
+.registration-confirmation .registration-reference-card { margin: 20px; }
+.registration-confirmation .info-section { margin: 0; }
+.registration-confirmation :is(.section-title, .profile-personal-header) { position: relative; margin: 0; padding: 12px 20px 12px 34px; background: #f4f6f8; border-top: 1px solid #d5dce5; border-bottom: 1px solid #d5dce5; color: #142b54; font-size: 15px; font-weight: 600; }
+.registration-confirmation :is(.section-title, .profile-personal-header)::before { content: ''; position: absolute; left: 20px; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #0038a8; }
+.registration-confirmation .profile-personal-header h3 { display: flex; align-items: center; margin: 0; font-size: 15px; font-weight: 600; line-height: 1.5; }
+.registration-confirmation :is(.application-summary, .info-card) { padding: 20px; border: 0; background: #fff; }
+.registration-confirmation .profile-details-section { margin-bottom: 0 !important; }
+.registration-confirmation .profile-details-body { padding: 24px 20px; }
+.registration-confirmation .profile-photo-panel { flex: 0 0 144px; min-width: 0; text-align: center; }
+.registration-confirmation .profile-photo-link { display: inline-block; overflow: hidden; border: 1px solid #d5dce5; border-radius: 8px; }
+.registration-confirmation .profile-photo-link img { display: block; width: 120px; height: 144px; object-fit: contain; background: #f8fafc; }
+.registration-confirmation .profile-photo-placeholder { display: flex; min-height: 144px; padding: 16px 12px; flex-direction: column; align-items: center; justify-content: center; gap: 12px; border: 1px dashed #cbd5e1; border-radius: 8px; background: #f8fafc; color: #64748b; font-size: 12px; }
+.registration-confirmation .profile-photo-caption { display: block; margin-top: 8px; color: #64748b; font-size: 12px; }
+.registration-confirmation .profile-personal-information { min-width: 0; width: auto !important; }
+.registration-confirmation .profile-additional-fields { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 22px 24px; margin: 0; }
+.registration-confirmation .profile-detail-field { grid-column: span 3; width: auto; min-width: 0; margin: 0; padding: 0; }
+.registration-confirmation .profile-detail-birthplace { grid-column: 1 / span 6; }
+.registration-confirmation :is(.profile-detail-field dt, .detail-label) { margin: 0; color: #64748b; font-size: 10px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+.registration-confirmation :is(.profile-detail-field dd, .detail-value) { margin: 6px 0 0; color: #142b54; font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+@media (max-width: 767.98px) {
+    .registration-confirmation .profile-photo-panel { flex-basis: auto; width: 144px; align-self: center; }
+    .registration-confirmation .profile-personal-information { width: 100% !important; }
+    .registration-confirmation .profile-additional-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 14px; }
+    .registration-confirmation .profile-detail-field { grid-column: auto; }
+    .registration-confirmation .profile-detail-birthplace { grid-column: 1 / -1; }
+    .registration-confirmation .registration-reference-card { margin: 16px; padding: 16px; }
+}
 .page-header {
     margin-bottom: 28px;
 }

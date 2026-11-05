@@ -11,10 +11,11 @@
         {% block extra_css %}{% endblock %}
         <link rel="stylesheet" href="{% static 'css/input-validation.css' %}">
         <link rel="stylesheet" href="{% static 'css/scrollbars.css' %}">
+        <link rel="stylesheet" href="{% static 'css/web-offline.css' %}">
     </head>
     <body class="{% block body_class %}{% endblock %}">
-        <header class="header">
-            <div class="header-inner">
+        <header class="header public-header">
+            <div class="header-inner public-header-inner">
                 <a class="brand" href="{% url 'home' %}">
                     <img
                         src="{% static 'images/comelec.png' %}"
@@ -25,28 +26,30 @@
                         <small>Municipality of Pio Duran, Albay</small>
                     </span>
                 </a>
-
+                <nav id="publicNavigation" class="public-header-navigation" aria-label="Main navigation">
+                    <a href="{% url 'home' %}" {% if request.resolver_match.url_name == 'home' or offline_page == 'home' %}aria-current="page"{% endif %}>Home</a>
+                    <a href="{% url 'new-registration' %}" {% if request.resolver_match.url_name == 'new-registration' or offline_page == 'registration' %}aria-current="page"{% endif %}>New registration</a>
+                    <a href="{% url 'applicant-offline' %}" {% if request.resolver_match.url_name == 'applicant-offline' or offline_page == 'saved' %}aria-current="page"{% endif %}>Offline</a>
+                </nav>
+                <span id="publicConnectionBadge" class="public-connection-badge" data-state="checking" role="status" aria-live="polite">
+                    <span class="public-connection-dot" aria-hidden="true"></span>
+                    <span id="publicConnectionLabel">Checking…</span>
+                </span>
+                <button id="publicMenuToggle" class="public-menu-toggle" type="button" aria-controls="publicNavigation" aria-expanded="false" aria-label="Open navigation menu" hidden>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
             </div>
         </header>
-        <nav class="navigation" aria-label="Main navigation">
-            <div class="nav-inner">
-                <a
-                    href="{% url 'home' %}"
-                    {% if request.resolver_match.url_name == "home" %}aria-current="page"{% endif %}
-                >Home</a>
-                <a
-                    href="{% url 'new-registration' %}"
-                    {% if request.resolver_match.url_name == "new-registration" %}aria-current="page"{% endif %}
-                >New registration</a>
-            </div>
-        </nav>
 
         <main>{% block content %}{% endblock %}<footer>Commission on Elections <span>&bull;</span> Pio Duran, Albay
             </footer>
         </main>
         <script src="{% static 'js/staff-workspace.js' %}" defer></script>
+        <script src="{% static 'js/public-navigation.js' %}" defer></script>
         {% block extra_js %}{% endblock %}
         <script src="{% static 'js/input-validation.js' %}" defer></script>
         <script src="{% static 'js/template-actions.js' %}" defer></script>
+        <script src="{% static 'js/public-connection.js' %}" defer></script>
+        <script src="{% static 'js/web-offline.js' %}" defer></script>
     </body>
 </html>

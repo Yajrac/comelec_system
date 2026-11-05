@@ -5,8 +5,10 @@ from django.shortcuts import render
 def page_not_found(request, exception=None):
     if request.path.startswith(("/api/", "/comelec/api/")):
         return JsonResponse({"success": False, "error": "Endpoint not found."}, status=404)
+    admin_path = request.path == '/comelec' or request.path.startswith('/comelec/')
     is_admin = request.user.is_authenticated and request.user.is_superuser
-    return render(request, "errors/404.html", {"is_admin": is_admin}, status=404)
+    template = 'errors/404.html' if admin_path else 'errors/applicant_404.html'
+    return render(request, template, {"is_admin": is_admin}, status=404)
 
 
 class FriendlyNotFoundMiddleware:

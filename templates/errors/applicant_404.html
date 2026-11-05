@@ -1,0 +1,23 @@
+{% extends "staff/base.html" %}
+{% load static %}
+{% block title %}Page not found | Applicant services{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/applicant-404.css' %}">
+{% endblock %}
+{% block content %}
+<section class="applicant-not-found" aria-labelledby="missingPageTitle">
+    <div class="applicant-not-found-icon" aria-hidden="true">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21v-2a8 8 0 0 1 16 0v2M9 21h6" />
+        </svg>
+    </div>
+    <span class="eyebrow">ERROR 404</span>
+    <h1 id="missingPageTitle">Page not found</h1>
+    <p>We couldn't find the page you're looking for. Check the address or return to Applicant services to continue.</p>
+    <a class="offline-button" href="{% url 'home' %}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7M5 12h14" /></svg>
+        Back to Home
+    </a>
+</section>
+{% endblock %}

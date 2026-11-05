@@ -99,6 +99,7 @@
       sync(false);
     }
     restore(initial);
+    original.addEventListener('offline:restore', () => restore(original.value));
     month.addEventListener('change', () => { sync(); if (month.value) day.focus(); });
     day.addEventListener('change', () => { sync(); if (day.value) year.focus(); });
     year.addEventListener('input', () => { year.value = year.value.replace(/[^0-9]/g, '').slice(0, 4); sync(); });

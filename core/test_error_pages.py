@@ -18,8 +18,16 @@ class ErrorPageTests(TestCase):
     def test_admin_can_return_to_dashboard(self):
         user = get_user_model().objects.create_superuser(username="errorsadmin", password="test-password")
         self.client.force_login(user)
-        response = self.client.get("/missing-page/")
+        response = self.client.get("/comelec/missing-page/")
         self.assertContains(response, reverse("dashboard"), status_code=404)
+
+    def test_public_404_stays_public_even_for_logged_in_admin(self):
+        user = get_user_model().objects.create_superuser(username='publicerrors', password='test-password')
+        self.client.force_login(user)
+        response = self.client.get('/com')
+        self.assertTemplateUsed(response, 'errors/applicant_404.html')
+        self.assertContains(response, 'Back to Home', status_code=404)
+        self.assertNotContains(response, 'Back to dashboard', status_code=404)
 
     def test_api_404_stays_json(self):
         with override_settings(DEBUG=True):

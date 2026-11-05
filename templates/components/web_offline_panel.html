@@ -1,0 +1,16 @@
+<section class="web-offline-panel" id="webOfflinePanel" aria-labelledby="offlinePanelTitle"{% if form_only %} hidden{% endif %}>
+    <div class="web-offline-heading">
+        <div><h2 id="offlinePanelTitle">Saved applications</h2></div>
+        <button class="offline-button" type="button" id="webSyncNow">Sync now</button>
+    </div>
+    <p id="webOfflineMessage" role="status" aria-live="polite">Checking this browser's saved drafts…</p>
+    <p id="webOfflineReady" class="web-offline-note" role="status" aria-live="polite"></p>
+    <ul id="webOfflineRecords" class="web-offline-records"></ul>
+</section>
+<dialog id="webSyncSuccessDialog" class="web-sync-success-dialog" aria-labelledby="webSyncSuccessTitle" aria-describedby="webSyncSuccessDescription">
+    <div class="web-sync-success-icon" aria-hidden="true">✓</div>
+    <h2 id="webSyncSuccessTitle">Registration submitted successfully</h2>
+    <p id="webSyncSuccessDescription">The server has saved your application. Open your registration confirmation to view the applicant details and reference number.</p>
+    <ul id="webSyncSuccessReferences"></ul>
+    <button type="button" class="offline-button" id="webSyncSuccessClose">Close</button>
+</dialog>

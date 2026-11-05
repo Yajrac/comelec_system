@@ -15,6 +15,16 @@
     let stream;
     let session = 0;
     let url;
+    photo.form?.addEventListener('offline:submitted', () => {
+        stopCamera();
+        if (url) URL.revokeObjectURL(url);
+        url = null;
+        photo.setCustomValidity('');
+        error.textContent = '';
+        status.textContent = '';
+        preview.hidden = true;
+        preview.removeAttribute('src');
+    });
 
     function stopCamera() {
         session += 1;

@@ -275,6 +275,15 @@ function backToForm() {
 }
 
 /* SUBMIT REGISTRATION */
+document.getElementById('registrationForm').addEventListener('offline:submitted', () => {
+    updateReviewAttachment('photo', null);
+    updateReviewAttachment('document', null);
+    document.querySelectorAll('#registrationForm .is-invalid').forEach(element => element.classList.remove('is-invalid'));
+    for (const id of ['documentError', 'documentFileInfo', 'phoneError']) {
+        const element = document.getElementById(id);
+        if (element) element.style.display = 'none';
+    }
+});
 function submitApplication() {
     const form = document.getElementById("registrationForm");
 
@@ -306,6 +315,10 @@ function submitApplication() {
 
     const submitButton = document.getElementById("submitButton");
 
+    if (window.webOfflineRegistration) {
+        window.webOfflineRegistration.submit(form, submitButton);
+        return;
+    }
     submitButton.disabled = true;
     window.setApplicationSubmitting(submitButton);
 

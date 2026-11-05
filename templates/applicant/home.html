@@ -6,7 +6,7 @@
 {% endblock %}
 {% block title %}Applicant Services | COMELEC Pio Duran{% endblock %}
 {% block content %}
-    <div class="breadcrumb">Voter registration <span>/</span> Home</div>
+    {% include 'components/web_offline_panel.html' with form_only=True %}
     <section class="page-heading">
         <div>
             <span class="eyebrow">COMELEC PIO DURAN</span>

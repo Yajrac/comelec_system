@@ -19,6 +19,10 @@
 {% endblock %}
 
 {% block content %}
+    {% if not request.walk_in_base %}
+        {% include 'components/web_offline_panel.html' with form_only=True %}
+        <p id="webRegistrationStatus" class="web-registration-status" role="status" aria-live="polite"></p>
+    {% endif %}
 
         <!-- REGISTRATION FORM SCREEN -->
         <div id="formScreen" class="registration-container">

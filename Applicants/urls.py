@@ -1,9 +1,16 @@
 from django.urls import path
 
 from . import views
+from . import offline
 
 
 urlpatterns = [
+    path('offline/', offline.saved_applications, name='applicant-offline'),
+    path('web-offline-sw.js', offline.service_worker, name='web-offline-worker'),
+    path('offline/connection/', offline.connection_status, name='web-connection-status'),
+    path('offline/shell/home/', offline.offline_shell, {'page': 'home'}, name='offline-home-shell'),
+    path('offline/shell/registration/', offline.offline_shell, {'page': 'registration'}, name='offline-registration-shell'),
+    path('offline/shell/saved/', offline.offline_shell, {'page': 'saved'}, name='offline-saved-shell'),
 
     path(
         "",

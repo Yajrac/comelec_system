@@ -1,7 +1,9 @@
 from .mobile_submission import mobile_submission
+from Applicants.submission_lock import registration_identity_lock
 from Applicants.profile_details import profile_values
 from Applicants.validation import validate_request
 from django.shortcuts import render
+from django.urls import reverse
 from datetime import datetime
 import json
 from django.http import JsonResponse
@@ -160,8 +162,9 @@ def barangay_list(request):
     return JsonResponse(data, safe=False)
 
 @csrf_exempt
-@validate_request(api=True)
 @mobile_submission
+@validate_request(api=True)
+@registration_identity_lock
 def new_registration_api(request):
 
     # =========================================================
@@ -518,6 +521,7 @@ def new_registration_api(request):
             "message": "New registration submitted successfully.",
             "applicant_id": applicant.id,
             "registration_reference": applicant.registration_reference,
+            "success_url": reverse('registration-success', args=[applicant.id]),
             "application_type": applicant.application_type,
             "status": applicant.status,
             "verification_status": applicant.verification_status,

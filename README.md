@@ -137,3 +137,39 @@ both regular-voter and SK age requirements, and 31+ meets the regular-voter age
 requirement. This checks age only; it does not determine registration-period,
 residency, citizenship, or final COMELEC approval. Current age remains calculated
 from birthdate separately. Web and API submissions enforce the same minimum age.
+
+# Public web offline registration
+
+Applicant Home, New Registration and the Offline page support a foreground sync queue
+without an installable PWA or manifest. A first online visit prepares anonymous
+page shells and static resources, including the Offline page. Wait for the "ready to reopen offline" message
+before disconnecting. Other applicant services and admin pages require internet.
+
+Drafts and attachments use this browser's IndexedDB. The Offline page lists drafts, pending
+items, correction messages, and server-confirmed reference numbers. Sync runs
+while Home, New Registration or Offline is open, on reconnect, every minute, and with
+"Sync now". Closing the browser does not schedule background uploads. Browser
+storage deletion, private browsing cleanup, or storage eviction can remove
+unsynced data; a shared browser profile also shares its local drafts.
+
+Retries reuse `client_reference` with the existing submission receipt API. A
+database mutex serializes requests for the same reference and registrations of
+the same name/birthdate through the public web and API paths. Database identity
+and reference locks require migration `Applicants.0031_registration_identity_lock`.
+Successful sync removes local form values and attachments, retaining only the
+confirmation reference. Correction items keep their original ID and files.
+Confirmed sync also displays a success dialog with the reference and a link to
+the same registration-success page used by online form submissions. Submitted
+items retain that link. Only the submitted draft is reset; another in-progress
+draft is kept. The upper-right X removes a local copy after confirmation and
+is disabled during sync; duplicate/validation errors keep their data until the
+user corrects or explicitly removes them.
+
+Deployment: run `python manage.py migrate`, `python manage.py collectstatic
+--noinput`, and reload the application. Serve `/web-offline-sw.js` through Django
+over HTTPS with its JavaScript MIME type and no-cache header. Do not map it to
+Nginx static storage. The worker caches only anonymous Home/registration shells
+and their public assets; it never caches submissions, lookups, uploads, admin
+pages, or success pages. Public 404s use the applicant theme; `/comelec/` 404s
+keep the administrator error page. Offline navigation failures have a distinct
+503 offline message. The existing mobile project is retained as a reference.

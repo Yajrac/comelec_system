@@ -1,11 +1,12 @@
 """Replay-safe mobile submissions when a connection drops after the server saves."""
 import json
+import hashlib
 import re
 from functools import wraps
 
 from django.db import IntegrityError, transaction
 from django.http import JsonResponse
-from Applicants.models import MobileSubmissionReceipt
+from Applicants.models import MobileSubmissionReceipt, RegistrationIdentityLock
 
 
 def mobile_submission(view):
@@ -33,6 +34,12 @@ def mobile_submission(view):
             return replay(receipt)
         try:
             with transaction.atomic():
+                key = hashlib.sha256(('receipt:' + reference).encode()).hexdigest()
+                RegistrationIdentityLock.objects.get_or_create(key=key)
+                RegistrationIdentityLock.objects.select_for_update().get(key=key)
+                receipt = MobileSubmissionReceipt.objects.filter(client_reference=reference).first()
+                if receipt:
+                    return replay(receipt)
                 response = view(request, *args, **kwargs)
                 if 200 <= response.status_code < 300:
                     MobileSubmissionReceipt.objects.create(client_reference=reference, endpoint=view.__name__,

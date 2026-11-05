@@ -36,6 +36,11 @@ class MobileSubmissionReceipt(models.Model):
     status_code = models.PositiveSmallIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+
+class RegistrationIdentityLock(models.Model):
+    """Database mutex for concurrent web/API registrations of one identity."""
+    key = models.CharField(max_length=64, primary_key=True)
+
 def generate_registration_reference():
     return "PD-" + uuid.uuid4().hex.upper()
 
