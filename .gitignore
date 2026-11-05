@@ -46,6 +46,7 @@ dist-ssr/
 .gradle/
 local.properties
 /mobile/**/build/
+/signature-app/android/**/build/
 *.apk
 *.aab
 .externalNativeBuild/

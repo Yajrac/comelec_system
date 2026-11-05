@@ -2,6 +2,19 @@ const signatureCapture = document.getElementById('signatureCapture');
 if (signatureCapture) {
   const cards = [...signatureCapture.querySelectorAll('[data-signature-slot]')];
   const token = document.querySelector('#csrfForm [name="csrfmiddlewaretoken"]')?.value || '';
+  document.getElementById('pairSignatureDevice')?.addEventListener('click', async event => {
+    if (!confirm('Pair a signing device to your officer account? Any previously paired device will be disconnected.')) return;
+    const button = event.currentTarget;
+    const output = document.getElementById('signaturePairingCode');
+    button.disabled = true;
+    try {
+      const response = await fetch(signatureCapture.dataset.pairUrl, {method: 'POST', headers: {'X-CSRFToken': token}});
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.message || 'Unable to generate code.');
+      output.textContent = `Pairing code: ${data.code.match(/.{1,4}/g).join('-')} — enter in the app within 5 minutes, then start Capture Signature. One device per officer account.`;
+    } catch (error) { output.textContent = error.message; }
+    finally { button.disabled = false; }
+  });
   const uuidPlaceholder = '00000000-0000-0000-0000-000000000000';
   let active = null;
   let timer;

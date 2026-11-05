@@ -60,6 +60,42 @@ class ThreeSignatureTests(TestCase):
         self.assertEqual(self.upload(data['session_id']).status_code, 200)
         self.assertEqual(self.upload(data['session_id']).status_code, 400)
 
+    def test_device_pairing_is_single_use_scoped_and_revocable(self):
+        code = self.client.post(reverse('signature-create-pairing')).json()['code']
+        claim_url = reverse('signature-claim-pairing')
+        device = self.client_class()
+        claim = device.post(claim_url, json.dumps({'code': code}), content_type='application/json')
+        self.assertEqual(claim.status_code, 200)
+        token = claim.json()['token']
+        self.assertEqual(device.post(claim_url, json.dumps({'code': code}), content_type='application/json').status_code, 400)
+        url = reverse('signature-paired-request')
+        headers = {'HTTP_AUTHORIZATION': 'Bearer ' + token}
+        self.assertEqual(device.get(url).status_code, 401)
+        self.assertIsNone(device.get(url, **headers).json()['session'])
+        session = self.start(2).json()['session_id']
+        response = device.get(url, **headers)
+        self.assertEqual(response.json()['session']['session_id'], session)
+        self.assertEqual(response['Cache-Control'], 'no-store')
+        other = get_user_model().objects.create_superuser('other-signing-officer', 'other@example.com', 'password')
+        SignatureSession.objects.create(officer=other, applicant=self.applicant, signature_slot=3)
+        self.assertEqual(device.get(url, **headers).json()['session']['session_id'], session)
+        self.upload(session)
+        self.assertIsNone(device.get(url, **headers).json()['session'])
+        self.client.post(reverse('signature-create-pairing'))
+        self.assertEqual(device.get(url, **headers).status_code, 401)
+
+    def test_expired_pairing_and_non_admin_are_rejected(self):
+        from Applicants.models import SignatureDevicePairing
+        from django.utils import timezone
+        from datetime import timedelta
+        code = self.client.post(reverse('signature-create-pairing')).json()['code']
+        SignatureDevicePairing.objects.update(expires_at=timezone.now() - timedelta(seconds=1))
+        response = self.client.post(reverse('signature-claim-pairing'), json.dumps({'code': code}), content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.admin.is_superuser = False
+        self.admin.save()
+        self.assertEqual(self.client.post(reverse('signature-create-pairing')).status_code, 403)
+
     def test_three_samples_and_two_fingers_required(self):
         self.biometric.left_finger.save('left.png', ContentFile(self.png))
         self.biometric.right_finger.save('right.png', ContentFile(self.png))

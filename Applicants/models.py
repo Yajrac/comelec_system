@@ -609,6 +609,14 @@ class ApplicantNotification(models.Model):
     def __str__(self):
         return f"{self.title} - {self.applicant}"
 
+class SignatureDevicePairing(models.Model):
+    officer = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    code_hash = models.CharField(max_length=64, unique=True)
+    expires_at = models.DateTimeField()
+    token_hash = models.CharField(max_length=64, blank=True)
+    paired_at = models.DateTimeField(null=True, blank=True)
+
+
 class SignatureSession(models.Model):
 
     STATUS_WAITING = "WAITING"

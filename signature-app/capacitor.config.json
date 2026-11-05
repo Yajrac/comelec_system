@@ -1,0 +1,10 @@
+{
+  "appId": "com.pioduran.signature",
+  "appName": "Pio Duran Signature",
+  "webDir": "www",
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}

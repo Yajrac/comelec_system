@@ -2,10 +2,14 @@ from django.urls import path
 from . import views
 from .receipts import acknowledgment_receipt
 from .signatures import signature_device
+from .signature_pairing import create_pairing, claim_pairing, paired_request
 from .walk_in import walk_in
 from .admin_security import change_admin_password, password_requirements
 
 urlpatterns = [
+    path("admin/signature/pair/", create_pairing, name="signature-create-pairing"),
+    path("api/signature/pair/", claim_pairing, name="signature-claim-pairing"),
+    path("api/signature/device/request/", paired_request, name="signature-paired-request"),
     path("signature/<uuid:session_id>/", signature_device, name="signature-device"),
     path("admin-applicants/<int:applicant_id>/receipt/", acknowledgment_receipt, name="acknowledgment-receipt"),
     path("password-requirements/", password_requirements, name="admin-password-requirements"),

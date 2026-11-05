@@ -7,8 +7,10 @@ import uuid
 from io import BytesIO
 from PIL import Image
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.db import transaction
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -42,8 +44,9 @@ def start_signature_session(request, applicant_id):
     except (ValueError, TypeError, AttributeError, UnicodeDecodeError):
         return JsonResponse({"success": False, "message": "Select signature slot 1, 2, or 3."}, status=400)
     with transaction.atomic():
+        get_user_model().objects.select_for_update().get(pk=request.user.pk)
         applicant = get_object_or_404(Applicant.objects.select_for_update(), pk=applicant_id)
-        SignatureSession.objects.filter(applicant=applicant, status=SignatureSession.STATUS_WAITING).update(status=SignatureSession.STATUS_CANCELLED, cancelled_at=timezone.now())
+        SignatureSession.objects.filter(Q(applicant=applicant) | Q(officer_id=request.user.pk), status=SignatureSession.STATUS_WAITING).update(status=SignatureSession.STATUS_CANCELLED, cancelled_at=timezone.now())
         session = SignatureSession.objects.create(applicant=applicant, officer=request.user, signature_slot=slot)
     return JsonResponse({"success": True, "session_id": str(session.session_id), "applicant_id": applicant.id, "applicant_name": str(applicant), "signature_slot": slot, "status": session.status, "signing_url": reverse("signature-device", args=[session.session_id])})
 

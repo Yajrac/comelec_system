@@ -126,6 +126,7 @@
             class="bio-card mb-4"
             id="signatureCapture"
             data-start-url="{% url 'start-signature-session' applicant.id %}"
+            data-pair-url="{% url 'signature-create-pairing' %}"
             data-status-url="{% url 'signature-session-status' '00000000-0000-0000-0000-000000000000' %}"
             data-cancel-url="{% url 'cancel-signature-session' '00000000-0000-0000-0000-000000000000' %}"
         >
@@ -140,6 +141,10 @@
             </div>
             <div class="bio-card-body">
                 <p class="signature-instructions">Capture three separate signature samples using the connected signing device. Each sample has its own preview and can be retaken without changing the other samples.</p>
+                <div class="signature-instructions">
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="pairSignatureDevice">Pair / replace signature app</button>
+                    <p id="signaturePairingCode" role="status" aria-live="polite"></p>
+                </div>
                 <div class="signature-samples-grid">
                     {% for sample in signature_slots %}
                         <article
