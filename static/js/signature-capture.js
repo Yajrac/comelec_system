@@ -103,6 +103,12 @@ if (signatureCapture) {
         showLoading(button, 'Waiting for signing device...');
         card.querySelector('[data-slot-cancel]').hidden = false;
         setMessage(card, `Please sign sample ${card.dataset.signatureSlot} on the connected device. Other samples will not be changed.`);
+        if (data.signing_url) {
+          const link = document.createElement('a');
+          link.href = data.signing_url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+          link.textContent = ' Open signing page (copy this link to the tablet).';
+          card.querySelector('[data-slot-message]').append(link);
+        }
         poll();
       } catch (error) { resetControls(); setMessage(card, error.message, true); }
     });

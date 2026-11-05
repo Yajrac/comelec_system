@@ -1,10 +1,12 @@
 from django.urls import path
 from . import views
 from .receipts import acknowledgment_receipt
+from .signatures import signature_device
 from .walk_in import walk_in
 from .admin_security import change_admin_password, password_requirements
 
 urlpatterns = [
+    path("signature/<uuid:session_id>/", signature_device, name="signature-device"),
     path("admin-applicants/<int:applicant_id>/receipt/", acknowledgment_receipt, name="acknowledgment-receipt"),
     path("password-requirements/", password_requirements, name="admin-password-requirements"),
     path("change-password/", change_admin_password, name="admin-change-password"),
