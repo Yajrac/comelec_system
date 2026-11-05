@@ -1,7 +1,7 @@
 # Pio Duran Signature (Android)
 
 The app bundles its own signing interface and uses the existing VPS signature API.
-The browser signing page remains available during Android testing.
+Signature capture is provided through the paired Android app.
 
 ## Build and test
 
@@ -33,10 +33,9 @@ QR scanning is not included. Internet is required for polling and submission.
 Drawings stay in memory and are lost if the app closes before saving.
 
 Deploy migration `Applicants.0032_signaturedevicepairing`, collectstatic, and reload
-Gunicorn before testing this APK. The original web signing links still work.
+Gunicorn before testing this APK. The browser signing page has been removed.
 
 CapacitorHttp is enabled to use native Android requests across the local WebView
 and VPS origins without loosening backend CORS settings. Browser previews require
 mocked API requests; validate real connectivity on Android. The HTML/CSS and drawing
-logic are adapted from the web signing page; keep both copies aligned when fixing
-shared drawing behavior.
+logic are bundled inside the Android app.

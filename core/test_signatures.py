@@ -46,17 +46,10 @@ class ThreeSignatureTests(TestCase):
         self.assertFalse(self.biometric.applicant_signature_2)
         self.assertFalse(self.biometric.completed)
 
-    def test_signing_link_is_bound_to_selected_session(self):
+    def test_apk_session_upload_is_single_use(self):
         data = self.start(2).json()
-        self.assertEqual(data['signing_url'], reverse('signature-device', args=[data['session_id']]))
+        self.assertNotIn('signing_url', data)
         self.client.logout()
-        response = self.client.get(data['signing_url'])
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'signatureCanvas')
-        self.assertContains(response, 'Sample 2 / 3')
-        self.assertContains(response, data['session_id'])
-        self.assertEqual(response['Cache-Control'], 'no-store')
-        self.assertEqual(response['Referrer-Policy'], 'no-referrer')
         self.assertEqual(self.upload(data['session_id']).status_code, 200)
         self.assertEqual(self.upload(data['session_id']).status_code, 400)
 

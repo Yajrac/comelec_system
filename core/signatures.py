@@ -12,8 +12,7 @@ from django.core.files.base import ContentFile
 from django.db import transaction
 from django.db.models import Q
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
@@ -21,14 +20,6 @@ from Applicants.models import Applicant, ApplicantBiometric, SignatureSession
 from .biometric_state import SIGNATURE_FIELDS, file_exists, signatures_complete, capture_complete, sync_completion
 
 logger = logging.getLogger(__name__)
-
-@require_GET
-def signature_device(request, session_id):
-    session = get_object_or_404(SignatureSession.objects.select_related("applicant"), session_id=session_id)
-    response = render(request, "components/signature_device.html", {"session": session})
-    response["Cache-Control"] = "no-store"
-    response["Referrer-Policy"] = "no-referrer"
-    return response
 
 @login_required
 @require_POST
@@ -48,7 +39,7 @@ def start_signature_session(request, applicant_id):
         applicant = get_object_or_404(Applicant.objects.select_for_update(), pk=applicant_id)
         SignatureSession.objects.filter(Q(applicant=applicant) | Q(officer_id=request.user.pk), status=SignatureSession.STATUS_WAITING).update(status=SignatureSession.STATUS_CANCELLED, cancelled_at=timezone.now())
         session = SignatureSession.objects.create(applicant=applicant, officer=request.user, signature_slot=slot)
-    return JsonResponse({"success": True, "session_id": str(session.session_id), "applicant_id": applicant.id, "applicant_name": str(applicant), "signature_slot": slot, "status": session.status, "signing_url": reverse("signature-device", args=[session.session_id])})
+    return JsonResponse({"success": True, "session_id": str(session.session_id), "applicant_id": applicant.id, "applicant_name": str(applicant), "signature_slot": slot, "status": session.status})
 
 @require_GET
 def get_waiting_signature_session(request):
