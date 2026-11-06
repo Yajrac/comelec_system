@@ -31,7 +31,7 @@
 
         .government-header {
             background: var(--gov-blue);
-            border-bottom: 4px solid var(--gov-gold);
+            border-bottom: 0;
             color: white;
         }
 

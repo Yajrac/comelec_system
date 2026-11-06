@@ -7,7 +7,7 @@ a { color: inherit; text-decoration: none; }
 button, input, select { font: inherit; }
 button, summary, a { -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 3px solid #d69f00; outline-offset: 4px; }
-.header { background: var(--blue); color: white; border-bottom: 4px solid #f5cf39; }
+.header { background: var(--blue); color: white; border-bottom: 0; }
 .header-inner, .nav-inner, main { max-width: 1280px; margin: auto; }
 .header-inner { min-height: 84px; display: flex; align-items: center; justify-content: space-between; padding: 13px 32px; gap: 20px; }
 .brand { display: flex; align-items: center; gap: 17px; }

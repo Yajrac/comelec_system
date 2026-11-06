@@ -3,7 +3,7 @@
 
 {% block title %}Print Registration Slips{% endblock %}
 {% block page_title %}Print Registration Slips{% endblock %}
-{% block page_subtitle %}Applicant and COMELEC registration copies{% endblock %}
+{% block page_subtitle %}Applicant and Pio Duran Voter Registration registration copies{% endblock %}
 
 {% block extra_css %}
     <link
@@ -31,7 +31,7 @@
             <button type="button" class="btn btn-primary" data-click-action="print">
                 <i class="bi bi-printer me-1">
                 </i>
-                Print Applicant &amp; COMELEC Copies
+                Print Applicant &amp; Pio Duran Voter Registration Copies
             </button>
         </div>
 
@@ -49,7 +49,7 @@
                             <div class="row align-items-center">
                                 <div class="col-md-8">
                                     <div class="government-title">Republic of the Philippines</div>
-                                    <div class="office-title">Commission on Elections</div>
+                                    <div class="office-title">Pio Duran Voter Registration</div>
                                     <div class="office-subtitle">Municipality of Pio Duran, Albay</div>
                                     <div class="office-subtitle mt-1">Voter Registration System</div>
                                 </div>
@@ -352,17 +352,17 @@
                                     <div class="signature-date">Date: __________________</div>
                                 </div>
 
-                                <!-- COMELEC officer electronic signature -->
+                                <!-- Pio Duran Voter Registration officer electronic signature -->
                                 <div class="signature-block">
                                     <div class="electronic-signature-box">
                                         {% if biometric.comelec_signature %}
                                             <img
                                                 src="{{ biometric.comelec_signature.url }}"
-                                                alt="COMELEC Officer Electronic Signature"
+                                                alt="Pio Duran Voter Registration Officer Electronic Signature"
                                                 class="electronic-signature-image"
                                             >
                                         {% else %}
-                                            <span class="signature-label">No COMELEC signature recorded</span>
+                                            <span class="signature-label">No Pio Duran Voter Registration signature recorded</span>
                                         {% endif %}
                                     </div>
                                     <div class="signature-name">
@@ -372,7 +372,7 @@
                                             __________________________
                                         {% endif %}
                                     </div>
-                                    <div class="signature-label">Authorized COMELEC Officer</div>
+                                    <div class="signature-label">Authorized Pio Duran Voter Registration Officer</div>
                                     <div class="signature-date">Date: __________________</div>
                                 </div>
 
@@ -427,7 +427,7 @@
                 <div class="copy-separator no-print"></div>
 
                 <!-- =================================================
-                 COMELEC COPY
+                 Pio Duran Voter Registration COPY
             ================================================== -->
                 <div class="slip-copy">
                     <div class="slip-copy-inner p-4">
@@ -437,13 +437,13 @@
                             <div class="row align-items-center">
                                 <div class="col-md-8">
                                     <div class="government-title">Republic of the Philippines</div>
-                                    <div class="office-title">Commission on Elections</div>
+                                    <div class="office-title">Pio Duran Voter Registration</div>
                                     <div class="office-subtitle">Municipality of Pio Duran, Albay</div>
                                     <div class="office-subtitle mt-1">Voter Registration System</div>
                                 </div>
 
                                 <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                                    <div class="copy-label">COMELEC COPY</div>
+                                    <div class="copy-label">Pio Duran Voter Registration COPY</div>
                                     <div class="small text-muted mt-2">Official Registration Record</div>
                                 </div>
                             </div>
@@ -698,7 +698,7 @@
                             </div>
                         </div>
 
-                        <!-- COMELEC COPY: THREE SIGNATURES -->
+                        <!-- Pio Duran Voter Registration COPY: THREE SIGNATURES -->
                         <div class="signature-area">
                             <div class="section-title">Applicant and Authorized Officer Signatures</div>
 
@@ -740,17 +740,17 @@
                                     <div class="signature-date">Date: __________________</div>
                                 </div>
 
-                                <!-- COMELEC officer electronic signature -->
+                                <!-- Pio Duran Voter Registration officer electronic signature -->
                                 <div class="signature-block">
                                     <div class="electronic-signature-box">
                                         {% if biometric.comelec_signature %}
                                             <img
                                                 src="{{ biometric.comelec_signature.url }}"
-                                                alt="COMELEC Officer Electronic Signature"
+                                                alt="Pio Duran Voter Registration Officer Electronic Signature"
                                                 class="electronic-signature-image"
                                             >
                                         {% else %}
-                                            <span class="signature-label">No COMELEC signature recorded</span>
+                                            <span class="signature-label">No Pio Duran Voter Registration signature recorded</span>
                                         {% endif %}
                                     </div>
                                     <div class="signature-name">
@@ -760,7 +760,7 @@
                                             __________________________
                                         {% endif %}
                                     </div>
-                                    <div class="signature-label">Authorized COMELEC Officer</div>
+                                    <div class="signature-label">Authorized Pio Duran Voter Registration Officer</div>
                                     <div class="signature-date">Date: __________________</div>
                                 </div>
 

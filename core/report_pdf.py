@@ -21,7 +21,7 @@ def download_applicant_list(groups, period_label="All months / All years"):
         pdfmetrics.registerFont(TTFont("ReportVera", str(font_path)))
     buffer = BytesIO()
     generated = timezone.localtime()
-    logo = finders.find("images/comelec.png")
+    logo = finders.find("images/PIODURAN.png")
     width, height = A4
     style = ParagraphStyle("record", fontName="ReportVera", fontSize=8, leading=12)
     rows = [["No.", "Applicant's Name", "Applicant's Address"]]
@@ -50,7 +50,7 @@ def download_applicant_list(groups, period_label="All months / All years"):
             canvas.drawImage(logo, 130, height - 82, width=46, height=46, mask="auto", preserveAspectRatio=True)
         canvas.setFont("ReportVera", 10)
         canvas.drawCentredString(width / 2, height - 48, "Republic of the Philippines")
-        canvas.drawCentredString(width / 2, height - 63, "COMMISSION ON ELECTIONS")
+        canvas.drawCentredString(width / 2, height - 63, "Pio Duran Voter Registration")
         canvas.setFont("ReportVera", 9)
         canvas.drawCentredString(width / 2, height - 98, "PROVINCE: ALBAY")
         canvas.drawCentredString(width / 2, height - 113, "CITY / MUNICIPALITY: PIO DURAN")
@@ -94,7 +94,7 @@ def download_summary(title, records, columns, period_label, note=""):
         ("VALIGN", (0, 0), (-1, -1), "TOP"), ("TOPPADDING", (0, 0), (-1, -1), 8),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 8), ("LINEBELOW", (0, 0), (-1, 0), .5, colors.black)]))
     generated = timezone.localtime()
-    logo = finders.find("images/comelec.png")
+    logo = finders.find("images/PIODURAN.png")
 
     def decorate(canvas, doc):
         canvas.saveState()
@@ -103,7 +103,7 @@ def download_summary(title, records, columns, period_label, note=""):
                              mask="auto", preserveAspectRatio=True)
         canvas.setFont("ReportVera", 10)
         canvas.drawCentredString(width / 2, height - 48, "Republic of the Philippines")
-        canvas.drawCentredString(width / 2, height - 63, "COMMISSION ON ELECTIONS")
+        canvas.drawCentredString(width / 2, height - 63, "Pio Duran Voter Registration")
         canvas.setFont("ReportVera", 9)
         canvas.drawCentredString(width / 2, height - 81, "Pio Duran, Albay")
         canvas.setFont("ReportVera", 12)

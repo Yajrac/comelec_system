@@ -16,7 +16,7 @@ def render_receipt(request, values, application_type):
         document = SimpleDocTemplate(output, pagesize=(297*mm, 148*mm), rightMargin=15*mm, leftMargin=15*mm, topMargin=12*mm, bottomMargin=12*mm)
         styles = getSampleStyleSheet()
         text = lambda value: Paragraph(escape(value or "________________________"), styles["Normal"])
-        story = [Paragraph("ACKNOWLEDGMENT RECEIPT", styles["Title"]), text("Commission on Elections - Pio Duran, Albay"), Spacer(1, 7*mm)]
+        story = [Paragraph("ACKNOWLEDGMENT RECEIPT", styles["Title"]), text("Pio Duran Voter Registration - Pio Duran, Albay"), Spacer(1, 7*mm)]
         rows = [[text("Type of Application"), text(application_type), text("Application No."), text(values["application_no"])]]
         for key, label, default in FIELDS:
             if key != "application_no":

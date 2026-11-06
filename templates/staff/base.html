@@ -5,7 +5,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}Applicant services{% endblock %}</title>
-        <link rel="icon" href="{% static 'images/comelec.png' %}">
+        <link rel="icon" href="{% static 'images/PIODURAN.png' %}">
         {% block vendor_css %}{% endblock %}
         <link rel="stylesheet" href="{% static 'css/staff-workspace.css' %}">
         {% block extra_css %}{% endblock %}
@@ -18,11 +18,11 @@
             <div class="header-inner public-header-inner">
                 <a class="brand" href="{% url 'home' %}">
                     <img
-                        src="{% static 'images/comelec.png' %}"
-                        alt="Commission on Elections logo"
+                        src="{% static 'images/PIODURAN.png' %}"
+                        alt="Municipality of Pio Duran logo"
                     >
                     <span>
-                        <strong>COMMISSION ON ELECTIONS</strong>
+                        <strong>Pio Duran Voter Registration</strong>
                         <small>Municipality of Pio Duran, Albay</small>
                     </span>
                 </a>
@@ -41,7 +41,7 @@
             </div>
         </header>
 
-        <main>{% block content %}{% endblock %}<footer>Commission on Elections <span>&bull;</span> Pio Duran, Albay
+        <main>{% block content %}{% endblock %}<footer>Pio Duran Voter Registration <span>&bull;</span> Pio Duran, Albay
             </footer>
         </main>
         <script src="{% static 'js/staff-workspace.js' %}" defer></script>
