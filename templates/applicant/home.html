@@ -1,295 +1,95 @@
 {% extends "staff/base.html" %}
 {% load static %}
-
-{% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/application-help.css' %}">
-{% endblock %}
 {% block title %}Applicant Services | Pio Duran Voter Registration{% endblock %}
+{% block body_class %}applicant-home{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/application-help.css' %}">
+<link rel="stylesheet" href="{% static 'css/applicant-home.css' %}?v=landing-about-6">
+{% endblock %}
 {% block content %}
-    {% include 'components/web_offline_panel.html' with form_only=True %}
-    <section class="page-heading">
-        <div>
-            <span class="eyebrow">Pio Duran Voter Registration</span>
-            <h1>Applicant services</h1>
-            <p>Select the registration service you need. Have your information and supporting documents ready.</p>
+<section class="home-intro home-hero" aria-labelledby="homeTitle">
+    <div class="home-hero-copy">
+        <span class="home-location"><span aria-hidden="true">&#9679;</span> MUNICIPALITY OF PIO DURAN, ALBAY</span>
+        <h1 id="homeTitle">Your registration.<br>Your voice.<br><span>Your community.</span></h1>
+        <p>Take the first step in your voter registration. Apply online, update your details, and prepare for your visit to the registration office.</p>
+        <div class="home-hero-actions">
+            <details class="public-service-menu home-application-menu"><summary><span>Select Application Type</span><svg class="ui-icon service-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><div class="public-service-options"><span class="menu-title">SELECT AN APPLICATION TYPE</span><a href="{% url 'new-registration' %}"><span>APPLICATION FOR NEW REGISTRATION</span><span class="service-arrow" aria-hidden="true">&rarr;</span></a><a href="{% url 'update-registration' %}"><span>APPLICATION FOR CHANGE OF NAME / CORRECTION OF ENTRIES / REVERSION TO MAIDEN NAME</span><span class="service-arrow" aria-hidden="true">&rarr;</span></a><a href="{% url 'transfer-registration' %}"><span>APPLICATION FOR TRANSFER OF REGISTRATION RECORD</span><span class="service-arrow" aria-hidden="true">&rarr;</span></a><a href="{% url 'reactivation-registration' %}"><span>APPLICATION FOR REACTIVATION OF REGISTRATION RECORD</span><span class="service-arrow" aria-hidden="true">&rarr;</span></a><a href="{% url 'reinstatement-registration' %}"><span>APPLICATION FOR INCLUSION OF RECORDS / REINSTATEMENT OF NAME IN THE LIST OF VOTERS</span><span class="service-arrow" aria-hidden="true">&rarr;</span></a></div></details>
+            <a class="home-hero-secondary" href="#servicesTitle">Application guide <span aria-hidden="true">&darr;</span></a>
         </div>
-    </section>
-    <section
-        class="applicant-service-panel application-panel-with-art"
-        aria-labelledby="services-heading"
-    >
-        <div class="application-panel-intro">
-            <div>
-                <span class="eyebrow">START AN APPLICATION</span>
-                <h2 id="services-heading">What would you like to do?</h2>
-                <p>Choose your application type to get started.</p>
-            </div>
+        <div class="home-intro-note"><span aria-hidden="true">&#10003;</span> Apply online. Complete your biometrics at the office.</div>
+    </div>
+    <div class="home-hero-visual" aria-hidden="true">
+        <div class="home-hero-orbit"></div>
+        <div class="home-registration-sheet">
+            <div class="home-sheet-brand"><img src="{% static 'images/PIODURAN.png' %}" alt=""><span>PIO DURAN<br><small>VOTER REGISTRATION</small></span></div>
+            <div class="home-sheet-rule"></div>
+            <svg class="home-sheet-person" viewBox="0 0 64 64" fill="none"><rect width="64" height="64" rx="12" fill="#edf3ff"/><circle cx="32" cy="23" r="10" fill="#9eb6dc"/><path d="M14 55v-5a18 18 0 0 1 36 0v5" fill="#9eb6dc"/></svg>
+            <span class="home-sheet-line long"></span><span class="home-sheet-line"></span><span class="home-sheet-line long"></span>
+            <div class="home-sheet-check"><span>&#10003;</span> Your next step starts here</div>
         </div>
-        <details class="public-service-menu">
-            <summary>
-                <span>Select Application Type</span>
-                <svg
-                    class="ui-icon service-chevron"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    aria-hidden="true"
-                >
-                    <path d="m6 9 6 6 6-6" />
-                </svg>
-            </summary>
-            <div class="public-service-options">
-                <span class="menu-title">SELECT AN APPLICATION TYPE</span>
-                <a href="{% url 'new-registration' %}">
-                    <svg
-                        class="ui-icon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                    >
-                        <circle cx="9" cy="8" r="3" />
-                        <path d="M3 21v-3a6 6 0 0 1 12 0v3m4-13v6m-3-3h6" />
-                    </svg>
-                    <span>APPLICATION FOR NEW REGISTRATION</span>
-                    <span class="service-arrow" aria-hidden="true">&rarr;</span>
-                </a>
-                <a href="{% url 'update-registration' %}">
-                    <svg
-                        class="ui-icon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                    >
-                        <path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14v6Zm8 0h9" />
-                    </svg>
-                    <span>APPLICATION FOR CHANGE OF NAME DUE TO MARRIAGE OR COURT ORDER / CORRECTION OF ENTRIES / REVERSION TO MAIDEN NAME IN THE VOTER&#8217;S REGISTRATION RECORD</span>
-                    <span class="service-arrow" aria-hidden="true">&rarr;</span>
-                </a>
-                <a href="{% url 'transfer-registration' %}">
-                    <svg
-                        class="ui-icon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                    >
-                        <path d="M3 7h17m-4-4 4 4-4 4M21 17H4m4-4-4 4 4 4" />
-                    </svg>
-                    <span>APPLICATION FOR TRANSFER OF REGISTRATION RECORD</span>
-                    <span class="service-arrow" aria-hidden="true">&rarr;</span>
-                </a>
-                <a href="{% url 'reactivation-registration' %}">
-                    <svg
-                        class="ui-icon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                    >
-                        <path d="M3 11a9 9 0 1 1 2 7M3 4v7h7" />
-                    </svg>
-                    <span>APPLICATION FOR REACTIVATION OF REGISTRATION RECORD</span>
-                    <span class="service-arrow" aria-hidden="true">&rarr;</span>
-                </a>
-                <a href="{% url 'reinstatement-registration' %}">
-                    <svg
-                        class="ui-icon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                    >
-                        <path d="m8 4-5 5 5 5M3 9h11a6 6 0 0 1 0 12h-3" />
-                    </svg>
-                    <span>APPLICATION FOR INCLUSION OF RECORDS IN THE BOOK OF VOTERS / REINSTATEMENT OF NAME IN THE LIST OF VOTERS</span>
-                    <span class="service-arrow" aria-hidden="true">&rarr;</span>
-                </a>
-            </div>
-        </details>
-        <div class="application-illustration" aria-hidden="true">
-            <svg viewBox="0 0 300 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <ellipse cx="155" cy="198" rx="116" ry="10" fill="#dee8fa" />
-                <circle cx="164" cy="100" r="83" fill="#e9f0ff" />
-                <rect x="152" y="28" width="102" height="134" rx="11" fill="white" stroke="#b8ccef" stroke-width="2" />
-                <rect x="180" y="20" width="47" height="17" rx="5" fill="#073ba8" />
-                <rect x="169" y="51" width="26" height="26" rx="6" fill="#edf3ff" />
-                <path d="m176 64 5 5 8-10" stroke="#073ba8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-                <path d="M205 57h30M205 67h22M170 91h65M170 104h51M170 117h60M170 139h32" stroke="#c1d2ed" stroke-width="4" stroke-linecap="round" />
-                <path d="M88 160 77 193h23l18-38" fill="#243f71" />
-                <path d="m119 156 15 38h21l-10-48" fill="#142b54" />
-                <path d="M76 194h26v6H71a5 5 0 0 1 5-6Zm58 0h21l8 6h-29v-6Z" fill="#142b54" />
-                <path d="M79 103c9-13 29-15 44-4 15 11 22 42 24 57H81c-4-16-8-36-2-53Z" fill="#073ba8" />
-                <path d="M114 103c12 1 21 13 30 19l35-18 6 10-39 25c-6 3-12 1-17-3l-22-18" fill="#295bc2" />
-                <path d="m177 104 9-8 12 1 2 7-15 10" fill="#e5ac87" />
-                <path d="m188 99 23-23" stroke="#d5a121" stroke-width="5" stroke-linecap="round" />
-                <path d="m210 77 5-6-1 8" fill="#142b54" />
-                <path d="M100 83v15c0 8 18 9 18 0V82" fill="#d99b77" />
-                <ellipse cx="107" cy="65" rx="21" ry="25" fill="#efbf9d" />
-                <path d="M86 67c-8-23 3-38 22-36 20-1 27 15 21 31-6-2-10-10-13-15-6 10-15 13-30 12v8Z" fill="#142b54" />
-                <path d="M125 69c8-2 8 10 1 11" fill="#efbf9d" />
-                <rect x="50" y="157" width="94" height="9" rx="4" fill="#c2d1e9" />
-                <path d="M59 166v30m75-30v30" stroke="#90a9cf" stroke-width="5" stroke-linecap="round" />
-                <path d="M43 100v50c0 10 5 16 14 16" stroke="#adc3e5" stroke-width="7" stroke-linecap="round" />
-                <circle cx="255" cy="167" r="20" fill="#f5cf39" />
-                <path d="m246 167 6 6 12-14" stroke="#142b54" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-        </div>
-    </section>
-    <section
-        id="applicationHelp"
-        class="application-help-panel"
-        aria-labelledby="applicationHelpTitle"
-    >
-        <div class="application-help-header">
-            <div>
-                <span class="eyebrow">APPLICATION GUIDE</span>
-                <h2 id="applicationHelpTitle">What would you like to do?</h2>
-            </div>
-        </div>
-        <p>Choose the option that best describes what you need.</p>
-        <div class="application-help-choices">
-            <button type="button" data-service="new-registration">Register for the first time</button>
-            <button type="button" data-service="transfer-registration">Transfer my registration record</button>
-            <button
-                type="button"
-                data-service="reactivation-registration"
-            >Apply to reactivate my registration record</button>
-            <button type="button" data-service="update-registration">Change my name due to marriage</button>
-            <button type="button" data-service="update-registration">Change my name due to a court order</button>
-            <button
-                type="button"
-                data-service="update-registration"
-            >Correct my name or other details in my registration record</button>
-            <button type="button" data-service="update-registration">Revert to my maiden name</button>
-            <button
-                type="button"
-                data-service="reinstatement-registration"
-            >Apply for inclusion of my record or reinstatement of my name in the list of voters</button>
-        </div>
-        <div id="applicationHelpResult" class="application-help-result" hidden>
-            <strong>Suggested application</strong>
-            <p id="applicationHelpSuggestion" aria-live="polite"></p>
-            <a id="applicationHelpContinue" class="application-help-continue">Continue &rarr;</a>
-        </div>
-        <p
-            class="application-help-note"
-        >Unsure about the status of your record? Contact the registration office for assistance.</p>
-        <div hidden id="applicationHelpRoutes">
-            <a data-route="new-registration" href="{% url 'new-registration' %}"></a>
-            <a
-                data-route="update-registration"
-                href="{% url 'update-registration' %}"
-            ></a>
-            <a
-                data-route="transfer-registration"
-                href="{% url 'transfer-registration' %}"
-            ></a>
-            <a
-                data-route="reactivation-registration"
-                href="{% url 'reactivation-registration' %}"
-            ></a>
-            <a
-                data-route="reinstatement-registration"
-                href="{% url 'reinstatement-registration' %}"
-            ></a>
-        </div>
-    </section>
-    <section class="advisories" aria-labelledby="advisories-heading">
-        <div class="advisories-header">
-            <div class="advisories-heading">
-                <span class="advisory-header-icon" aria-hidden="true">
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.7"
-                    >
-                        <path d="m3 9 9-6 9 6H3ZM5 10v8m5-8v8m4-8v8m5-8v8M3 18h18M2 21h20" />
-                    </svg>
-                </span>
-                <div>
-                    <h2 id="advisories-heading">Government Information &amp; Advisories</h2>
-                    <p>Registration guidance and public service information.</p>
-                </div>
-            </div>
-            <span class="advisory-preview-label">PUBLIC INFORMATION</span>
-        </div>
-        <div class="advisory-list">
-            <article class="advisory-item">
-                <span class="advisory-icon" aria-hidden="true">
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.7"
-                    >
-                        <path d="M8 4H5v17h14V4h-3M9 3h6v4H9zM8 12h8M8 16h6" />
-                    </svg>
-                </span>
-                <div>
-                    <h3>Registration guidelines</h3>
-                    <p>Check the registration office's current requirements and prepare your supporting documents before applying.</p>
-                    <span class="advisory-tag">PROCESSING REMINDER</span>
-                </div>
-            </article>
-            <article class="advisory-item">
-                <span class="advisory-icon" aria-hidden="true">
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.7"
-                    >
-                        <path d="M8 3H4v18h16V3h-4M9 2h6v4H9zM8 12l2 2 5-5M8 18h8" />
-                    </svg>
-                </span>
-                <div>
-                    <h3>Application follow-up</h3>
-                    <p>Follow the instructions provided by the registration office and submit any additional requirements requested.</p>
-                    <span class="advisory-tag">PUBLIC INFORMATION</span>
-                </div>
-            </article>
-            <article class="advisory-item">
-                <span class="advisory-icon" aria-hidden="true">
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.7"
-                    >
-                        <circle cx="12" cy="12" r="9" />
-                        <path d="M12 7v6m0 3v1" />
-                    </svg>
-                </span>
-                <div>
-                    <h3>Public advisories</h3>
-                    <p>Confirm schedules and public notices with the registration office.</p>
-                    <span class="advisory-tag">OFFICE NOTICE</span>
-                </div>
-            </article>
-        </div>
-        <div class="advisory-footer">Follow the latest approved instructions issued by the registration office.</div>
-    </section>
+        <div class="home-hero-label"><span class="home-hero-label-icon">&#10003;</span><span>Made for our community<small>Accessible services, wherever you are.</small></span></div>
+        <span class="home-hero-caption">PIO DURAN VOTER REGISTRATION</span>
+    </div>
+</section>
+<section class="home-services" id="applicationHelp" aria-labelledby="servicesTitle">
+    <div class="home-service-intro"><span class="eyebrow">APPLICATION GUIDE</span></div>
+    <div class="home-section-heading"><h2 id="servicesTitle">What would you like to do?</h2></div>
+    <p class="home-guide-description">Choose the situation that best describes what you need. We will suggest the application type for you.</p>
+    <div class="home-service-grid home-guide-grid">
+<article class="home-service-card home-service-new"><button type="button" class="home-guide-choice" data-service="new-registration" aria-pressed="false" aria-controls="applicationHelpResult"><div class="home-card-top"><span class="home-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="home-card-number">01</span></div><h3>Register for the first time</h3><span class="home-guide-select">Select this situation <span aria-hidden="true">&rarr;</span></span></button></article>
+<article class="home-service-card home-service-transfer"><button type="button" class="home-guide-choice" data-service="transfer-registration" aria-pressed="false" aria-controls="applicationHelpResult"><div class="home-card-top"><span class="home-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h17m-4-4 4 4-4 4M21 17H4m4-4-4 4 4 4"/></svg></span><span class="home-card-number">02</span></div><h3>Transfer my registration record</h3><span class="home-guide-select">Select this situation <span aria-hidden="true">&rarr;</span></span></button></article>
+<article class="home-service-card home-service-reactivation"><button type="button" class="home-guide-choice" data-service="reactivation-registration" aria-pressed="false" aria-controls="applicationHelpResult"><div class="home-card-top"><span class="home-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11a9 9 0 1 1 2 7M3 4v7h7"/></svg></span><span class="home-card-number">03</span></div><h3>Apply to reactivate my registration record</h3><span class="home-guide-select">Select this situation <span aria-hidden="true">&rarr;</span></span></button></article>
+<article class="home-service-card home-service-update"><button type="button" class="home-guide-choice" data-service="update-registration" aria-pressed="false" aria-controls="applicationHelpResult"><div class="home-card-top"><span class="home-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14v6Z"/></svg></span><span class="home-card-number">04</span></div><h3>Change my name due to marriage</h3><span class="home-guide-select">Select this situation <span aria-hidden="true">&rarr;</span></span></button></article>
+<article class="home-service-card home-service-update"><button type="button" class="home-guide-choice" data-service="update-registration" aria-pressed="false" aria-controls="applicationHelpResult"><div class="home-card-top"><span class="home-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14v6Z"/></svg></span><span class="home-card-number">05</span></div><h3>Change my name due to a court order</h3><span class="home-guide-select">Select this situation <span aria-hidden="true">&rarr;</span></span></button></article>
+<article class="home-service-card home-service-update"><button type="button" class="home-guide-choice" data-service="update-registration" aria-pressed="false" aria-controls="applicationHelpResult"><div class="home-card-top"><span class="home-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14v6Z"/></svg></span><span class="home-card-number">06</span></div><h3>Correct my name or other details in my registration record</h3><span class="home-guide-select">Select this situation <span aria-hidden="true">&rarr;</span></span></button></article>
+<article class="home-service-card home-service-update"><button type="button" class="home-guide-choice" data-service="update-registration" aria-pressed="false" aria-controls="applicationHelpResult"><div class="home-card-top"><span class="home-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14v6Z"/></svg></span><span class="home-card-number">07</span></div><h3>Revert to my maiden name</h3><span class="home-guide-select">Select this situation <span aria-hidden="true">&rarr;</span></span></button></article>
+<article class="home-service-card home-service-reinstatement"><button type="button" class="home-guide-choice" data-service="reinstatement-registration" aria-pressed="false" aria-controls="applicationHelpResult"><div class="home-card-top"><span class="home-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m8 4-5 5 5 5M3 9h11a6 6 0 0 1 0 12h-3"/></svg></span><span class="home-card-number">08</span></div><h3>Apply for inclusion of my record or reinstatement of my name in the list of voters</h3><span class="home-guide-select">Select this situation <span aria-hidden="true">&rarr;</span></span></button></article>
+    </div>
+    <div id="applicationHelpResult" class="application-help-result" hidden>
+        <strong>Suggested application</strong><p id="applicationHelpSuggestion" aria-live="polite"></p>
+        <button type="button" id="applicationHelpContinue" class="application-help-continue">Proceed &rarr;</button>
+    </div>
+    <div hidden id="applicationHelpRoutes">
+<a data-route="new-registration" href="{% url 'new-registration' %}"></a>
+<a data-route="update-registration" href="{% url 'update-registration' %}"></a>
+<a data-route="transfer-registration" href="{% url 'transfer-registration' %}"></a>
+<a data-route="reactivation-registration" href="{% url 'reactivation-registration' %}"></a>
+<a data-route="reinstatement-registration" href="{% url 'reinstatement-registration' %}"></a>
+</div>
+<dialog id="applicationProceedDialog" class="home-proceed-dialog" aria-labelledby="applicationProceedTitle" aria-describedby="applicationProceedDescription">
+    <h2 id="applicationProceedTitle">Continue to this application?</h2>
+    <p id="applicationProceedDescription">You are about to open the form for:</p>
+    <p id="applicationProceedType" class="home-proceed-type"></p>
+    <p class="home-proceed-note">You can review the requirements and fill in your details on the next page. Nothing has been submitted yet.</p>
+    <div class="home-proceed-actions"><button type="button" id="applicationProceedCancel">Go back</button><a id="applicationProceedConfirm" class="application-help-continue">Yes, open form &rarr;</a></div>
+</dialog>
+</section>
+<section class="home-process" aria-labelledby="processTitle">
+    <div class="home-process-heading"><span class="eyebrow">A SIMPLE PROCESS</span><h2 id="processTitle">What happens next?</h2></div>
+    <ol>
+        <li><span class="home-step-number">1</span><div><h3>Submit your application</h3><p>Complete your details and attach your documents.</p></div></li>
+        <li><span class="home-step-number">2</span><div><h3>Wait for review</h3><p>The office reviews your application and provides instructions.</p></div></li>
+        <li><span class="home-step-number">3</span><div><h3>Visit for biometrics</h3><p>Follow your appointment instructions for fingerprints and signatures.</p></div></li>
+    </ol>
+</section>
+<section class="home-offline-shortcut" aria-labelledby="savedTitle">
+    <span class="home-offline-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4zM8 4v6h8V4M8 20v-6h8v6"/></svg></span>
+    <div><h2 id="savedTitle">Continue a saved application</h2><p>Open your drafts, check pending submissions, or sync when you are online.</p></div>
+    <a href="{% url 'applicant-offline' %}">View saved applications <span aria-hidden="true">&rarr;</span></a>
+</section>
+<section id="about" class="home-about" aria-labelledby="aboutTitle">
+    <div class="home-about-intro">
+        <span class="eyebrow">ABOUT THE PORTAL</span>
+        <h2 id="aboutTitle">Closer to the community.<br>Easier to get started.</h2>
+        <p>Pio Duran Voter Registration helps applicants in Pio Duran, Albay begin their registration services online and prepare for the next steps at the registration office.</p>
+    </div>
+    <div class="home-about-details">
+        <article><span class="home-about-number" aria-hidden="true">01</span><div><h3>One place for your application</h3><p>Start a new registration or request a correction, transfer, reactivation, or reinstatement of your record.</p></div></article>
+        <article><span class="home-about-number" aria-hidden="true">02</span><div><h3>Prepare at your own pace</h3><p>Complete your information and prepare supporting documents. New registration drafts can be saved in this browser and synced when online.</p></div></article>
+        <article><span class="home-about-number" aria-hidden="true">03</span><div><h3>Guided by the registration office</h3><p>Online submission is the first step. Applications remain subject to office review, and fingerprint and signature capture are completed during your office visit.</p></div></article>
+    </div>
+</section>
+{% include 'components/web_offline_panel.html' with form_only=True %}
+<p class="home-office-note">Need assistance? Contact the registration office for current requirements, schedules, and the status of your record.</p>
 {% endblock %}
-
-{% block extra_js %}
-    <script src="{% static 'js/application-help.js' %}" defer></script>
-{% endblock %}
+{% block extra_js %}<script src="{% static 'js/application-help.js' %}?v=guide-cards-6" defer></script>{% endblock %}

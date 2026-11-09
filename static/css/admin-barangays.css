@@ -20,6 +20,13 @@
 .barangay-summary .summary-card-record { background: #eee5ad !important; border-top-color: #b4a650; }
 .barangay-summary .summary-card-record .summary-icon { background: #dfd28b !important; color: #62591f !important; }
 .barangay-summary .summary-label { color: #34445b !important; }
+.applicant-summary .blue-card { background: #bed5f3 !important; border-top-color: #6e99ce; }
+.applicant-summary .blue-card .summary-icon { background: #9fbee8 !important; color: #254d83 !important; }
+.applicant-summary .green-card { background: #bfe2cd !important; border-top-color: #62a57c; }
+.applicant-summary .green-card .summary-icon { background: #9dceb1 !important; color: #205c3c !important; }
+.applicant-summary .gray-card { background: #e3d8f2 !important; border-top-color: #a98acb; }
+.applicant-summary .gray-card .summary-icon { background: #cebae7 !important; color: #64408d !important; }
+.applicant-summary .summary-label { color: #34445b !important; }
 .barangay-card, .barangay-form-card, .delete-form-card, .applicant-card { background: white; border: 1px solid var(--admin-border); border-radius: 12px; overflow: hidden; box-shadow: 0 3px 14px #243b5306; }
 .barangay-card-header, .barangay-form-header, .delete-form-header, .applicant-card-header { background: white; border-bottom-color: var(--admin-border); padding: 20px 24px; }
 .barangay-title, .barangay-form-title, .delete-form-title, .header-title { color: var(--admin-text); font-size: 17px; font-weight: 750; }

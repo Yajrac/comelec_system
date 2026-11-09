@@ -111,7 +111,6 @@
         {% if capture_complete and applicant.verification_status == "VERIFIED" %}
             <div class="bio-notice success">
                 <strong>Biometrics and signatures complete</strong>
-                <p><a href="{% url 'acknowledgment-receipt' applicant.id %}" class="btn btn-primary">View / Download Acknowledgment Receipt</a></p>
                 <p>Both fingerprint images and all three signature samples are saved.</p>
                 <a
                     href="{% url 'print-slip-account' applicant.id %}"

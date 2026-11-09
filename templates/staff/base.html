@@ -7,11 +7,11 @@
         <title>{% block title %}Applicant services{% endblock %}</title>
         <link rel="icon" href="{% static 'images/PIODURAN.png' %}">
         {% block vendor_css %}{% endblock %}
-        <link rel="stylesheet" href="{% static 'css/staff-workspace.css' %}">
+        <link rel="stylesheet" href="{% static 'css/staff-workspace.css' %}?v=white-header-2">
         {% block extra_css %}{% endblock %}
         <link rel="stylesheet" href="{% static 'css/input-validation.css' %}">
         <link rel="stylesheet" href="{% static 'css/scrollbars.css' %}">
-        <link rel="stylesheet" href="{% static 'css/web-offline.css' %}">
+        <link rel="stylesheet" href="{% static 'css/web-offline.css' %}?v=sticky-header-3">
     </head>
     <body class="{% block body_class %}{% endblock %}">
         <header class="header public-header">
@@ -28,6 +28,7 @@
                 </a>
                 <nav id="publicNavigation" class="public-header-navigation" aria-label="Main navigation">
                     <a href="{% url 'home' %}" {% if request.resolver_match.url_name == 'home' or offline_page == 'home' %}aria-current="page"{% endif %}>Home</a>
+                    <a href="{% url 'home' %}#about">About</a>
                     <a href="{% url 'new-registration' %}" {% if request.resolver_match.url_name == 'new-registration' or offline_page == 'registration' %}aria-current="page"{% endif %}>New registration</a>
                     <a href="{% url 'applicant-offline' %}" {% if request.resolver_match.url_name == 'applicant-offline' or offline_page == 'saved' %}aria-current="page"{% endif %}>Offline</a>
                 </nav>
