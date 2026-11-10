@@ -1,28 +1,47 @@
-.receipt-page { padding: 24px 0; color: #172554; }
-.receipt-page *, .receipt-page .application-badge { border-radius: 0; }
-.receipt-notice { border: 1px solid #bbd4ee; border-left: 4px solid #0038a8; background: #eef5ff; padding: 16px 24px; margin-bottom: 24px; }
-.receipt-notice p { margin: 6px 0 0; font-size: 14px; }
-.receipt-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 22px; }
-.receipt-field { min-width: 0; }
-.receipt-field label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
-.receipt-field input, .receipt-field select { width: 100%; box-sizing: border-box; padding: 13px; border: 1px solid #d5dce5; background: #fff; color: #172554; font: inherit; }
-.receipt-field input:focus, .receipt-field select:focus { outline: 2px solid #0038a8; outline-offset: 2px; }
-.full { grid-column: 1/-1; }
-.field-hint { margin: 0; color: #64748b; font-size: 14px; }
-.receipt-sheet { padding: 28px; color: #172554; background: white; }
-.receipt-office, .receipt-sheet > h2, .sample-mark { text-align: center; }
-.receipt-office { font-size: 12px; letter-spacing: 1px; }
-.receipt-sheet > h2 { font-size: 22px; margin: 12px 0 8px; }
-.sample-mark { font-size: 12px; color: #92400e; margin-bottom: 28px; }
-.receipt-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; font-size: 14px; line-height: 1.7; }
-.receipt-columns dl { display: grid; grid-template-columns: 95px 1fr; gap: 14px; }
-.receipt-columns dd { margin: 0; border-bottom: 1px solid #94a3b8; overflow-wrap: anywhere; }
-.receipt-columns span { overflow-wrap: anywhere; }
-.officer-line { margin-top: 40px; text-align: center; }
-.officer-line span { display: block; min-height: 25px; border-bottom: 1px solid #172554; }
-.officer-line small { display: block; }
-.receipt-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 24px 0; }
-.receipt-button { padding: 13px 22px; background: #0038a8; color: white; border: 1px solid #0038a8; font: inherit; cursor: pointer; }
-.receipt-button.secondary { background: white; color: #0038a8; }
-@media(max-width: 700px) { .receipt-fields, .receipt-columns { grid-template-columns: 1fr; } .receipt-sheet { padding: 20px; } }
-@media print { @page { size: A4 landscape; margin: 12mm; } body { background: white !important; } .header, .navigation, footer, .registration-header, .receipt-notice, .editor-panel, .receipt-actions, .preview-panel > .form-section-header { display: none !important; } main, .receipt-page, .registration-container { margin: 0 !important; padding: 0 !important; max-width: none !important; width: 100% !important; } .preview-panel { border: 1px solid #172554; box-shadow: none; break-inside: avoid; } .receipt-columns { grid-template-columns: 1fr 1fr; } }
+﻿.receipt-page{padding:24px 0;color:#172554}
+.receipt-scroll{padding:24px;overflow-x:auto}
+.receipt-sheet{position:relative;min-width:960px;max-width:1160px;margin:auto;padding:14px 16px 12px;border:2px solid #222;background:white;color:#111;font-family:Arial,sans-serif}
+.receipt-sheet>h2{text-align:center;font-size:18px;margin:0 0 3px;font-weight:700}
+.receipt-brand{text-align:center;font-size:10px;margin:0 0 10px}
+.receipt-columns{display:grid;grid-template-columns:minmax(0,2.5fr) minmax(0,1fr);gap:28px}
+.receipt-sheet h3{font-size:14px;margin:0 0 6px;font-weight:700}
+.receipt-types{list-style:none;display:grid;grid-template-rows:repeat(3,auto);grid-auto-flow:column;grid-template-columns:1fr 1.85fr;gap:6px 12px;margin:0;padding:0;font-size:13px}
+.receipt-types li{display:flex;align-items:center;gap:7px;line-height:1.25}
+.type-circle{width:17px;height:17px;border:1.5px solid #222;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;line-height:1}
+.receipt-date{text-align:right;font-size:11px;margin:8px 0}
+.name-row{display:flex;align-items:center;margin-top:2px;gap:8px}
+.name-label{width:35px;flex-shrink:0;font-size:11px}
+.letter-boxes{display:grid;grid-template-columns:repeat(var(--letter-count),minmax(0,1fr));flex:1;min-width:0;border-left:1px dotted #888}
+.letter-boxes span,.application-number span{display:flex;align-items:center;justify-content:center;min-height:25px;border:1px dotted #888;border-left:0;font-size:14px;white-space:pre}
+.receipt-acknowledgment h3{text-align:center}
+.application-number{display:flex;border-left:1px dotted #888}
+.application-number span{flex:1;min-width:0;font-size:16px}
+.receipt-text{font-size:11px;line-height:1.7;text-align:justify;margin:10px 0}
+.hearing-date{font-size:11px;display:flex;gap:6px;margin:10px 0 20px;white-space:nowrap}
+.hearing-date span{flex:1;border-bottom:1px solid #222;min-width:30px}
+.officer-line{text-align:center;font-size:10px}
+.officer-line strong{display:block;min-height:21px;border-bottom:1px solid #222;padding:0 2px 4px;overflow-wrap:anywhere}
+.officer-line>span{display:block;padding-top:4px;font-size:9px}
+.receipt-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:24px 0}
+.receipt-button{display:inline-flex;justify-content:center;padding:12px 20px;background:#073ba8;color:white;border:1px solid #073ba8;border-radius:7px;font:inherit;font-size:13px;cursor:pointer;text-decoration:none}
+.receipt-button.secondary{background:white;color:#073ba8}
+.receipt-button:focus-visible,.receipt-back:focus-visible{outline:3px solid #d69f00;outline-offset:3px}
+.receipt-back{font-size:13px;color:#61748c;padding:12px}
+@media(max-width:700px){.receipt-scroll{padding:16px}.receipt-page{padding-top:16px}}
+@media print{
+ @page{size:A4 landscape;margin:7mm 8mm}
+ body{background:white!important}
+ .header,.navigation,body>header,main>footer,.registration-header,.receipt-actions,.preview-panel>.form-section-header{display:none!important}
+ main,.receipt-page,.registration-container,.preview-panel{margin:0!important;padding:0!important;max-width:none!important;width:100%!important;border:0!important;box-shadow:none!important}
+ .receipt-scroll{padding:0;overflow:visible}
+ .receipt-sheet{min-width:0;max-width:none;width:100%;break-inside:avoid;padding:3mm 4mm;border:0.5mm solid #222;print-color-adjust:exact}
+ .receipt-columns{grid-template-columns:minmax(0,2.5fr) minmax(0,1fr);gap:7mm}
+ .letter-boxes span{min-height:6.5mm;font-size:10pt}
+}
+
+.receipt-settings-form{padding:24px;display:grid;gap:12px;max-width:660px}
+.receipt-settings-form label{font-size:14px;font-weight:600}
+.receipt-settings-form input{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:6px;font:inherit;color:#172554}
+.receipt-settings-form p{font-size:12px;line-height:1.7;color:#64748b;margin:0}
+.receipt-settings-form button{justify-self:start}
+@media print{.receipt-settings{display:none!important}}

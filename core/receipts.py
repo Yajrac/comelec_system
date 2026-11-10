@@ -2,7 +2,7 @@
 from secrets import randbelow
 from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404, redirect
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
 from django.utils import timezone
 from Applicants.models import Applicant, ApplicantBiometric, AcknowledgmentReceipt
 from .biometric_state import capture_complete
@@ -30,6 +30,28 @@ def acknowledgment_receipt(request, applicant_id):
                 if attempt == 9:
                     raise
     values = dict(receipt.details, application_no=receipt.application_number)
-    response = render_receipt(request, values, values["application_type"])
+    from .models import ReceiptSettings
+    settings = ReceiptSettings.objects.filter(pk=1).first()
+    if settings is not None:
+        values['officer'] = settings.officer_name
+    response = render_receipt(request, values, values["application_type"], applicant_id=applicant_id)
     response["Cache-Control"] = "private, no-store"
     return response
+
+
+@require_POST
+def save_receipt_settings(request, applicant_id):
+    from .views import admin_superuser_required
+    from .models import ReceiptSettings
+    from django.contrib import messages
+    access = admin_superuser_required(request)
+    if access:
+        return access
+    get_object_or_404(Applicant, pk=applicant_id)
+    name = request.POST.get('officer_name', '').strip()
+    if len(name) > 100:
+        messages.error(request, 'Officer name must be at most 100 characters.')
+    else:
+        ReceiptSettings.objects.update_or_create(pk=1, defaults={'officer_name': name})
+        messages.success(request, 'Receipt officer name updated.')
+    return redirect('acknowledgment-receipt', applicant_id=applicant_id)

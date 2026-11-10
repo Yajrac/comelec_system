@@ -1,11 +1,12 @@
 from django.urls import path
 from . import views
-from .receipts import acknowledgment_receipt
+from .receipts import acknowledgment_receipt, save_receipt_settings
 from .signature_pairing import create_pairing, claim_pairing, paired_request
 from .walk_in import walk_in
 from .admin_security import change_admin_password, password_requirements
 
 urlpatterns = [
+    path("admin-applicants/<int:applicant_id>/receipt/settings/", save_receipt_settings, name="receipt-settings"),
     path("admin/signature/pair/", create_pairing, name="signature-create-pairing"),
     path("api/signature/pair/", claim_pairing, name="signature-claim-pairing"),
     path("api/signature/device/request/", paired_request, name="signature-paired-request"),

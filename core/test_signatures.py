@@ -102,7 +102,7 @@ class ThreeSignatureTests(TestCase):
         self.assertEqual(self.applicant.verification_status, 'VERIFIED')
         response = self.client.get(reverse('print-slip-account', args=[self.applicant.pk]))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Applicant signature sample 3')
+        self.assertContains(response, 'ACKNOWLEDGMENT RECEIPT')
 
 
     def test_signatures_without_fingerprints_are_incomplete(self):

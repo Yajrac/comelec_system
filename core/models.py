@@ -11,3 +11,7 @@ class AdminLoginThrottle(models.Model):
     failures = models.PositiveIntegerField(default=0)
     window_started = models.DateTimeField()
     locked_until = models.DateTimeField(null=True, blank=True)
+
+
+class ReceiptSettings(models.Model):
+    officer_name = models.CharField(max_length=100, blank=True)

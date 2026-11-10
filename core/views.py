@@ -2565,14 +2565,8 @@ def print_slip_account(request, applicant_id):
             applicant_id=applicant.id
         )
 
-    return render(
-        request,
-        "comelec/applications/print_slip_account.html",
-        {
-            "applicant": applicant,
-            "biometric": biometric,
-        }
-    )
+    from .receipts import acknowledgment_receipt
+    return acknowledgment_receipt(request, applicant_id)
 
 @login_required
 def admin_applicants(request):

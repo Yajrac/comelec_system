@@ -1,4 +1,4 @@
-{% extends "staff/base.html" %}
+﻿{% extends "staff/base.html" %}
 {% load static %}
 {% block title %}Acknowledgment Receipt{% endblock %}
 {% block extra_css %}
@@ -7,20 +7,46 @@
 {% endblock %}
 {% block content %}
 <div class="registration-container receipt-page">
-    <div class="registration-header">
-        <h1>ACKNOWLEDGMENT RECEIPT</h1>
-        <p>Prepare the applicant's receipt after biometric capture.</p>
-        <span class="application-badge">BIOMETRICS COMPLETED</span>
-    </div>
-    <div class="receipt-notice"><strong>Biometrics completed</strong><p>Your acknowledgment receipt is ready to download or print.</p></div>
-    <form method="get" id="receiptForm">
-        <section class="form-section editor-panel">
-            <div class="form-section-header"><div class="form-section-marker"></div><h2>Receipt Information</h2></div>
-            <div class="form-section-body receipt-fields">
-                <div class="receipt-field full"><label for="application_type">Type of Application</label><select id="application_type" name="application_type" disabled>{% for type in application_types %}<option {% if type == application_type %}selected{% endif %}>{{ type }}</option>{% endfor %}</select></div>
-                {% for field in fields %}<div class="receipt-field"><label for="{{ field.key }}">{{ field.label }}{% if field.key == 'officer' %} (optional){% endif %}</label><input id="{{ field.key }}" name="{{ field.key }}" type="{{ field.type }}" value="{{ field.value }}" readonly maxlength="{% if field.key == 'application_no' %}12{% else %}100{% endif %}"{% if field.key == 'application_no' %} readonly inputmode="numeric" pattern="[0-9]{12}"{% endif %}></div>{% endfor %}
-                <p class="field-hint full">Download PDF</button><button class="receipt-button secondary" id="printReceipt" type="button">Print Receipt</button></div>
-    </form>
+    <div class="registration-header"><h1>Acknowledgment Receipt</h1><p>Review and print the applicant's registration receipt.</p></div>
+    {% if receipt_applicant_id %}
+    <section class="form-section receipt-settings">
+        <div class="form-section-header"><div class="form-section-marker"></div><h2>Receipt Settings</h2></div>
+        <form method="post" action="{% url 'receipt-settings' receipt_applicant_id %}" class="receipt-settings-form">
+            {% csrf_token %}
+            {% for message in messages %}<p role="status">{{ message }}</p>{% endfor %}
+            <label for="receiptOfficer">EO / Interviewer printed name</label>
+            <input id="receiptOfficer" name="officer_name" value="{{ receipt_values.officer }}" maxlength="100" placeholder="Officer's full name">
+            <p>This name appears on all receipt previews, prints and PDFs, including previously issued receipts. Leave blank for a handwritten name.</p>
+            <button class="receipt-button" type="submit">Save settings</button>
+        </form>
+    </section>
+    {% endif %}
+    <section class="form-section preview-panel">
+        <div class="form-section-header"><div class="form-section-marker"></div><h2>Receipt Preview</h2></div>
+        <div class="receipt-scroll">
+            <article class="receipt-sheet" aria-label="Acknowledgment receipt">
+                <h2>ACKNOWLEDGMENT RECEIPT</h2>
+                <p class="receipt-brand">Pio Duran Voter Registration</p>
+                <div class="receipt-columns">
+                    <div class="receipt-applicant">
+                        <h3>Type of Application</h3>
+                        <ul class="receipt-types">{% for option in application_options %}<li><span class="type-circle" aria-label="{% if option.selected %}Selected{% else %}Not selected{% endif %}">{% if option.selected %}&#10003;{% endif %}</span>{{ option.label }}</li>{% endfor %}</ul>
+                        <p class="receipt-date">Date: {{ receipt_values.receipt_date }}</p>
+                        <h3>Application for Registration</h3>
+                        {% for row in name_rows %}<div class="name-row"><span class="name-label">{{ row.label }}</span><div class="letter-boxes" style="--letter-count: {{ row.letters|length }}">{% for letter in row.letters %}<span>{{ letter }}</span>{% endfor %}</div></div>{% endfor %}
+                    </div>
+                    <div class="receipt-acknowledgment">
+                        <h3>Application No.</h3>
+                        <div class="application-number" aria-label="Application number {{ receipt_values.application_no }}">{% for digit in number_digits %}<span>{{ digit }}</span>{% endfor %}</div>
+                        <p class="receipt-text">{{ receipt_notice }}</p>
+                        <p class="hearing-date">Date of ERB Hearing: <span></span></p>
+                        <div class="officer-line"><strong>{{ receipt_values.officer|default:" " }}</strong><span>EO / Interviewer Signature above Printed Name</span></div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+    <div class="receipt-actions"><a class="receipt-button" href="?format=pdf">Download PDF</a><button class="receipt-button secondary" id="printReceipt" type="button">Print Receipt</button><a class="receipt-back" href="{% url 'admin-applicants' %}">Back to Applicants</a></div>
 </div>
 <script src="{% static 'js/acknowledgment-receipt.js' %}" defer></script>
 {% endblock %}
