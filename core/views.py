@@ -2714,6 +2714,7 @@ def admin_applicant_detail(request, applicant_id):
             "applicant": applicant,
             "biometric": biometric,
             "application_history": history,
+            "signature_slots": [{"slot": slot, "field": getattr(biometric, field) if biometric_file_exists(getattr(biometric, field)) else None} for slot, field in SIGNATURE_FIELDS.items()],
         }
     )
 

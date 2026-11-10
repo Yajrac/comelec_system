@@ -569,6 +569,15 @@
 
                 </div>
 
+                <section class="mt-4" aria-labelledby="applicantSignaturesTitle">
+                    <h3 class="h5 mb-3" id="applicantSignaturesTitle">Applicant Signatures</h3>
+                    <div class="review-signature-grid">
+                        {% for sample in signature_slots %}
+                            {% include 'components/biometric_signature_preview.html' with slot=sample.slot sample=sample.field %}
+                        {% endfor %}
+                    </div>
+                </section>
+
                 <!-- =====================================================
                  COMPLETION STATUS
             ====================================================== -->
@@ -584,8 +593,7 @@
 
                             <strong>Biometric verification completed.</strong>
 
-                            Both required fingerprint records have been
-                            captured and the applicant is fully verified.
+                            Both fingerprints and all three signature samples have been captured and the applicant is fully verified.
 
                         </div>
 
