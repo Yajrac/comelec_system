@@ -2622,20 +2622,29 @@ def admin_applicants(request):
             brgy_id=barangay_id
         )
 
-    application_type = request.GET.get("application_type", "").strip().upper()
+    history_view = request.GET.get('view') == 'history'
+    application_type = request.GET.get("application_type", "").strip().upper() if history_view else ''
     type_choices = [("NEW", "New Registration"), ("UPDATE", "Correction / Update"),
                     ("TRANSFER", "Transfer"), ("REACTIVATION", "Reactivation"),
                     ("REINSTATEMENT", "Reinstatement")]
     if application_type not in dict(type_choices):
         application_type = ""
-    request_models = {"UPDATE": ApplicantUpdateRequest, "TRANSFER": ApplicantTransferRequest,
-                      "REACTIVATION": ApplicantReactivationRequest,
-                      "REINSTATEMENT": ApplicantReinstatementRequest}
-    if application_type in request_models:
-        history_ids = request_models[application_type].objects.values("applicant_id")
-        applicants = applicants.filter(Q(application_type=application_type) | Q(pk__in=history_ids))
-    elif application_type:
-        applicants = applicants.filter(application_type=application_type)
+    if history_view:
+        from .application_history import application_history
+        from django.core.paginator import Paginator
+        rows = []
+        for record in applicants.prefetch_related('update_requests', 'transfer_requests', 'reactivation_requests', 'reinstatement_requests'):
+            for item in application_history(record):
+                if not application_type or item['type'] == application_type:
+                    rows.append(dict(item, applicant=record))
+        rows.sort(key=lambda item: item['submitted_at'], reverse=True)
+        page_obj = Paginator(rows, 10).get_page(request.GET.get('page'))
+        return render(request, 'comelec/applicants/list.html', {
+            'history_view': True, 'history_rows': page_obj, 'page_obj': page_obj,
+            'barangays': Barangay.objects.all().order_by('name'), 'search': search,
+            'barangay_id': barangay_id, 'application_type': application_type,
+            'application_type_choices': type_choices,
+        })
 
     if request.GET.get("format") == "print":
         from .report_print import render_application_list
@@ -2659,12 +2668,6 @@ def admin_applicants(request):
     page_obj = paginator.get_page(
         page_number
     )
-
-    from .application_history import application_history
-    from django.db.models import prefetch_related_objects
-    prefetch_related_objects(page_obj.object_list, 'update_requests', 'transfer_requests', 'reactivation_requests', 'reinstatement_requests')
-    for record in page_obj:
-        record.latest_application = application_history(record)[0]
 
     barangays = Barangay.objects.all().order_by(
         "name"

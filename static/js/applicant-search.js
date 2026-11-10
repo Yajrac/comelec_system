@@ -48,6 +48,6 @@ if (applicantFilters) {
     if (event.key === 'Enter' && !event.isComposing) { event.preventDefault(); runSearch(); }
   });
   barangay.addEventListener('change', runSearch);
-  applicationType.addEventListener('change', runSearch);
+  applicationType?.addEventListener('change', runSearch);
   applicantFilters.addEventListener('submit', event => { event.preventDefault(); runSearch(); });
 }

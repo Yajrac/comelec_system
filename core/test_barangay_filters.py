@@ -37,19 +37,23 @@ class BarangayTypeFilterTests(TestCase):
         self.assertEqual(response.context['applicants'].count(), 0)
         self.assertContains(response, 'No Matching Verified Applicants')
 
-    def test_admin_applicants_type_filter_combines_history_search_and_barangay(self):
+    def test_admin_tabs_keep_type_filter_only_in_history(self):
         for applicant in self.records:
             ApplicantBiometric.objects.create(applicant=applicant, biometrics_completed=True, completed=True)
         url = reverse('admin-applicants')
-        response = self.client.get(url, {'application_type': 'TRANSFER', 'barangay': self.barangay.pk})
-        self.assertEqual(set(response.context['applicants']), {self.records[0], self.records[1]})
-        self.assertContains(response, 'value="TRANSFER" selected')
-        response = self.client.get(url, {'application_type': 'TRANSFER', 'search': 'Pending'})
-        self.assertEqual(list(response.context['applicants']), [self.records[1]])
-        response = self.client.get(url, {'application_type': 'UPDATE'})
-        self.assertEqual(list(response.context['applicants']), [])
-        response = self.client.get(url, {'application_type': 'unknown'})
+        response = self.client.get(url, {'application_type': 'TRANSFER'})
         self.assertEqual(response.context['page_obj'].paginator.count, 3)
+        self.assertNotContains(response, 'id="applicationTypeFilter"')
+        self.assertNotContains(response, '<th>Latest Application</th>')
+        response = self.client.get(url, {'view':'history', 'application_type':'TRANSFER', 'barangay':self.barangay.pk})
+        self.assertEqual(response.context['page_obj'].paginator.count, 2)
+        self.assertEqual({row['applicant'].pk for row in response.context['history_rows']}, {self.records[0].pk,self.records[1].pk})
+        self.assertContains(response, 'value="TRANSFER" selected')
+        response = self.client.get(url, {'view':'history','application_type':'TRANSFER','search':'Pending'})
+        self.assertEqual(response.context['page_obj'].paginator.count, 1)
+        self.assertEqual(response.context['history_rows'][0]['status'], 'PENDING')
+        response = self.client.get(url, {'view':'history','application_type':'UPDATE'})
+        self.assertEqual(response.context['page_obj'].paginator.count, 0)
 
     def test_detail_history_retains_all_requests_and_filter_has_no_duplicate_rows(self):
         for applicant in self.records:
@@ -64,7 +68,8 @@ class BarangayTypeFilterTests(TestCase):
         self.assertEqual({row['status'] for row in history}, {'APPROVED', 'DISAPPROVED', 'PENDING'})
         response = self.client.get(reverse('admin-applicants'), {'application_type':'TRANSFER', 'search':'Transferred'})
         self.assertEqual(response.context['page_obj'].paginator.count, 1)
-        self.assertEqual(response.context['applicants'][0].latest_application['status'], 'PENDING')
+        history_response = self.client.get(reverse('admin-applicants'), {'view':'history','application_type':'TRANSFER','search':'Transferred'})
+        self.assertEqual(history_response.context['page_obj'].paginator.count, 3)
         response = self.client.get(reverse('admin-applicant-detail', args=[applicant.pk]))
         self.assertContains(response, 'Application History')
         self.assertContains(response, f'TRANSFER-{rejected.pk}')

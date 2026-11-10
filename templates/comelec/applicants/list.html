@@ -14,12 +14,17 @@
 {% endblock %}
 
 {% block page_subtitle %}
-    Fully verified voter applicants
+    {% if history_view %}Application records of verified applicants{% else %}Fully verified voter applicants{% endif %}
 {% endblock %}
 
 {% block content %}
 
     <div class="container-fluid px-0">
+        <nav class="nav nav-tabs mb-4" aria-label="Applicant records">
+            <a class="nav-link {% if not history_view %}active{% endif %}" {% if not history_view %}aria-current="page"{% endif %} href="{% url 'admin-applicants' %}{% if search or barangay_id %}?search={{ search|urlencode }}&amp;barangay={{ barangay_id }}{% endif %}">Verified Applicants</a>
+            <a class="nav-link {% if history_view %}active{% endif %}" {% if history_view %}aria-current="page"{% endif %} href="?view=history&amp;search={{ search|urlencode }}&amp;barangay={{ barangay_id }}">Application History</a>
+        </nav>
+
 
         <!-- =========================================================
          FILTER CARD
@@ -30,6 +35,7 @@
             <div class="card-body">
 
                 <form method="get" id="applicantFilters">
+                    {% if history_view %}<input type="hidden" name="view" value="history">{% endif %}
 
                     <div class="row g-3 align-items-end">
 
@@ -81,6 +87,7 @@
 
                         </div>
 
+                        {% if history_view %}
                         <div class="col-md-4">
                             <label for="applicationTypeFilter" class="form-label fw-semibold">Type of Application</label>
                             <select id="applicationTypeFilter" name="application_type" class="form-select">
@@ -91,6 +98,7 @@
                             </select>
                         </div>
 
+                        {% endif %}
                         <!-- ACTION -->
 
                         <div class="col-md-1">
@@ -98,7 +106,7 @@
                             <div class="d-flex gap-2">
 
                                 <a
-                                    href="{% url 'admin-applicants' %}"
+                                    href="{% url 'admin-applicants' %}{% if history_view %}?view=history{% endif %}"
                                     class="btn btn-outline-secondary"
                                     aria-label="Clear applicant filters"
                                     title="Clear filters"
@@ -141,11 +149,10 @@
 
                     <div>
 
-                        <h5 class="mb-1">Verified Applicants</h5>
+                        <h5 class="mb-1">{% if history_view %}Application History{% else %}Verified Applicants{% endif %}</h5>
 
                         <small class="text-muted">
-                            Applicants who completed registration,
-                            biometrics, and electronic signature
+                            {% if history_view %}All application records for verified applicants{% else %}Applicants who completed registration, biometrics, and electronic signature{% endif %}
                         </small>
 
                     </div>
@@ -158,7 +165,7 @@
                             </i>
 
                             {{ page_obj.paginator.count }}
-                            Verified
+                            {% if history_view %}Records{% else %}Verified{% endif %}
 
                         </span>
 
@@ -174,6 +181,9 @@
 
                 <div class="table-responsive">
 
+                    {% if history_view %}
+                    {% include 'comelec/applicants/history_table.html' %}
+                    {% else %}
                     <table class="table table-hover align-middle mb-0">
 
                         <thead class="table-light">
@@ -188,7 +198,6 @@
 
                                 <th>Contact</th>
 
-                                <th>Latest Application</th>
 
                                 <th>Verification</th>
 
@@ -267,22 +276,6 @@
 
                                     </td>
 
-                                    <!-- REGISTRATION -->
-
-                                    <td>
-
-                                        <span class="badge bg-primary">
-
-                                            {{ applicant.latest_application.label }}
-
-                                        </span>
-
-                                        <div
-                                            class="small text-muted mt-1"
-                                        >{{ applicant.latest_application.submitted_at|date:"M d, Y" }} ? {{ applicant.latest_application.status_label }}</div>
-
-                                    </td>
-
                                     <!-- VERIFICATION -->
 
                                     <td>
@@ -291,7 +284,7 @@
 
                                             <i class="bi bi-patch-check-fill me-1">
                                             </i>
-                                            Verified
+                                            {% if history_view %}Records{% else %}Verified{% endif %}
 
                                         </span>
 
@@ -349,7 +342,7 @@
 
                                 <tr>
 
-                                    <td colspan="7" class="text-center py-5">
+                                    <td colspan="6" class="text-center py-5">
 
                                         <div class="text-muted">
 
@@ -377,6 +370,7 @@
                         </tbody>
 
                     </table>
+                    {% endif %}
 
                 </div>
 
@@ -400,7 +394,7 @@
                             {{ page_obj.end_index }}
                             of
                             {{ page_obj.paginator.count }}
-                            applicants
+                            {% if history_view %}application records{% else %}applicants{% endif %}
 
                         </small>
 
@@ -414,7 +408,7 @@
 
                                         <a
                                             class="page-link"
-                                            href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}{% if barangay_id %}&barangay={{ barangay_id }}{% endif %}{% if application_type %}&application_type={{ application_type|urlencode }}{% endif %}"
+                                            href="?{% if history_view %}view=history&amp;{% endif %}page={{ page_obj.previous_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}{% if barangay_id %}&barangay={{ barangay_id }}{% endif %}{% if application_type %}&application_type={{ application_type|urlencode }}{% endif %}"
                                         >Previous</a>
 
                                     </li>
@@ -439,7 +433,7 @@
 
                                             <a
                                                 class="page-link"
-                                                href="?page={{ num }}{% if search %}&search={{ search|urlencode }}{% endif %}{% if barangay_id %}&barangay={{ barangay_id }}{% endif %}{% if application_type %}&application_type={{ application_type|urlencode }}{% endif %}"
+                                                href="?{% if history_view %}view=history&amp;{% endif %}page={{ num }}{% if search %}&search={{ search|urlencode }}{% endif %}{% if barangay_id %}&barangay={{ barangay_id }}{% endif %}{% if application_type %}&application_type={{ application_type|urlencode }}{% endif %}"
                                             >{{ num }}</a>
 
                                         </li>
@@ -454,7 +448,7 @@
 
                                         <a
                                             class="page-link"
-                                            href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}{% if barangay_id %}&barangay={{ barangay_id }}{% endif %}{% if application_type %}&application_type={{ application_type|urlencode }}{% endif %}"
+                                            href="?{% if history_view %}view=history&amp;{% endif %}page={{ page_obj.next_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}{% if barangay_id %}&barangay={{ barangay_id }}{% endif %}{% if application_type %}&application_type={{ application_type|urlencode }}{% endif %}"
                                         >Next</a>
 
                                     </li>
