@@ -188,7 +188,7 @@
 
                                 <th>Contact</th>
 
-                                <th>Registration</th>
+                                <th>Latest Application</th>
 
                                 <th>Verification</th>
 
@@ -273,13 +273,13 @@
 
                                         <span class="badge bg-primary">
 
-                                            {{ applicant.get_application_type_display }}
+                                            {{ applicant.latest_application.label }}
 
                                         </span>
 
                                         <div
                                             class="small text-muted mt-1"
-                                        >{{ applicant.date_joined|date:"M d, Y" }}</div>
+                                        >{{ applicant.latest_application.submitted_at|date:"M d, Y" }} ? {{ applicant.latest_application.status_label }}</div>
 
                                     </td>
 

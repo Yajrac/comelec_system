@@ -2632,8 +2632,8 @@ def admin_applicants(request):
                       "REACTIVATION": ApplicantReactivationRequest,
                       "REINSTATEMENT": ApplicantReinstatementRequest}
     if application_type in request_models:
-        approved_ids = request_models[application_type].objects.filter(status="APPROVED").values("applicant_id")
-        applicants = applicants.filter(Q(application_type=application_type) | Q(pk__in=approved_ids))
+        history_ids = request_models[application_type].objects.values("applicant_id")
+        applicants = applicants.filter(Q(application_type=application_type) | Q(pk__in=history_ids))
     elif application_type:
         applicants = applicants.filter(application_type=application_type)
 
@@ -2659,6 +2659,12 @@ def admin_applicants(request):
     page_obj = paginator.get_page(
         page_number
     )
+
+    from .application_history import application_history
+    from django.db.models import prefetch_related_objects
+    prefetch_related_objects(page_obj.object_list, 'update_requests', 'transfer_requests', 'reactivation_requests', 'reinstatement_requests')
+    for record in page_obj:
+        record.latest_application = application_history(record)[0]
 
     barangays = Barangay.objects.all().order_by(
         "name"
@@ -2695,6 +2701,8 @@ def admin_applicant_detail(request, applicant_id):
     )
 
     biometric = applicant.biometric
+    from .application_history import application_history
+    history = application_history(applicant)
 
     return render(
         request,
@@ -2702,6 +2710,7 @@ def admin_applicant_detail(request, applicant_id):
         {
             "applicant": applicant,
             "biometric": biometric,
+            "application_history": history,
         }
     )
 
