@@ -1,13 +1,14 @@
-﻿{% extends "staff/base.html" %}
+{% extends "admin.html" %}
 {% load static %}
 {% block title %}Acknowledgment Receipt{% endblock %}
+{% block page_title %}Acknowledgment Receipt{% endblock %}
+{% block page_subtitle %}Review and print the applicant's registration receipt.{% endblock %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/applicant-forms-new_registration.css' %}">
 <link rel="stylesheet" href="{% static 'css/acknowledgment-receipt.css' %}">
 {% endblock %}
 {% block content %}
 <div class="registration-container receipt-page">
-    <div class="registration-header"><h1>Acknowledgment Receipt</h1><p>Review and print the applicant's registration receipt.</p></div>
     {% if receipt_applicant_id %}
     <section class="form-section receipt-settings">
         <div class="form-section-header"><div class="form-section-marker"></div><h2>Receipt Settings</h2></div>
@@ -48,5 +49,7 @@
     </section>
     <div class="receipt-actions"><a class="receipt-button" href="?format=pdf">Download PDF</a><button class="receipt-button secondary" id="printReceipt" type="button">Print Receipt</button><a class="receipt-back" href="{% url 'admin-applicants' %}">Back to Applicants</a></div>
 </div>
+{% endblock %}
+{% block extra_js %}
 <script src="{% static 'js/acknowledgment-receipt.js' %}" defer></script>
 {% endblock %}

@@ -30,6 +30,8 @@ class ReceiptTests(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.context['receipt_values']['officer'], 'Maria Santos')
         self.assertContains(response, 'Receipt Settings')
+        self.assertTemplateUsed(response, 'admin.html')
+        self.assertTemplateNotUsed(response, 'staff/base.html')
         self.assertEqual(AcknowledgmentReceipt.objects.get(applicant=self.applicant).application_number, number)
         self.client.post(url, {'officer_name': 'x' * 101})
         self.assertEqual(ReceiptSettings.objects.get(pk=1).officer_name, 'Maria Santos')

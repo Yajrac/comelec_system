@@ -1,4 +1,4 @@
-﻿.receipt-page{padding:24px 0;color:#172554}
+.receipt-page{padding:24px 0;color:#172554}
 .receipt-scroll{padding:24px;overflow-x:auto}
 .receipt-sheet{position:relative;min-width:960px;max-width:1160px;margin:auto;padding:14px 16px 12px;border:2px solid #222;background:white;color:#111;font-family:Arial,sans-serif}
 .receipt-sheet>h2{text-align:center;font-size:18px;margin:0 0 3px;font-weight:700}
@@ -45,3 +45,9 @@
 .receipt-settings-form p{font-size:12px;line-height:1.7;color:#64748b;margin:0}
 .receipt-settings-form button{justify-self:start}
 @media print{.receipt-settings{display:none!important}}
+
+.admin-content .receipt-page{max-width:none;margin:0;padding:0;min-width:0}
+@media print{
+ .admin-sidebar,.sidebar-toggle-bar,.admin-mobile-header,.admin-offcanvas,.admin-page-header,.admin-nav-tooltip,body>.offcanvas-backdrop{display:none!important}
+ .admin-main,.admin-content,.admin-content-inner{margin:0!important;padding:0!important;width:100%!important;max-width:none!important;min-height:0!important;display:block!important}
+}
