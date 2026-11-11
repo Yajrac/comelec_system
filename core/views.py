@@ -2622,30 +2622,6 @@ def admin_applicants(request):
             brgy_id=barangay_id
         )
 
-    history_view = request.GET.get('view') == 'history'
-    application_type = request.GET.get("application_type", "").strip().upper() if history_view else ''
-    type_choices = [("NEW", "New Registration"), ("UPDATE", "Correction / Update"),
-                    ("TRANSFER", "Transfer"), ("REACTIVATION", "Reactivation"),
-                    ("REINSTATEMENT", "Reinstatement")]
-    if application_type not in dict(type_choices):
-        application_type = ""
-    if history_view:
-        from .application_history import application_history
-        from django.core.paginator import Paginator
-        rows = []
-        for record in applicants.prefetch_related('update_requests', 'transfer_requests', 'reactivation_requests', 'reinstatement_requests'):
-            for item in application_history(record):
-                if not application_type or item['type'] == application_type:
-                    rows.append(dict(item, applicant=record))
-        rows.sort(key=lambda item: item['submitted_at'], reverse=True)
-        page_obj = Paginator(rows, 10).get_page(request.GET.get('page'))
-        return render(request, 'comelec/applicants/list.html', {
-            'history_view': True, 'history_rows': page_obj, 'page_obj': page_obj,
-            'barangays': Barangay.objects.all().order_by('name'), 'search': search,
-            'barangay_id': barangay_id, 'application_type': application_type,
-            'application_type_choices': type_choices,
-        })
-
     if request.GET.get("format") == "print":
         from .report_print import render_application_list
         return render_application_list(request, applicants, ApplicantUpdateRequest.objects.none(),
@@ -2653,39 +2629,31 @@ def admin_applicants(request):
             ApplicantReinstatementRequest.objects.none(), "", "", applicant_only=True)
 
     # =========================================================
-    # PAGINATION
+    # APPLICATION HISTORY OF VERIFIED APPLICANTS
     # =========================================================
 
+    application_type = request.GET.get("application_type", "").strip().upper()
+    type_choices = [("NEW", "New Registration"), ("UPDATE", "Correction / Update"),
+                    ("TRANSFER", "Transfer"), ("REACTIVATION", "Reactivation"),
+                    ("REINSTATEMENT", "Reinstatement")]
+    if application_type not in dict(type_choices):
+        application_type = ""
+
+    from .application_history import application_history
     from django.core.paginator import Paginator
-
-    paginator = Paginator(
-        applicants,
-        10
-    )
-
-    page_number = request.GET.get("page")
-
-    page_obj = paginator.get_page(
-        page_number
-    )
-
-    barangays = Barangay.objects.all().order_by(
-        "name"
-    )
-
-    return render(
-        request,
-        "comelec/applicants/list.html",
-        {
-            "applicants": page_obj,
-            "page_obj": page_obj,
-            "barangays": barangays,
-            "search": search,
-            "barangay_id": barangay_id,
-            "application_type": application_type,
-            "application_type_choices": type_choices,
-        }
-    )
+    rows = []
+    for record in applicants.prefetch_related('update_requests', 'transfer_requests', 'reactivation_requests', 'reinstatement_requests'):
+        for item in application_history(record):
+            if not application_type or item['type'] == application_type:
+                rows.append(dict(item, applicant=record))
+    rows.sort(key=lambda item: item['submitted_at'], reverse=True)
+    page_obj = Paginator(rows, 10).get_page(request.GET.get('page'))
+    return render(request, 'comelec/applicants/list.html', {
+        'history_rows': page_obj, 'page_obj': page_obj,
+        'barangays': Barangay.objects.all().order_by('name'), 'search': search,
+        'barangay_id': barangay_id, 'application_type': application_type,
+        'application_type_choices': type_choices,
+    })
 
 @login_required
 def admin_applicant_detail(request, applicant_id):

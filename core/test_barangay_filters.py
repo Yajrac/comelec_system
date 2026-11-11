@@ -37,14 +37,18 @@ class BarangayTypeFilterTests(TestCase):
         self.assertEqual(response.context['applicants'].count(), 0)
         self.assertContains(response, 'No Matching Verified Applicants')
 
-    def test_admin_tabs_keep_type_filter_only_in_history(self):
+    def test_applicants_page_shows_history_with_profile_columns_and_suspend(self):
         for applicant in self.records:
             ApplicantBiometric.objects.create(applicant=applicant, biometrics_completed=True, completed=True)
         url = reverse('admin-applicants')
         response = self.client.get(url, {'application_type': 'TRANSFER'})
         self.assertEqual(response.context['page_obj'].paginator.count, 3)
-        self.assertNotContains(response, 'id="applicationTypeFilter"')
-        self.assertNotContains(response, '<th>Latest Application</th>')
+        self.assertContains(response, 'id="applicationTypeFilter"')
+        self.assertNotContains(response, 'Verified Applicants</a>')
+        for heading in ('<th>Barangay</th>', '<th>Contact</th>', '<th>Verification</th>'):
+            self.assertContains(response, heading)
+        self.assertContains(response, reverse('admin-suspend-applicant', args=[self.records[0].pk]))
+        self.assertContains(response, '09171234567')
         response = self.client.get(url, {'view':'history', 'application_type':'TRANSFER', 'barangay':self.barangay.pk})
         self.assertEqual(response.context['page_obj'].paginator.count, 2)
         self.assertEqual({row['applicant'].pk for row in response.context['history_rows']}, {self.records[0].pk,self.records[1].pk})
@@ -66,8 +70,6 @@ class BarangayTypeFilterTests(TestCase):
         self.assertEqual(len(history), 4)
         self.assertEqual(history[0]['reference'], f'TRANSFER-{pending.pk}')
         self.assertEqual({row['status'] for row in history}, {'APPROVED', 'DISAPPROVED', 'PENDING'})
-        response = self.client.get(reverse('admin-applicants'), {'application_type':'TRANSFER', 'search':'Transferred'})
-        self.assertEqual(response.context['page_obj'].paginator.count, 1)
         history_response = self.client.get(reverse('admin-applicants'), {'view':'history','application_type':'TRANSFER','search':'Transferred'})
         self.assertEqual(history_response.context['page_obj'].paginator.count, 3)
         response = self.client.get(reverse('admin-applicant-detail', args=[applicant.pk]))
