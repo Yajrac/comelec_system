@@ -10,3 +10,14 @@ html body .inline-comelec-applicants-list-4.inline-comelec-applicants-list-4 { f
 .applicant-pagination .page-item.active .page-link { background: #073ba8; border-color: #073ba8; color: white; }
 .applicant-pagination .page-item.disabled .page-link { background: white; color: #98a9c5; border-color: #edf1f8; }
 .applicant-pagination .page-item:not(.disabled):not(.active) .page-link:hover { background: #edf3ff; }
+
+.applicant-history-table th { white-space: nowrap; }
+.applicant-history-table td,
+.applicant-history-table th { padding: 14px 12px; }
+.applicant-history-table td:first-child,
+.applicant-history-table th:first-child { padding-left: 20px; }
+.applicant-history-table td:last-child,
+.applicant-history-table th:last-child { padding-right: 20px; }
+.applicant-history-table .history-applicant { min-width: 170px; max-width: 240px; }
+.applicant-history-table .badge { font-size: 12px; padding: 6px 10px; }
+.applicant-history-table form { margin: 0; }

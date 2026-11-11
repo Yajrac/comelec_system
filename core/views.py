@@ -2605,9 +2605,7 @@ def admin_applicants(request):
         applicants = applicants.filter(
             Q(lastname__icontains=search) |
             Q(firstname__icontains=search) |
-            Q(middlename__icontains=search) |
-            Q(email__icontains=search) |
-            Q(phone__icontains=search)
+            Q(middlename__icontains=search)
         )
 
     # =========================================================

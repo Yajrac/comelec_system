@@ -2,7 +2,7 @@
 {% load static %}
 {% block extra_css %}{{ block.super }}<link
     rel="stylesheet"
-    href="{% static 'css/pages/comelec-applicants-list.css' %}?v=regular-2"
+    href="{% static 'css/pages/comelec-applicants-list.css' %}?v=history-2"
 >{% endblock %}
 
 {% block title %}
@@ -51,7 +51,7 @@
                                     type="text"
                                     name="search"
                                     class="form-control"
-                                    placeholder="Name, email, or phone"
+                                    placeholder="Applicant name"
                                     value="{{ search }}"
                                 >
 
