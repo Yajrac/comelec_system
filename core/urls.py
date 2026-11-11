@@ -84,6 +84,12 @@ urlpatterns = [
         name="admin-applicant-biometric"
     ),
     path(
+        "admin-applicants/<int:applicant_id>/biometric/finish/",
+        views.admin_finish_verification,
+        name="admin-finish-verification"
+    ),
+    path("admin-applicants/<int:applicant_id>/receipt/<int:receipt_id>/", acknowledgment_receipt, name="acknowledgment-receipt-issued"),
+    path(
         "admin-applicants/<int:applicant_id>/print-slip/",
         views.print_slip_account,
         name="print-slip-account"

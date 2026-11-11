@@ -9,9 +9,10 @@
             <td>{{ item.label }}</td>
             <td class="text-nowrap">{{ item.submitted_at|date:"M d, Y" }}</td>
             <td><span class="badge text-nowrap {% if item.status == 'APPROVED' %}bg-success{% elif item.status == 'DISAPPROVED' %}bg-danger{% elif item.status == 'REVIEW' %}bg-info text-dark{% else %}bg-warning text-dark{% endif %}">{{ item.status_label }}</span></td>
-            <td><span class="badge bg-success text-nowrap"><i class="bi bi-patch-check-fill me-1" aria-hidden="true"></i>{{ item.applicant.get_verification_status_display }}</span></td>
+            <td>{% if item.applicant.verification_status == 'VERIFIED' %}<span class="badge bg-success text-nowrap"><i class="bi bi-patch-check-fill me-1" aria-hidden="true"></i>Verified</span>{% else %}<span class="badge bg-warning text-dark text-nowrap"><i class="bi bi-fingerprint me-1" aria-hidden="true"></i>Biometrics Pending</span>{% endif %}</td>
             <td class="text-end">
                 <div class="d-flex justify-content-end gap-2">
+                    {% if item.applicant.verification_status != 'VERIFIED' %}<a class="btn btn-sm admin-icon-action" href="{% url 'admin-applicant-biometric' item.applicant.id %}" title="Capture new biometrics" aria-label="Capture new biometrics for {{ item.applicant }}"><i class="bi bi-fingerprint" aria-hidden="true"></i></a>{% endif %}
                     <a class="btn btn-sm admin-icon-action" href="{{ item.url }}" title="View application" aria-label="View {{ item.label }} of {{ item.applicant }}"><i class="bi bi-eye" aria-hidden="true"></i></a>
                     <form method="post" action="{% url 'admin-suspend-applicant' item.applicant.id %}" data-confirm-submit="Are you sure you want to suspend {{ item.applicant }}?">
                         {% csrf_token %}

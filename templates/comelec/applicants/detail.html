@@ -634,6 +634,49 @@
 
     </div>
 
+    <section class="card mt-4" aria-labelledby="previousBiometricsTitle">
+        <div class="card-header"><h2 class="h5 mb-0" id="previousBiometricsTitle">Previous Biometrics</h2></div>
+        <div class="card-body">
+            <p class="text-muted small">Current biometrics belong to: <strong>{{ current_round }}</strong>. Earlier captures are kept here when an approved application requires new biometrics.</p>
+            {% for item in previous_biometrics %}
+                <div class="border rounded p-3 mb-3">
+                    <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+                        <div><strong>{{ item.round }}</strong>{% if item.record.captured_at %} <span class="text-muted">· captured {{ item.record.captured_at|date:"M d, Y h:i A" }}</span>{% endif %}</div>
+                        <div class="text-muted small">Replaced on {{ item.record.archived_at|date:"M d, Y h:i A" }} after <strong>{{ item.replaced_by }}</strong> was approved{% if not item.record.was_completed %} (capture was incomplete){% endif %}</div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-3 mb-3">
+                        {% for label, finger in item.fingers %}
+                            <div class="text-center">
+                                <div class="small fw-semibold mb-1">{{ label }} Finger</div>
+                                {% if finger %}<a href="{{ finger.url }}" target="_blank" rel="noopener"><img src="{{ finger.url }}" alt="Previous {{ label|lower }} fingerprint" width="90" height="100" loading="lazy" class="border rounded"></a>
+                                {% else %}<div class="text-muted small">Not captured</div>{% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="review-signature-grid">
+                        {% for sample in item.signatures %}
+                            {% include 'components/biometric_signature_preview.html' with slot=sample.slot sample=sample.field %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-muted mb-0">No previous biometrics. This applicant has only been captured once.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="card mt-4" aria-labelledby="receiptsTitle">
+        <div class="card-header"><h2 class="h5 mb-0" id="receiptsTitle">Acknowledgment Receipts</h2></div>
+        <div class="table-responsive">
+            <table class="table mb-0 align-middle">
+                <thead><tr><th>Application</th><th>Application No.</th><th>Issued</th><th>Action</th></tr></thead>
+                <tbody>{% for item in receipts %}
+                    <tr><td>{{ item.round }}</td><td>{{ item.record.application_number }}</td><td>{{ item.record.issued_at|date:"M d, Y h:i A" }}</td><td><a class="btn btn-outline-primary btn-sm" href="{% url 'acknowledgment-receipt-issued' applicant.id item.record.id %}" title="View receipt" aria-label="View receipt {{ item.record.application_number }}"><i class="bi bi-receipt" aria-hidden="true"></i></a></td></tr>
+                {% empty %}<tr><td colspan="4" class="text-muted">No receipts issued yet. A receipt is issued from Print Slip after verification.</td></tr>{% endfor %}</tbody>
+            </table>
+        </div>
+    </section>
+
     <section class="card mt-4">
         <div class="card-header"><h2 class="h5 mb-0">Application History</h2></div>
         <div class="card-body"><p class="text-muted small mb-0">All saved applications for this applicant, including pending and disapproved requests. Request IDs identify individual applications.</p></div>

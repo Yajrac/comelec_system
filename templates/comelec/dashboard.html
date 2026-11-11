@@ -825,7 +825,7 @@
 
                                         {% elif applicant.status == "REVIEW" %}
 
-                                            <span class="badge bg-info status-badge">Review</span>
+                                            <span class="badge bg-info text-dark status-badge">Review</span>
 
                                         {% elif applicant.status == "APPROVED" %}
 
@@ -845,21 +845,15 @@
 
                                         {% if applicant.verification_status == "VERIFIED" %}
 
-                                            <span
-                                                class="badge bg-success-subtle text-success-emphasis status-badge"
-                                            >Verified</span>
+                                            <span class="badge bg-success status-badge"><i class="bi bi-patch-check-fill me-1" aria-hidden="true"></i>Verified</span>
 
                                         {% elif applicant.verification_status == "BIOMETRICS_PENDING" %}
 
-                                            <span
-                                                class="badge bg-warning-subtle text-warning-emphasis status-badge"
-                                            >Biometrics Pending</span>
+                                            <span class="badge bg-warning text-dark status-badge"><i class="bi bi-fingerprint me-1" aria-hidden="true"></i>Biometrics Pending</span>
 
                                         {% else %}
 
-                                            <span
-                                                class="badge bg-secondary-subtle text-secondary-emphasis status-badge"
-                                            >Unverified</span>
+                                            <span class="badge bg-secondary status-badge"><i class="bi bi-hourglass-split me-1" aria-hidden="true"></i>Unverified</span>
 
                                         {% endif %}
 

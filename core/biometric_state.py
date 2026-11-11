@@ -26,3 +26,40 @@ def sync_completion(biometric):
     biometric.save(update_fields=["completed", "biometrics_completed", "updated_at"])
     Applicant.objects.filter(pk=biometric.applicant_id).update(verification_status="VERIFIED" if complete else "BIOMETRICS_PENDING")
     return complete
+
+
+CAPTURE_FIELDS = ("left_finger", "left_finger_template", "right_finger", "right_finger_template",
+                  "applicant_signature", "applicant_signature_2", "applicant_signature_3")
+
+
+def restart_biometrics(applicant, application_type, request_id):
+    """Start a new capture round after an approved application.
+
+    The previous capture is kept as BiometricHistory (files stay where they are; only the
+    references move), and the applicant must be captured again before being verified.
+    """
+    from django.db import transaction
+    from Applicants.models import ApplicantBiometric, BiometricHistory
+    with transaction.atomic():
+        biometric, _ = ApplicantBiometric.objects.select_for_update().get_or_create(applicant=applicant)
+        if any(getattr(biometric, name) for name in CAPTURE_FIELDS):
+            BiometricHistory.objects.create(
+                applicant=applicant,
+                **{name: getattr(biometric, name) for name in CAPTURE_FIELDS},
+                was_completed=biometric.completed,
+                captured_at=biometric.captured_at,
+                application_type=biometric.application_type,
+                application_request_id=biometric.application_request_id,
+                replaced_by_type=application_type,
+                replaced_by_request_id=request_id,
+            )
+        for name in CAPTURE_FIELDS:
+            setattr(biometric, name, None)
+        biometric.completed = False
+        biometric.biometrics_completed = False
+        biometric.captured_at = None
+        biometric.application_type = application_type
+        biometric.application_request_id = request_id
+        biometric.save()
+        Applicant.objects.filter(pk=applicant.pk).update(verification_status="BIOMETRICS_PENDING")
+    return biometric

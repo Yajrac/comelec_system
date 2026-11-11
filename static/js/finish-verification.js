@@ -13,10 +13,10 @@
     });
     button.addEventListener('click', async () => {
         if (!ready()) return;
-        const message = 'All required fingerprints and signature samples have been saved. Finish verification and return to Applications?';
+        const message = 'All required fingerprints and signature samples have been saved. Finish verification and return to Applicants?';
         const confirmed = window.confirmAdminAction
             ? await window.confirmAdminAction(message)
             : window.confirm(message);
-        if (confirmed && ready()) window.location.assign(button.dataset.returnUrl);
+        if (confirmed && ready()) { button.disabled = true; button.form.submit(); }
     });
 })();

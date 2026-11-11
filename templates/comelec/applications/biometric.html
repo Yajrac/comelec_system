@@ -108,6 +108,15 @@
             </div>
         {% endif %}
 
+        {% if recapture_round %}
+            <div class="bio-notice warning">
+                <strong>New biometrics required: {{ recapture_round }}</strong>
+                <br>
+                This applicant's application was approved, so fingerprints and all three signatures must be captured again.
+                The previous capture is kept under Previous Biometrics on the applicant's details page.
+            </div>
+        {% endif %}
+
         {% if capture_complete and applicant.verification_status == "VERIFIED" %}
             <div class="bio-notice success">
                 <strong>Biometrics and signatures complete</strong>
@@ -495,15 +504,17 @@
         <p id="finishVerificationHelp" class="text-muted small mb-0" role="status">
             {% if capture_complete %}All required captures are saved. You can finish verification.{% else %}Save both fingerprints and all 3 signature samples to finish verification.{% endif %}
         </p>
+        <form method="post" action="{% url 'admin-finish-verification' applicant.id %}" id="finishVerificationForm" class="m-0">
+        {% csrf_token %}
         <button
             id="finishVerification"
             type="button"
             class="btn btn-success"
             data-complete="{{ capture_complete|yesno:'true,false' }}"
-            data-return-url="{% url 'admin-applications' %}"
             aria-describedby="finishVerificationHelp"
             {% if not capture_complete %}disabled{% endif %}
         ><i class="bi bi-check-circle me-1" aria-hidden="true"></i>Finish Verification</button>
+        </form>
     </div>
 
     <form
@@ -521,5 +532,5 @@
 
     <script src="{% static 'js/fingerprint-capture.js' %}" defer></script>
     <script src="{% static 'js/signature-capture.js' %}" defer></script>
-    <script src="{% static 'js/finish-verification.js' %}" defer></script>
+    <script src="{% static 'js/finish-verification.js' %}?v=post-1" defer></script>
 {% endblock %}

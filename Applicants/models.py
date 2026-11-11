@@ -567,8 +567,37 @@ class ApplicantBiometric(models.Model):
         auto_now=True
     )
 
+    # Application whose approval started the current capture round
+    # (NEW for the first registration, or an approved service request).
+    application_type = models.CharField(max_length=20, choices=APPLICATION_TYPE_CHOICES, default="NEW")
+    application_request_id = models.PositiveIntegerField(null=True, blank=True)
+
     def __str__(self):
         return f"Biometrics - {self.applicant}"
+
+
+class BiometricHistory(models.Model):
+    """A previous capture round, kept when an approved application requires new biometrics."""
+    applicant = models.ForeignKey(Applicant, on_delete=models.CASCADE, related_name="biometric_history")
+    left_finger = models.FileField(upload_to="biometrics/left/", null=True, blank=True)
+    left_finger_template = models.TextField(null=True, blank=True)
+    right_finger = models.FileField(upload_to="biometrics/right/", null=True, blank=True)
+    right_finger_template = models.TextField(null=True, blank=True)
+    applicant_signature = models.FileField(upload_to="biometrics/signatures/", null=True, blank=True)
+    applicant_signature_2 = models.FileField(upload_to="biometrics/signatures/", null=True, blank=True)
+    applicant_signature_3 = models.FileField(upload_to="biometrics/signatures/", null=True, blank=True)
+    was_completed = models.BooleanField(default=False)
+    captured_at = models.DateTimeField(null=True, blank=True)
+    # Round these biometrics belonged to.
+    application_type = models.CharField(max_length=20, choices=APPLICATION_TYPE_CHOICES, default="NEW")
+    application_request_id = models.PositiveIntegerField(null=True, blank=True)
+    # Approved application that required a new capture.
+    replaced_by_type = models.CharField(max_length=20, choices=APPLICATION_TYPE_CHOICES)
+    replaced_by_request_id = models.PositiveIntegerField(null=True, blank=True)
+    archived_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-archived_at", "-id"]
 
 
 class ApplicantNotification(models.Model):
@@ -720,8 +749,14 @@ class FingerprintCaptureRequest(models.Model):
 
 
 class AcknowledgmentReceipt(models.Model):
-    applicant = models.OneToOneField(Applicant, on_delete=models.PROTECT, related_name="acknowledgment_receipt")
+    # One receipt per verification round: the first registration and each approved application.
+    applicant = models.ForeignKey(Applicant, on_delete=models.PROTECT, related_name="acknowledgment_receipts")
+    application_type = models.CharField(max_length=20, choices=APPLICATION_TYPE_CHOICES, default="NEW")
+    application_request_id = models.PositiveIntegerField(null=True, blank=True)
     application_number = models.CharField(max_length=12, unique=True)
     details = models.JSONField(default=dict)
     issued_at = models.DateTimeField(auto_now_add=True)
     issued_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+
+    class Meta:
+        ordering = ["-issued_at", "-id"]

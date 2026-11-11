@@ -1018,7 +1018,7 @@ def admin_application_reinstatement_detail(request, application_id):
         }
     )
 
-def approve_applicant_for_biometrics(applicant, notification_title, notification_message):
+def approve_applicant_for_biometrics(applicant, notification_title, notification_message, restart_for=None):
 
     applicant.status = "APPROVED"
     applicant.is_active = True
@@ -1026,9 +1026,14 @@ def approve_applicant_for_biometrics(applicant, notification_title, notification
 
     applicant.save()
 
-    ApplicantBiometric.objects.get_or_create(
-        applicant=applicant
-    )
+    if restart_for:
+        # Approved service request: archive the previous capture and require a new one.
+        from .biometric_state import restart_biometrics
+        restart_biometrics(applicant, *restart_for)
+    else:
+        ApplicantBiometric.objects.get_or_create(
+            applicant=applicant
+        )
 
     ApplicantNotification.objects.create(
         applicant=applicant,
@@ -1566,6 +1571,7 @@ def admin_application_action(
                 apply_profile_details(application, applicant)
                 approve_applicant_for_biometrics(
                     applicant=applicant,
+                    restart_for=("UPDATE", application.id),
                     notification_title="Registration Update Approved",
                     notification_message=(
                         "Your registration update request "
@@ -1726,6 +1732,7 @@ def admin_application_action(
                 apply_profile_details(application, applicant)
                 approve_applicant_for_biometrics(
                     applicant=applicant,
+                    restart_for=("TRANSFER", application.id),
                     notification_title="Transfer Request Approved",
                     notification_message=(
                         "Your voter registration transfer "
@@ -1868,6 +1875,7 @@ def admin_application_action(
                 apply_profile_details(application, applicant)
                 approve_applicant_for_biometrics(
                     applicant=applicant,
+                    restart_for=("REACTIVATION", application.id),
                     notification_title="Reactivation Approved",
                     notification_message=(
                         "Your voter registration reactivation "
@@ -2010,6 +2018,7 @@ def admin_application_action(
                 apply_profile_details(application, applicant)
                 approve_applicant_for_biometrics(
                     applicant=applicant,
+                    restart_for=("REINSTATEMENT", application.id),
                     notification_title="Reinstatement Approved",
                     notification_message=(
                         "Your voter registration reinstatement "
@@ -2127,6 +2136,7 @@ def admin_applicant_biometric(request, applicant_id):
     biometric, created = ApplicantBiometric.objects.get_or_create(
         applicant=applicant
     )
+    from .application_history import round_label
 
     # Check the actual files in the configured storage.
     def file_exists(field):
@@ -2163,8 +2173,24 @@ def admin_applicant_biometric(request, applicant_id):
             "signature_slots": [{"slot": slot, "field": getattr(biometric, field), "captured": biometric_file_exists(getattr(biometric, field))} for slot, field in SIGNATURE_FIELDS.items()],
             "signatures_complete": signatures_complete(biometric),
             "capture_complete": capture_complete(biometric),
+            "recapture_round": round_label(biometric.application_type, biometric.application_request_id) if biometric.application_type != "NEW" else "",
         }
     )
+
+
+@login_required
+@require_POST
+def admin_finish_verification(request, applicant_id):
+    """Mark the applicant verified once the current capture round is complete."""
+    access = admin_superuser_required(request)
+    if access:
+        return access
+    applicant = get_object_or_404(Applicant, id=applicant_id)
+    with transaction.atomic():
+        biometric = get_object_or_404(ApplicantBiometric.objects.select_for_update(), applicant=applicant)
+        if not sync_completion(biometric):
+            return redirect("admin-applicant-biometric", applicant_id=applicant.id)
+    return redirect("admin-applicants")
 
 
 from .signatures import start_signature_session, get_waiting_signature_session, complete_signature_session, signature_session_status
@@ -2577,16 +2603,26 @@ def admin_applicants(request):
         return access
 
     # =========================================================
-    # ONLY FULLY VERIFIED APPLICANTS
+    # VERIFIED APPLICANTS, PLUS VERIFIED APPLICANTS WHOSE NEW
+    # APPLICATION WAS APPROVED AND ARE AWAITING NEW BIOMETRICS
     # =========================================================
 
-    applicants = Applicant.objects.filter(
-        status="APPROVED",
+    verified = Q(
         verification_status="VERIFIED",
-        is_active=True,
         biometric__biometrics_completed=True,
         biometric__completed=True,
-    ).select_related(
+    )
+    reverifying = Q(verification_status="BIOMETRICS_PENDING") & (
+        Q(update_requests__status="APPROVED") |
+        Q(transfer_requests__status="APPROVED") |
+        Q(reactivation_requests__status="APPROVED") |
+        Q(reinstatement_requests__status="APPROVED")
+    )
+    applicants = Applicant.objects.filter(
+        verified | reverifying,
+        status="APPROVED",
+        is_active=True,
+    ).distinct().select_related(
         "brgy",
         "biometric"
     ).order_by(
@@ -2622,7 +2658,7 @@ def admin_applicants(request):
 
     if request.GET.get("format") == "print":
         from .report_print import render_application_list
-        return render_application_list(request, applicants, ApplicantUpdateRequest.objects.none(),
+        return render_application_list(request, applicants.filter(verified), ApplicantUpdateRequest.objects.none(),
             ApplicantTransferRequest.objects.none(), ApplicantReactivationRequest.objects.none(),
             ApplicantReinstatementRequest.objects.none(), "", "", applicant_only=True)
 
@@ -2670,8 +2706,21 @@ def admin_applicant_detail(request, applicant_id):
     )
 
     biometric = applicant.biometric
-    from .application_history import application_history
+    from .application_history import application_history, round_label
     history = application_history(applicant)
+    previous_biometrics = [{
+        "record": record,
+        "round": round_label(record.application_type, record.application_request_id),
+        "replaced_by": round_label(record.replaced_by_type, record.replaced_by_request_id),
+        "fingers": [(label, getattr(record, field) if biometric_file_exists(getattr(record, field)) else None)
+                    for label, field in (("Left", "left_finger"), ("Right", "right_finger"))],
+        "signatures": [{"slot": slot, "field": getattr(record, field) if biometric_file_exists(getattr(record, field)) else None}
+                       for slot, field in SIGNATURE_FIELDS.items()],
+    } for record in applicant.biometric_history.all()]
+    receipts = [{
+        "record": receipt,
+        "round": round_label(receipt.application_type, receipt.application_request_id),
+    } for receipt in applicant.acknowledgment_receipts.all()]
 
     return render(
         request,
@@ -2680,6 +2729,9 @@ def admin_applicant_detail(request, applicant_id):
             "applicant": applicant,
             "biometric": biometric,
             "application_history": history,
+            "current_round": round_label(biometric.application_type, biometric.application_request_id),
+            "previous_biometrics": previous_biometrics,
+            "receipts": receipts,
             "signature_slots": [{"slot": slot, "field": getattr(biometric, field) if biometric_file_exists(getattr(biometric, field)) else None} for slot, field in SIGNATURE_FIELDS.items()],
         }
     )

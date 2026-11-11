@@ -10,6 +10,14 @@ REQUEST_HISTORY = (
     ('REINSTATEMENT', 'Reinstatement', 'reinstatement_requests', 'admin-application-reinstatement-detail'),
 )
 
+TYPE_LABELS = {'NEW': 'New Registration', **{code: label for code, label, _, _ in REQUEST_HISTORY}}
+
+
+def round_label(application_type, request_id):
+    """Short name of a verification round, e.g. "Transfer #3"."""
+    label = TYPE_LABELS.get(application_type, application_type)
+    return f'{label} #{request_id}' if request_id else label
+
 
 def application_history(applicant):
     initial_date = timezone.make_aware(datetime.combine(applicant.date_joined, time.min))
