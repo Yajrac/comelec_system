@@ -211,6 +211,11 @@ path(
     name="fingerprint-device-complete",
 ),
 path(
+    "admin/fingerprint-capture/<int:request_id>/cancel/",
+    views.cancel_fingerprint_capture,
+    name="cancel-fingerprint-capture",
+),
+path(
     "admin/fingerprint-capture/<int:request_id>/status/",
     views.fingerprint_capture_status,
     name="fingerprint-capture-status",

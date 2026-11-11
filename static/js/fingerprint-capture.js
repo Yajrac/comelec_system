@@ -5,6 +5,32 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!config) return;
     const startCaptureUrl = config.dataset.startCaptureUrl;
     const captureStatusUrlTemplate = config.dataset.captureStatusUrl;
+    const cancelCaptureUrlTemplate = config.dataset.cancelCaptureUrl;
+
+    // Active capture per finger, so the officer can cancel it while waiting.
+    const activeCapture = { left: null, right: null };
+
+    function createCancelButton(finger) {
+        const captureButton = document.getElementById(
+            finger === "left" ? "captureLeftFinger" : "captureRightFinger"
+        );
+        const cancel = document.createElement("button");
+        cancel.type = "button";
+        cancel.className = "btn btn-outline-danger bio-action mt-2";
+        cancel.hidden = true;
+        cancel.innerHTML = '<i class="bi bi-x-circle me-1" aria-hidden="true"></i>Cancel Capture';
+        cancel.setAttribute("aria-label", `Cancel ${finger} fingerprint capture`);
+        cancel.addEventListener("click", () => cancelCapture(finger));
+        captureButton.insertAdjacentElement("afterend", cancel);
+        return cancel;
+    }
+
+    const cancelButtons = {
+        left: createCancelButton("left"),
+        right: createCancelButton("right")
+    };
+
+    class CaptureCancelled extends Error {}
 
     const leftButton =
         document.getElementById("captureLeftFinger");
@@ -108,12 +134,51 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
-    async function waitForCaptureResult(requestId, messageElement) {
+    async function cancelCapture(finger) {
+        const active = activeCapture[finger];
+        const cancel = cancelButtons[finger];
+        if (!active || active.cancelling) return;
+        active.cancelling = true;
+        cancel.disabled = true;
+        cancel.innerHTML =
+            '<span class="spinner-border spinner-border-sm me-2"></span>Cancelling...';
+        try {
+            const response = await fetch(
+                cancelCaptureUrlTemplate.replace("999999", String(active.requestId)),
+                {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": getCsrfToken(),
+                        "X-Requested-With": "XMLHttpRequest",
+                        "Accept": "application/json"
+                    }
+                }
+            );
+            const data = await parseResponse(response);
+            // A capture that finished just before the cancel arrived is kept.
+            if (data.status === "cancelled") active.cancelled = true;
+        } catch (error) {
+            active.cancelling = false;
+            cancel.disabled = false;
+            cancel.innerHTML =
+                '<i class="bi bi-x-circle me-1" aria-hidden="true"></i>Cancel Capture';
+            const message = document.getElementById(
+                finger === "left" ? "leftCaptureMessage" : "rightCaptureMessage"
+            );
+            setMessage(message, (error.message || "Unable to cancel.") + " Try again.", "error");
+        }
+    }
+
+    async function waitForCaptureResult(requestId, messageElement, finger) {
         const statusUrl = getCaptureStatusUrl(requestId);
         const deadline = Date.now() + 90000;
 
         while (Date.now() < deadline) {
             await new Promise(resolve => setTimeout(resolve, 1500));
+
+            if (activeCapture[finger]?.cancelled) {
+                throw new CaptureCancelled();
+            }
 
             const response = await fetch(
                 statusUrl + "?t=" + Date.now(),
@@ -129,8 +194,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const data = await parseResponse(response);
 
+            if (activeCapture[finger]) activeCapture[finger].lastStatus = data.status;
+
             if (data.status === "completed") {
                 return data;
+            }
+
+            if (data.status === "cancelled") {
+                throw new CaptureCancelled();
             }
 
             if (data.status === "failed") {
@@ -154,6 +225,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
         }
+
+        // Stop the scanner from picking up this request after the page gives up.
+        await fetch(cancelCaptureUrlTemplate.replace("999999", String(requestId)), {
+            method: "POST",
+            headers: { "X-CSRFToken": getCsrfToken(), "X-Requested-With": "XMLHttpRequest" }
+        }).catch(() => {});
 
         throw new Error(
             "Timed out waiting for the fingerprint device. Check its power, Wi-Fi, and Django polling connection."
@@ -218,6 +295,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 '<span class="spinner-border spinner-border-sm me-2"></span>' +
                 "Waiting for Scanner...";
 
+            activeCapture[finger] = { requestId: data.request_id };
+            const cancel = cancelButtons[finger];
+            cancel.disabled = false;
+            cancel.innerHTML =
+                '<i class="bi bi-x-circle me-1" aria-hidden="true"></i>Cancel Capture';
+            cancel.hidden = false;
+
             setMessage(
                 message,
                 "Request created. Place the selected finger on the scanner when prompted.",
@@ -226,7 +310,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const result = await waitForCaptureResult(
                 data.request_id,
-                message
+                message,
+                finger
             );
 
             setMessage(
@@ -239,6 +324,31 @@ document.addEventListener("DOMContentLoaded", function () {
             window.location.reload();
 
         } catch (error) {
+            if (error instanceof CaptureCancelled) {
+                if (activeCapture[finger]?.lastStatus === "capturing") {
+                    // The scanner may have uploaded before the cancel reached the server.
+                    setStatus(status, "Check", "warning");
+                    setMessage(
+                        message,
+                        "Capture cancelled while the scanner was reading. Refresh the page to confirm which fingerprint is saved.",
+                        "info"
+                    );
+                    button.innerHTML = getFingerButtonLabel(finger);
+                    return;
+                }
+                const saved = savedFingers[finger].image;
+                setStatus(status, saved ? "Image Saved" : "Not Captured", saved ? "success" : "");
+                setMessage(
+                    message,
+                    saved
+                        ? "Capture cancelled. The previously saved fingerprint was kept."
+                        : "Capture cancelled.",
+                    "info"
+                );
+                button.innerHTML = getFingerButtonLabel(finger);
+                return;
+            }
+
             console.error(`${finger} fingerprint error:`, error);
 
             setStatus(status, "Not Confirmed", "error");
@@ -252,6 +362,8 @@ document.addEventListener("DOMContentLoaded", function () {
             button.innerHTML = getFingerButtonLabel(finger);
 
         } finally {
+            activeCapture[finger] = null;
+            cancelButtons[finger].hidden = true;
             button.dataset.busy = "false";
             leftButton.disabled = false;
             rightButton.disabled = false;

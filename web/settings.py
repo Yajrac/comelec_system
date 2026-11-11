@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -198,6 +199,10 @@ FINGERPRINT_DEVICE_TOKEN = os.environ.get(
 # Browser page burst protection. Configure a shared cache on multi-worker deployments.
 PAGE_RATE_LIMIT_REQUESTS = 30
 PAGE_RATE_LIMIT_SECONDS = 10
+# The test client sends every request from one address, so the limiter would return
+# random 429s across the suite. core.test_page_rate_limit sets its own limit explicitly.
+if len(sys.argv) > 1 and sys.argv[1] == "test":
+    PAGE_RATE_LIMIT_REQUESTS = 0
 
 # Age qualification date for the configured Barangay and SK election.
 VOTER_ELECTION_DATE = os.environ.get("VOTER_ELECTION_DATE", "2028-11-13")

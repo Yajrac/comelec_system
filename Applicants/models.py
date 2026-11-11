@@ -715,6 +715,7 @@ class FingerprintCaptureRequest(models.Model):
         ("capturing", "Capturing"),
         ("completed", "Completed"),
         ("failed", "Failed"),
+        ("cancelled", "Cancelled"),
     ]
 
     applicant = models.ForeignKey(

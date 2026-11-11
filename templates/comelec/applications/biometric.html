@@ -522,6 +522,7 @@
         hidden
         data-start-capture-url="{% url 'start-fingerprint-capture' applicant.id %}"
         data-capture-status-url="{% url 'fingerprint-capture-status' 999999 %}"
+        data-cancel-capture-url="{% url 'cancel-fingerprint-capture' 999999 %}"
         data-left-image="{% if biometric and biometric.left_finger %}true{% else %}false{% endif %}"
         data-left-template="{% if biometric and biometric.left_finger_template %}true{% else %}false{% endif %}"
         data-right-image="{% if biometric and biometric.right_finger %}true{% else %}false{% endif %}"
@@ -530,7 +531,7 @@
         {% csrf_token %}
     </form>
 
-    <script src="{% static 'js/fingerprint-capture.js' %}" defer></script>
+    <script src="{% static 'js/fingerprint-capture.js' %}?v=cancel-1" defer></script>
     <script src="{% static 'js/signature-capture.js' %}" defer></script>
     <script src="{% static 'js/finish-verification.js' %}?v=post-1" defer></script>
 {% endblock %}

@@ -3521,6 +3521,12 @@ def save_fingerprint(request, applicant_id):
             "applicant_id": applicant_id,
         }, status=404)
 
+    if fingerprint_upload_cancelled(applicant.id, finger):
+        return JsonResponse({
+            "success": False,
+            "message": "This capture was cancelled. The previously saved fingerprint was kept.",
+        }, status=409)
+
     # --------------------------------------------------
     # 3. Get the uploaded fingerprint image
     # --------------------------------------------------
@@ -3959,6 +3965,12 @@ def fingerprint_device_upload(request, applicant_id):
             status=400,
         )
 
+    if fingerprint_upload_cancelled(applicant.id, finger):
+        return JsonResponse(
+            {"error": "This capture was cancelled. The previously saved fingerprint was kept."},
+            status=409,
+        )
+
     if not isinstance(template_b64, str) or not template_b64:
         return JsonResponse(
             {"error": "A Base64 fingerprint template is required."},
@@ -4012,6 +4024,45 @@ def fingerprint_device_upload(request, applicant_id):
             "success": False,
             "error": f"Database save failed: {str(e)}",
         }, status=500)
+
+
+# The browser stops waiting after 90 seconds; older pending requests are abandoned
+# and must not be picked up by the scanner for the wrong applicant.
+FINGERPRINT_REQUEST_TTL = timedelta(minutes=2)
+
+
+def fingerprint_upload_cancelled(applicant_id, finger):
+    """True when the officer cancelled the latest capture for this applicant and finger.
+
+    Device uploads carry no request id, so an upload that arrives after a cancel is
+    recognised by the latest request's status. Normal captures are "capturing" here.
+    """
+    latest = (FingerprintCaptureRequest.objects
+              .filter(applicant_id=applicant_id, finger=finger)
+              .order_by("-created_at", "-id").first())
+    return latest is not None and latest.status == "cancelled"
+
+
+@login_required
+@require_POST
+def cancel_fingerprint_capture(request, request_id):
+    if not request.user.is_staff:
+        return JsonResponse({"success": False, "error": "Permission denied."}, status=403)
+    with transaction.atomic():
+        capture_request = get_object_or_404(
+            FingerprintCaptureRequest.objects.select_for_update(), pk=request_id)
+        if capture_request.status in ("pending", "capturing"):
+            capture_request.status = "cancelled"
+            capture_request.message = "Capture cancelled by the officer."
+            capture_request.save(update_fields=["status", "message", "updated_at"])
+            logger.info("Fingerprint capture cancelled: request=%s applicant=%s finger=%s",
+                        capture_request.id, capture_request.applicant_id, capture_request.finger)
+    return JsonResponse({
+        "success": True,
+        "request_id": capture_request.id,
+        "status": capture_request.status,
+        "message": capture_request.message,
+    })
 
 
 @login_required
@@ -4107,6 +4158,14 @@ def start_fingerprint_capture(request, applicant_id):
 def fingerprint_device_next(request):
     # Prototype endpoint: no device token, as requested.
     with transaction.atomic():
+        FingerprintCaptureRequest.objects.filter(
+            status="pending",
+            updated_at__lt=timezone.now() - FINGERPRINT_REQUEST_TTL,
+        ).update(
+            status="cancelled",
+            message="Expired: the officer stopped waiting for the scanner.",
+            updated_at=timezone.now(),
+        )
         capture_request = (
             FingerprintCaptureRequest.objects
             .select_for_update()

@@ -13,7 +13,7 @@ from Applicants.models import (AcknowledgmentReceipt, Applicant, ApplicantBiomet
 CAPTURE_FILES = ("left_finger", "right_finger", "applicant_signature", "applicant_signature_2", "applicant_signature_3")
 
 
-@override_settings(STORAGES={'default': {'BACKEND': 'django.core.files.storage.InMemoryStorage'},
+@override_settings(PAGE_RATE_LIMIT_REQUESTS=0, STORAGES={'default': {'BACKEND': 'django.core.files.storage.InMemoryStorage'},
                              'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'}})
 @patch('core.views.send_approval_sms', return_value=True)
 class ReverificationTests(TestCase):
