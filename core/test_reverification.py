@@ -99,7 +99,11 @@ class ReverificationTests(TestCase):
         reopened = self.client.get(reverse('acknowledgment-receipt-issued', args=[self.applicant.pk, first_receipt.pk]))
         self.assertEqual(reopened.context['receipt_values']['application_no'], first_receipt.application_number)
 
-        detail = self.client.get(reverse('admin-applicant-detail', args=[self.applicant.pk]))
+        listing = self.client.get(reverse('admin-applicants'))
+        self.assertContains(listing, f"{reverse('admin-applicant-detail', args=[self.applicant.pk])}?highlight=TRANSFER-{transfer.pk}#application-history")
+        detail = self.client.get(reverse('admin-applicant-detail', args=[self.applicant.pk]), {'highlight': f'TRANSFER-{transfer.pk}'})
+        self.assertContains(detail, 'aria-current="true"', count=1)
+        self.assertContains(detail, 'id="application-history"')
         self.assertContains(detail, 'Previous Biometrics')
         self.assertContains(detail, first_receipt.application_number)
         self.assertContains(detail, second.application_number)

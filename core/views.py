@@ -2729,6 +2729,7 @@ def admin_applicant_detail(request, applicant_id):
             "applicant": applicant,
             "biometric": biometric,
             "application_history": history,
+            "highlight": request.GET.get("highlight", ""),
             "current_round": round_label(biometric.application_type, biometric.application_request_id),
             "previous_biometrics": previous_biometrics,
             "receipts": receipts,
