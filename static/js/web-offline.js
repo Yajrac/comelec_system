@@ -32,6 +32,9 @@
         sessionStorage.setItem('web-registration-draft', draftId);
         history.replaceState(null, '', '/new-registration/');
     }
+    // Uploads confirmed in this tab. Their local copies are already deleted, so the
+    // reference shown in the success dialog is the applicant's only record of it.
+    const confirmed = [];
     async function showSuccess() {
         const dialog = document.getElementById('webSyncSuccessDialog');
         if (!dialog || dialog.open || notifying) return;
@@ -39,20 +42,50 @@
         try {
             const references = document.getElementById('webSyncSuccessReferences');
             references.replaceChildren();
+            const items = confirmed.splice(0);
+            // Older versions kept confirmed uploads as "submitted"; show unseen ones once, then remove them.
             for (const record of await read()) {
-                if (record.status !== 'submitted' || record.notificationSeen || !confirmationUrl(record)) continue;
+                if (record.status !== 'submitted') continue;
                 const claimed = await change(record.id, current => !current ? null : current.notificationSeen ? current : {...current, notificationSeen: true, notificationOwner: owner});
-                if (claimed?.notificationOwner !== owner) continue;
+                if (claimed?.notificationOwner === owner && confirmationUrl(record)) items.push(record);
+                await change(record.id, () => null);
+            }
+            for (const record of items) {
                 resetSubmittedForm(record.id);
                 const li = document.createElement('li');
                 const reference = document.createElement('strong');
                 reference.textContent = record.reference;
-                const link = document.createElement('a');
-                link.className = 'offline-button'; link.href = confirmationUrl(record); link.textContent = 'View registration';
-                li.append(reference, link); references.append(li);
+                li.append(reference);
+                if (confirmationUrl(record)) {
+                    const link = document.createElement('a');
+                    link.className = 'offline-button'; link.href = confirmationUrl(record); link.textContent = 'View registration';
+                    li.append(link);
+                }
+                references.append(li);
             }
-            if (references.children.length) dialog.showModal();
+            if (references.children.length) {
+                await renderRecords();
+                dialog.showModal();
+            }
         } finally { notifying = false; }
+    }
+    // Reads a server reply. Non-JSON replies (Nginx 413 "too large", 502/504 gateway pages)
+    // previously threw and left the record pending forever.
+    async function interpret(response) {
+        let data = null;
+        try { data = await response.json(); } catch { data = null; }
+        if (response.ok && data?.success && data.registration_reference) return {kind: 'success', data};
+        if (response.status === 413) return {kind: 'invalid', error: 'The attached files are too large. Use smaller or compressed photos of your documents, then submit again.'};
+        if (response.status >= 400 && response.status < 500 && ![408, 429].includes(response.status)) {
+            return {kind: 'invalid', error: data?.error || data?.message || 'Please review the application.'};
+        }
+        return {kind: 'retry'};
+    }
+    function uploadBody(entries, reference) {
+        const body = new FormData();
+        for (const [name, value] of entries) body.append(name, value);
+        body.set('client_reference', reference);
+        return body;
     }
     function notice(text) {
         message.textContent = text;
@@ -255,7 +288,8 @@
         syncButton.disabled = true;
         let acquired = false, heartbeat;
         try {
-            if (!await checkConnection()) { notice('Offline. Pending applications remain saved on this device.'); return; }
+            if (!(await read()).some(record => ['pending', 'syncing'].includes(record.status))) return;
+            if (!await checkConnection()) { notice('Offline. Pending applications remain saved on this device and will upload automatically when you are back online.'); return; }
             acquired = await lease();
             if (!acquired) { notice('Another tab is syncing, or a closed session is recovering. Retry in 90 seconds.'); return; }
             heartbeat = setInterval(() => lease().catch(fail), 20000);
@@ -267,18 +301,17 @@
                     return {...current, status: 'syncing', updated: Date.now()};
                 });
                 await renderRecords();
-                const body = new FormData();
-                for (const [name, value] of active.entries) body.append(name, value);
-                body.set('client_reference', active.id);
                 try {
-                    const response = await fetch('/api/new-registration/', {method: 'POST', body, signal: AbortSignal.timeout(45000), credentials: 'same-origin'});
-                    const data = await response.json();
-                    if (response.ok && data.success && data.registration_reference) {
-                        await change(active.id, current => ({id: current.id, status: 'submitted', reference: data.registration_reference,
-                            applicantId: data.applicant_id, successUrl: data.success_url, notificationSeen: false, updated: Date.now()}));
-                        notice('Application submitted and confirmed by the server.');
-                    } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
-                        await change(active.id, current => ({...current, status: 'needs-correction', error: data.error || data.message || 'Please review the application.', updated: Date.now()}));
+                    const response = await fetch('/api/new-registration/', {method: 'POST', body: uploadBody(active.entries, active.id), signal: AbortSignal.timeout(60000), credentials: 'same-origin'});
+                    const result = await interpret(response);
+                    if (result.kind === 'success') {
+                        const {data} = result;
+                        // Confirmed by the server: drop the local copy and its attachments.
+                        await change(active.id, () => null);
+                        confirmed.push({id: active.id, reference: data.registration_reference, applicantId: data.applicant_id, successUrl: data.success_url});
+                        notice('Application uploaded successfully.');
+                    } else if (result.kind === 'invalid') {
+                        await change(active.id, current => ({...current, status: 'needs-correction', error: result.error, updated: Date.now()}));
                     } else throw new Error('The server could not confirm this application. It remains saved for retry.');
                 } catch (error) {
                     await change(active.id, current => ({...current, status: 'pending', error: 'Not confirmed. Retry sync when the connection is stable. The same submission ID will be reused.', updated: Date.now()}));
@@ -303,7 +336,35 @@
             clearTimeout(timer);
             timer = null;
             try {
-                if (!storageReady) throw new Error('Browser storage is not ready. Your form has not been queued. Keep this page open and try again.');
+                // Online: upload directly; the form only goes to the offline queue if this fails.
+                if (await checkConnection()) {
+                    notice('Uploading your application…');
+                    let result;
+                    try {
+                        const response = await fetch('/api/new-registration/', {method: 'POST', body: uploadBody(snapshot(), draftId),
+                            signal: AbortSignal.timeout(60000), credentials: 'same-origin'});
+                        result = await interpret(response);
+                    } catch { result = {kind: 'retry'}; }
+                    if (result.kind === 'success') {
+                        queueing = true;
+                        if (storageReady) {
+                            await writes.catch(() => {});
+                            await change(draftId, () => null).catch(() => {});
+                        }
+                        sessionStorage.removeItem('web-registration-draft');
+                        dirty = false;
+                        location.href = result.data.success_url || '/';
+                        return;
+                    }
+                    if (result.kind === 'invalid') {
+                        notice(result.error);
+                        if (typeof window.backToForm === 'function') window.backToForm();
+                        return;
+                    }
+                    // Connection dropped or server unavailable: fall through and queue it. The same
+                    // client_reference is reused, so a save that reached the server is not duplicated.
+                }
+                if (!storageReady) throw new Error('No connection and browser storage is not ready. Your form has not been saved. Keep this page open and try again.');
                 await writes;
                 await saveDraft();
                 if (syncFlight) await syncFlight;
@@ -313,18 +374,8 @@
                     return {...current, status: 'pending', updated: Date.now()};
                 });
                 sessionStorage.removeItem('web-registration-draft');
-                notice('Saved on this device. Waiting for server confirmation.');
-                await sync();
-                const result = await read(draftId);
-                if (result?.status === 'submitted') {
-                    resetSubmittedForm(result.id);
-                    queueing = false;
-                    await showSuccess();
-                } else if (result?.status === 'needs-correction') {
-                    queueing = false;
-                    notice(result.error);
-                    if (typeof window.backToForm === 'function') window.backToForm();
-                } else location.href = '/offline/';
+                notice('No connection. Saved on this device; it will upload automatically when you are back online.');
+                location.href = '/offline/';
             } catch (error) { fail(error); queueing = false; }
             finally { button.disabled = false; submitting = false; }
         }
@@ -387,7 +438,11 @@
             await prepareOffline();
             await sync();
             syncButton.addEventListener('click', sync);
-            window.addEventListener('online', sync);
+            // The network is often not usable the instant the "online" event fires, so retry a few times.
+            window.addEventListener('online', () => {
+                for (const delay of [0, 3000, 10000, 30000]) setTimeout(() => sync().catch(fail), delay);
+            });
+            document.addEventListener('visibilitychange', () => { if (!document.hidden) sync().catch(fail); });
             window.addEventListener('offline', () => { online = false; renderRecords().catch(fail); });
             setInterval(sync, 60000);
         } catch (error) { storageReady = false; syncButton.disabled = true; fail(error); }

@@ -10,7 +10,8 @@ class PageRateLimitMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        exempt = (settings.STATIC_URL, settings.MEDIA_URL, "/api/", "/comelec/api/")
+        # The offline-sync connection check polls; a 429 would make queued forms look offline forever.
+        exempt = (settings.STATIC_URL, settings.MEDIA_URL, "/api/", "/comelec/api/", "/offline/connection/")
         limit = settings.PAGE_RATE_LIMIT_REQUESTS
         if request.method not in {"GET", "HEAD"} or any(
                 prefix and request.path.startswith(prefix) for prefix in exempt) or limit <= 0:

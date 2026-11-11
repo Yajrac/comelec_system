@@ -27,7 +27,7 @@ class PageRateLimitTests(SimpleTestCase):
         self.assertEqual(self.middleware(self.factory.get("/unknown/")).status_code, 200)
 
     def test_device_api_assets_and_login_posts_are_not_counted(self):
-        for path in ["/api/find-applicant/", "/comelec/api/signature/waiting/", "/static/test.css", "/media/test.png"]:
+        for path in ["/api/find-applicant/", "/comelec/api/signature/waiting/", "/static/test.css", "/media/test.png", "/offline/connection/"]:
             for index in range(5):
                 self.assertEqual(self.middleware(self.factory.get(path)).status_code, 200)
         for index in range(5):
