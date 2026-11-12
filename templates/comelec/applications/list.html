@@ -17,7 +17,7 @@
 
     <link
         rel="stylesheet"
-        href="{% static 'css/pages/comelec-applications-list.css' %}?v=responsive-table-10"
+        href="{% static 'css/pages/comelec-applications-list.css' %}?v=delete-dialog-1"
     >
 
 {% endblock %}
@@ -454,42 +454,29 @@
 
                                             {% endif %}
 
-                                            <!-- DELETE (approved applications are kept; use Suspend) -->
-
-                                            {% if application.status == "APPROVED" %}
-                                            <button
-                                                type="button"
-                                                class="btn btn-sm btn-outline-secondary application-disabled-btn admin-icon-action"
-                                                title="Approved applications cannot be deleted. Use Suspend on the Applicants page."
-                                                aria-label="Delete unavailable: application is approved"
-                                                disabled
-                                            ><i class="bi bi-trash me-1" aria-hidden="true"></i><span class="visually-hidden">Delete</span></button>
-                                            {% else %}
+                                            <!-- DELETE (opens the typed-confirmation dialog) -->
                                             <form
                                                 method="post"
                                                 action="{% url 'delete-application' application.type|lower application.id %}"
                                                 class="d-inline"
-                                                data-confirm-submit="Are you sure you want to delete this application? This action cannot be undone."
+                                                data-delete-application
+                                                data-applicant="{{ application.applicant_name }}"
+                                                data-type-label="{{ application.type_display }}"
+                                                data-status="{{ application.status_display }}"
+                                                data-whole-applicant="{% if application.type == 'NEW' %}true{% else %}false{% endif %}"
                                             >
-
                                                 {% csrf_token %}
-
+                                                <input type="hidden" name="confirm_text" value="">
                                                 <button
                                                     type="submit"
                                                     class="btn btn-sm application-delete-btn admin-icon-action admin-icon-danger"
-                                                    aria-label="Delete application"
+                                                    aria-label="Delete {{ application.type_display|lower }} of {{ application.applicant_name }}"
                                                     title="Delete application"
                                                 >
-
-                                                    <i class="bi bi-trash me-1">
-                                                    </i>
-
+                                                    <i class="bi bi-trash me-1" aria-hidden="true"></i>
                                                     <span class="visually-hidden">Delete</span>
-
                                                 </button>
-
                                             </form>
-                                            {% endif %}
 
                                         </div>
 
@@ -546,7 +533,7 @@
 
                             <div class="application-pagination-info">
 
-                                Showing {{ page_obj.start_index }}?{{ page_obj.end_index }} of {{ page_obj.paginator.count }} applications
+                                Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} applications
 
                             </div>
 
@@ -645,8 +632,27 @@
 
     </div>
 
+
+    <dialog id="deleteApplicationDialog" class="admin-action-dialog delete-application-dialog" data-kind="delete" aria-labelledby="deleteApplicationTitle" aria-describedby="deleteApplicationSummary">
+        <div class="admin-action-dialog-icon" aria-hidden="true"><i class="bi bi-exclamation-triangle"></i></div>
+        <h2 id="deleteApplicationTitle" tabindex="-1">Permanently delete?</h2>
+        <p id="deleteApplicationSummary" class="delete-application-summary"></p>
+        <div class="delete-application-warning" role="note">
+            <strong>This cannot be undone.</strong>
+            <ul id="deleteApplicationEffects"></ul>
+        </div>
+        <label for="deleteApplicationConfirm" class="delete-application-label">Type <strong>DELETE</strong> to confirm</label>
+        <input id="deleteApplicationConfirm" class="form-control delete-application-input" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="deleteApplicationHint">
+        <p id="deleteApplicationHint" class="delete-application-hint">Capital letters, exactly as shown.</p>
+        <div class="admin-action-dialog-buttons">
+            <button type="button" id="deleteApplicationCancel">Cancel</button>
+            <button type="button" id="deleteApplicationSubmit" class="delete-application-submit" disabled>Delete permanently</button>
+        </div>
+    </dialog>
+
 {% endblock %}
 {% block extra_js %}
+    <script src="{% static 'js/delete-application-dialog.js' %}" defer></script>
     <script src="{% static 'js/application-date-filters.js' %}" defer></script>
     <script src="{% static 'js/application-search.js' %}" defer></script>
 {% endblock %}

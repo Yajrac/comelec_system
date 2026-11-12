@@ -3478,10 +3478,36 @@ DELETABLE_APPLICATIONS = {
 }
 
 
+def applicant_stored_files(applicant):
+    """Every uploaded file that belongs only to this applicant (photos, IDs, biometrics)."""
+    from django.db.models.fields.files import FieldFile
+    from Applicants.models import BiometricHistory
+    records = [applicant]
+    biometric = ApplicantBiometric.objects.filter(applicant=applicant).first()
+    if biometric:
+        records.append(biometric)
+    records += list(BiometricHistory.objects.filter(applicant=applicant))
+    for model in (ApplicantUpdateRequest, ApplicantTransferRequest,
+                  ApplicantReactivationRequest, ApplicantReinstatementRequest):
+        records += list(model.objects.filter(applicant=applicant))
+    files = set()
+    for record in records:
+        for field in record._meta.concrete_fields:
+            value = getattr(record, field.name, None)
+            if isinstance(value, FieldFile) and value.name:
+                files.add((value.storage, value.name))
+    return files
+
+
 @login_required
 @require_POST
 def delete_application(request, application_type, id):
-    """Delete only the clicked application; approved ones are kept (use Suspend instead)."""
+    """Permanently delete the clicked application after the officer types DELETE.
+
+    A new registration deletes the whole applicant: requests, biometrics,
+    receipts, history and uploaded files. A service request deletes only that
+    request; changes already applied to the applicant stay.
+    """
     from django.contrib import messages
 
     access = admin_superuser_required(request)
@@ -3494,26 +3520,28 @@ def delete_application(request, application_type, id):
     model, label = entry
     record = get_object_or_404(model, pk=id)
 
-    if record.status == "APPROVED":
-        messages.error(
-            request,
-            f"{label} #{record.pk} is approved and cannot be deleted. "
-            "Use Suspend on the Applicants page instead.",
-        )
+    if request.POST.get("confirm_text", "").strip() != "DELETE":
+        messages.error(request, f"{label} #{id} was not deleted. Type DELETE to confirm.")
         return redirect("admin-applications")
 
     try:
         with transaction.atomic():
-            record.delete()
+            if application_type == "new":
+                files = applicant_stored_files(record)
+                record.acknowledgment_receipts.all().delete()
+                record.delete()
+                # Remove uploaded files only once the database delete is final.
+                transaction.on_commit(lambda: [
+                    storage.delete(name) for storage, name in files if storage.exists(name)
+                ])
+            else:
+                record.delete()
     except ProtectedError:
-        messages.error(
-            request,
-            f"{label} #{id} cannot be deleted because other records "
-            "(such as acknowledgment receipts) depend on it.",
-        )
+        messages.error(request, f"{label} #{id} cannot be deleted because other records depend on it.")
         return redirect("admin-applications")
 
-    messages.success(request, f"{label} #{id} was deleted.")
+    logger.warning("Application deleted: type=%s id=%s by=%s", application_type, id, request.user.get_username())
+    messages.success(request, f"{label} #{id} was permanently deleted.")
     return redirect("admin-applications")
 
 

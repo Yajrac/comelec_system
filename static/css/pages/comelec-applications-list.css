@@ -625,3 +625,15 @@
 @media (max-width: 359.98px) {
     .applications-workspace #applicationFilters .col-6 { width: 100%; }
 }
+
+/* Typed-confirmation delete dialog (extends .admin-action-dialog). */
+.delete-application-dialog { width: min(480px, calc(100% - 32px)); }
+.delete-application-dialog .delete-application-summary { margin: 0 0 14px; color: #142b54; font-weight: 600; }
+.delete-application-warning { margin: 0 0 18px; padding: 12px 14px; border: 1px solid #f0caca; border-left: 4px solid #c43742; border-radius: 8px; background: #fff6f6; color: #7f1d1d; font-size: 13px; }
+.delete-application-warning ul { margin: 6px 0 0; padding-left: 18px; }
+.delete-application-warning li { margin: 2px 0; line-height: 1.5; }
+.delete-application-label { display: block; margin-bottom: 6px; color: #142b54; font-size: 13px; font-weight: 600; }
+.delete-application-input { letter-spacing: .08em; font-weight: 700; }
+.delete-application-dialog .delete-application-hint { margin: 6px 0 20px; color: #61748c; font-size: 12px; line-height: 1.4; }
+#deleteApplicationSubmit { background: #c43742; border-color: #c43742; color: #fff; }
+#deleteApplicationSubmit:disabled { background: #f3d3d6; border-color: #f3d3d6; color: #fff; cursor: not-allowed; }
