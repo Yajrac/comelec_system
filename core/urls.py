@@ -124,7 +124,8 @@ urlpatterns = [
     ),
 
     path(
-        "applications/<int:id>/delete/",
+        # The type is part of the URL: each application type has its own ID numbering.
+        "applications/<str:application_type>/<int:id>/delete/",
         views.delete_application,
         name="delete-application"
     ),

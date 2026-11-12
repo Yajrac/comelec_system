@@ -28,6 +28,12 @@
 
         <div class="applications-page applications-workspace">
 
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} mb-3" role="{% if message.tags == 'error' %}alert{% else %}status{% endif %}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
             <!-- =====================================================
              FILTER CARD
         ====================================================== -->
@@ -448,11 +454,20 @@
 
                                             {% endif %}
 
-                                            <!-- DELETE -->
+                                            <!-- DELETE (approved applications are kept; use Suspend) -->
 
+                                            {% if application.status == "APPROVED" %}
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-outline-secondary application-disabled-btn admin-icon-action"
+                                                title="Approved applications cannot be deleted. Use Suspend on the Applicants page."
+                                                aria-label="Delete unavailable: application is approved"
+                                                disabled
+                                            ><i class="bi bi-trash me-1" aria-hidden="true"></i><span class="visually-hidden">Delete</span></button>
+                                            {% else %}
                                             <form
                                                 method="post"
-                                                action="{% url 'delete-application' application.id %}"
+                                                action="{% url 'delete-application' application.type|lower application.id %}"
                                                 class="d-inline"
                                                 data-confirm-submit="Are you sure you want to delete this application? This action cannot be undone."
                                             >
@@ -474,6 +489,7 @@
                                                 </button>
 
                                             </form>
+                                            {% endif %}
 
                                         </div>
 

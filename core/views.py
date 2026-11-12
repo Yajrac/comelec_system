@@ -18,7 +18,7 @@ from Applicants.models import Barangay
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from Applicants.models import (
     Applicant,
     ApplicantBiometric,
@@ -3469,15 +3469,51 @@ def admin_reports_export(request):
     return response
 
 
-@login_required()
-def delete_application(request, id):
+DELETABLE_APPLICATIONS = {
+    "new": (Applicant, "New registration"),
+    "update": (ApplicantUpdateRequest, "Correction / update request"),
+    "transfer": (ApplicantTransferRequest, "Transfer request"),
+    "reactivation": (ApplicantReactivationRequest, "Reactivation request"),
+    "reinstatement": (ApplicantReinstatementRequest, "Reinstatement request"),
+}
 
-    application = get_object_or_404(Applicant, id=id)
 
-    if request.method == "POST":
-        application.delete()
+@login_required
+@require_POST
+def delete_application(request, application_type, id):
+    """Delete only the clicked application; approved ones are kept (use Suspend instead)."""
+    from django.contrib import messages
+
+    access = admin_superuser_required(request)
+    if access:
+        return access
+
+    entry = DELETABLE_APPLICATIONS.get(application_type)
+    if entry is None:
+        raise Http404("Unknown application type.")
+    model, label = entry
+    record = get_object_or_404(model, pk=id)
+
+    if record.status == "APPROVED":
+        messages.error(
+            request,
+            f"{label} #{record.pk} is approved and cannot be deleted. "
+            "Use Suspend on the Applicants page instead.",
+        )
         return redirect("admin-applications")
 
+    try:
+        with transaction.atomic():
+            record.delete()
+    except ProtectedError:
+        messages.error(
+            request,
+            f"{label} #{id} cannot be deleted because other records "
+            "(such as acknowledgment receipts) depend on it.",
+        )
+        return redirect("admin-applications")
+
+    messages.success(request, f"{label} #{id} was deleted.")
     return redirect("admin-applications")
 
 
