@@ -1,0 +1,25 @@
+/* Extra parts of the Update, Transfer, Reactivation and Reinstatement success pages.
+   Layout, cards, section titles and labels come from components-registration_success.css
+   so every success page looks the same. */
+.registration-confirmation .request-id { color: #142b54; font-weight: 600; }
+
+.registration-confirmation .reason-text { margin: 0; color: #142b54; font-size: 14px; font-weight: 500; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.registration-confirmation .notice-box { margin: 20px; }
+.registration-confirmation .notice-box strong { color: #002b7f; }
+
+.registration-confirmation .transfer-card { background: #fff; }
+.registration-confirmation .transfer-column { height: 100%; padding: 20px; }
+.registration-confirmation .transfer-column.new { background: #f4f8ff; }
+.registration-confirmation .transfer-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; color: #142b54; font-size: 14px; font-weight: 700; }
+.registration-confirmation .transfer-column.new .transfer-heading { color: #0038a8; }
+.registration-confirmation .address-item + .address-item { margin-top: 14px; }
+.registration-confirmation .address-label { display: block; margin: 0; color: #64748b; font-size: 10px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+.registration-confirmation .address-value { margin: 6px 0 0; color: #142b54; font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+
+@media (min-width: 768px) {
+    .registration-confirmation .transfer-column.current { border-right: 1px solid #d5dce5; }
+}
+@media (max-width: 767.98px) {
+    .registration-confirmation .transfer-column.current { border-bottom: 1px solid #d5dce5; }
+}

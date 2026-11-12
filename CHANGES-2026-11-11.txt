@@ -1,0 +1,61 @@
+COMELEC SYSTEM - MGA GINAWA (Nov 11, 2026)
+============================================
+
+1. APPLICANTS PAGE (Application History)
+   - Inalis ang "Verified Applicants" tab; Application History na lang.
+   - Columns: Applicant, Barangay, Contact (number lang), Type, Date Submitted,
+     Status, Verification, Action.
+   - Inalis ang email, Date Reviewed, at Reference / Request ID.
+   - Search: pangalan na lang.
+   - Action: View + Suspend.
+   - View -> Applicant Details page (hindi na Applications), naka-highlight ang
+     napiling application sa Application History.
+
+2. OFFLINE -> ONLINE SYNC (laging "pending" dati)
+   - Kapag online: diretsong upload, hindi na dumadaan sa offline.
+   - Kapag offline: naka-save sa browser, auto-upload pagbalik ng net
+     (retry sa 0s, 3s, 10s, 30s, tapos kada minuto).
+   - Pag na-upload: nabubura sa offline list + "success" message na may reference no.
+   - Fix: hindi na sakop ng rate limit ang /offline/connection/.
+   - Fix: 413 (sobrang laking file) -> "Needs correction" na, hindi na pending.
+
+3. RE-VERIFICATION PAGKATAPOS NG APPLICATION (migration 0033)
+   - Pag na-approve ang Update/Transfer/Reactivation/Reinstatement:
+     lumang biometrics -> "Previous Biometrics" (hindi nabubura),
+     applicant -> Biometrics Pending, kailangan mag-capture ulit.
+   - Finish Verification: totoong sine-save na sa server (dati redirect lang,
+     kaya naiipit sa Biometrics Pending).
+   - Bagong Acknowledgment Receipt kada verification (luma, nandoon pa rin).
+   - Applicant Details: may "Previous Biometrics" at "Acknowledgment Receipts".
+   - Applicants page: makikita rin ang "Biometrics Pending" (may fingerprint button).
+
+4. DASHBOARD
+   - Verification badges (Verified / Biometrics Pending / Unverified) kapareho
+     na ng style sa Applicants table.
+
+5. FINGERPRINT CANCEL CAPTURE (migration 0034)
+   - May "Cancel Capture" button habang hinihintay ang scanner.
+   - Upload pagkatapos mag-cancel -> tinatanggihan; naiiwan ang lumang fingerprint.
+   - Mga pending request na lampas 2 minuto -> auto-expire (para hindi ma-scan
+     para sa maling applicant).
+
+6. TESTS
+   - Bagong tests: core/test_reverification.py, core/test_fingerprint_cancel.py.
+   - Naka-off ang page rate limit habang tests (dati random 429 failures).
+   - 7 lumang failing tests (document preview + API JSON) - hindi pa naaayos.
+
+DEPLOY SA VPS (MySQL, Gunicorn master PID 28233)
+   cd /var/www/comelec_system
+   mysqldump -u comelec_user -p comelec_system > ~/db-backup-$(date +%F-%H%M).sql   (kapag may migration)
+   git pull
+   source .venv/bin/activate
+   python manage.py check
+   python manage.py migrate
+   python manage.py collectstatic --noinput
+   kill -HUP 28233
+
+PARA SA SUSUNOD
+   - Nasa likod ng Nginx (127.0.0.1) -> iisang IP para sa lahat sa rate limit
+     at login lockout. Ayusin ang pagpasa ng totoong IP.
+   - I-test sa totoong scanner ang Cancel Capture.
+   - I-test sa phone ang offline sync.
