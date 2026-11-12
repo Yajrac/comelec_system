@@ -129,3 +129,44 @@ class ReverificationTests(TestCase):
                                                       details={'application_type': 'NEW'}, issued_by=self.admin)
         url = reverse('acknowledgment-receipt-issued', args=[self.applicant.pk, receipt.pk])
         self.assertEqual(self.client.get(url).status_code, 404)
+
+
+@override_settings(PAGE_RATE_LIMIT_REQUESTS=0, STORAGES={'default': {'BACKEND': 'django.core.files.storage.InMemoryStorage'},
+                             'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'}})
+class LegacyRoundReceiptTests(TestCase):
+    """Requests approved before capture rounds existed must still print the right type."""
+
+    def test_receipt_checks_the_latest_approved_request_type(self):
+        from django.utils import timezone
+        admin = get_user_model().objects.create_superuser(username='legacyadmin', password='test-password')
+        self.client.force_login(admin)
+        brgy = Barangay.objects.create(name='Agol')
+        applicant = Applicant.objects.create(
+            lastname='Legacy', firstname='Aiza', middlename='', age=26, sex='Female', birthdate=date(2000, 1, 2),
+            birthplace='X', phone='09171234567', brgy=brgy, status='APPROVED', verification_status='VERIFIED')
+        biometric = ApplicantBiometric.objects.create(applicant=applicant, completed=True, biometrics_completed=True)
+        for name in CAPTURE_FILES:
+            getattr(biometric, name).save(f'{name}.png', ContentFile(b'png'), save=False)
+        biometric.save()
+        transfer = ApplicantTransferRequest.objects.create(applicant=applicant, new_brgy=brgy, status='APPROVED',
+                                                           reviewed_at=timezone.now())
+        self.assertEqual(biometric.application_type, 'NEW')  # legacy: round never recorded
+        response = self.client.get(reverse('acknowledgment-receipt', args=[applicant.pk]))
+        selected = [option['label'] for option in response.context['application_options'] if option['selected']]
+        self.assertEqual(selected, ['Transfer'])
+        receipt = AcknowledgmentReceipt.objects.get()
+        self.assertEqual((receipt.application_type, receipt.application_request_id), ('TRANSFER', transfer.pk))
+
+    def test_new_registration_without_requests_stays_registration(self):
+        admin = get_user_model().objects.create_superuser(username='newadmin', password='test-password')
+        self.client.force_login(admin)
+        applicant = Applicant.objects.create(
+            lastname='Fresh', firstname='Ana', middlename='', age=26, sex='Female', birthdate=date(2000, 1, 2),
+            birthplace='X', phone='09171234567', status='APPROVED', verification_status='VERIFIED')
+        biometric = ApplicantBiometric.objects.create(applicant=applicant, completed=True, biometrics_completed=True)
+        for name in CAPTURE_FILES:
+            getattr(biometric, name).save(f'{name}.png', ContentFile(b'png'), save=False)
+        biometric.save()
+        response = self.client.get(reverse('acknowledgment-receipt', args=[applicant.pk]))
+        selected = [option['label'] for option in response.context['application_options'] if option['selected']]
+        self.assertEqual(selected, ['Registration'])

@@ -63,3 +63,26 @@ def restart_biometrics(applicant, application_type, request_id):
         biometric.save()
         Applicant.objects.filter(pk=applicant.pk).update(verification_status="BIOMETRICS_PENDING")
     return biometric
+
+
+def settle_legacy_round(biometric):
+    """Requests approved before capture rounds were recorded left the round at NEW.
+
+    If so, the latest approved request is the application this verification belongs to,
+    so its receipt shows the right type (e.g. Transfer instead of Registration).
+    """
+    if biometric.application_type != "NEW":
+        return biometric
+    from Applicants.models import (ApplicantUpdateRequest, ApplicantTransferRequest,
+                                   ApplicantReactivationRequest, ApplicantReinstatementRequest)
+    latest = None
+    for code, model in (("UPDATE", ApplicantUpdateRequest), ("TRANSFER", ApplicantTransferRequest),
+                        ("REACTIVATION", ApplicantReactivationRequest), ("REINSTATEMENT", ApplicantReinstatementRequest)):
+        for request in model.objects.filter(applicant_id=biometric.applicant_id, status="APPROVED"):
+            when = request.reviewed_at or request.requested_at
+            if latest is None or when > latest[0]:
+                latest = (when, code, request.pk)
+    if latest:
+        biometric.application_type, biometric.application_request_id = latest[1], latest[2]
+        biometric.save(update_fields=["application_type", "application_request_id", "updated_at"])
+    return biometric

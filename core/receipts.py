@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_GET, require_POST
 from django.utils import timezone
 from Applicants.models import Applicant, ApplicantBiometric, AcknowledgmentReceipt
-from .biometric_state import capture_complete
+from .biometric_state import capture_complete, settle_legacy_round
 from .receipt_rendering import render_receipt
 
 @require_GET
@@ -25,7 +25,7 @@ def acknowledgment_receipt(request, applicant_id, receipt_id=None):
             return redirect("admin-applicant-biometric", applicant_id=applicant.pk)
         # One receipt per verification round (first registration or each approved application).
         with transaction.atomic():
-            biometric = ApplicantBiometric.objects.select_for_update().get(pk=biometric.pk)
+            biometric = settle_legacy_round(ApplicantBiometric.objects.select_for_update().get(pk=biometric.pk))
             round_filter = {"applicant": applicant, "application_type": biometric.application_type,
                             "application_request_id": biometric.application_request_id}
             receipt = AcknowledgmentReceipt.objects.filter(**round_filter).first()
