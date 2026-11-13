@@ -11,6 +11,7 @@
 {% block title %}APPLICATION FOR TRANSFER OF REGISTRATION RECORD{% endblock %}
 
 {% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/document-check.css' %}">
     <link rel="stylesheet" href="{% static 'css/application-dialog.css' %}">
     <link
         rel="stylesheet"
@@ -193,7 +194,7 @@
             </section>
 
             <!-- STEP 2: TRANSFER FORM -->
-            <form method="post" id="transferForm" class="office-application-form" enctype="multipart/form-data">
+            <form method="post" id="transferForm"{% if document_ai_enabled %} data-document-check="TRANSFER"{% if request.walk_in_base %} data-walk-in="1"{% endif %}{% endif %} class="office-application-form" enctype="multipart/form-data">
                 {% csrf_token %}
                 
                 {% include "components/profile_personal_section.html" %}
@@ -439,6 +440,8 @@
     </div>
 
     <script src="{% static 'js/application-submit-state.js' %}"></script>
+    <script src="{% static 'js/document-camera.js' %}"></script>
+    <script src="{% static 'js/document-check.js' %}"></script>
     <script src="{% static 'js/pages/applicant-forms-transfer_registration-1.js' %}"></script>
     <script src="{% static 'js/replacement-document-preview.js' %}"></script>
 {% endblock %}

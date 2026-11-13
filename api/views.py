@@ -1,3 +1,5 @@
+from Applicants.document_check import (enforce as enforce_document, link as link_document_check,
+                                       expected_name_from)
 from .mobile_submission import mobile_submission
 from Applicants.submission_lock import registration_identity_lock
 from Applicants.profile_details import profile_values
@@ -441,6 +443,11 @@ def new_registration_api(request):
 
         if request.content_type != "application/json" and not request.FILES.get("valid_id_document"):
             return JsonResponse({"success": False, "error": "Upload your Valid ID and Birth Certificate."}, status=400)
+        document_check, document_error = enforce_document(
+            request, request.FILES.get("valid_id_document"), expected_name_from(data), "NEW")
+        if document_error:
+            return JsonResponse({"success": False, "error": document_error, "message": document_error,
+                                 "document_check": document_check.status}, status=400)
 
         applicant = Applicant.objects.create(
             suffix=data.get("suffix", "").strip(),
@@ -514,6 +521,8 @@ def new_registration_api(request):
     # =========================================================
     # SUCCESS
     # =========================================================
+
+    link_document_check(document_check, "NEW", applicant.id)
 
     return JsonResponse(
         {

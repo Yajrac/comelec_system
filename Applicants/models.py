@@ -761,3 +761,32 @@ class AcknowledgmentReceipt(models.Model):
 
     class Meta:
         ordering = ["-issued_at", "-id"]
+
+
+class DocumentCheck(models.Model):
+    """AI check of an uploaded valid ID / birth certificate (is it valid, does the name match)."""
+    STATUS_CHOICES = [
+        ("passed", "Passed"),
+        ("invalid", "Not a valid document"),
+        ("mismatch", "Name does not match"),
+        ("unavailable", "Not checked"),
+        ("override", "Verified by officer"),
+    ]
+    file_digest = models.CharField(max_length=64, db_index=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    ai_checked = models.BooleanField(default=False)
+    ai_result = models.JSONField(default=dict, blank=True)
+    document_type = models.CharField(max_length=100, blank=True)
+    document_name = models.CharField(max_length=255, blank=True)
+    expected_name = models.CharField(max_length=255, blank=True)
+    reason = models.CharField(max_length=255, blank=True)
+    model_name = models.CharField(max_length=100, blank=True)
+    # Application this check was used for (set once the application is saved).
+    application_type = models.CharField(max_length=20, blank=True)
+    record_id = models.PositiveIntegerField(null=True, blank=True)
+    officer = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+        indexes = [models.Index(fields=["application_type", "record_id"])]

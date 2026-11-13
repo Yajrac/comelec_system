@@ -14,8 +14,9 @@ from .models import Barangay
 
 
 def shell_context():
+    from .document_check import ai_enabled
     return {'csrf_token': 'NOTPROVIDED', 'barangays': list(Barangay.objects.order_by('name')),
-            'voter_election_date': election_date().isoformat()}
+            'voter_election_date': election_date().isoformat(), 'document_ai_enabled': ai_enabled()}
 
 
 @require_GET
@@ -33,12 +34,17 @@ def saved_applications(request):
 def service_worker(request):
     context = shell_context()
     version = '|'.join([staticfiles_storage.url('js/web-offline.js'),
-                        staticfiles_storage.url('css/web-offline.css'), election_date().isoformat(),
+                        staticfiles_storage.url('css/web-offline.css'),
+                        staticfiles_storage.url('js/document-check.js'),
+                        staticfiles_storage.url('js/document-camera.js'),
+                        staticfiles_storage.url('css/document-check.css'), election_date().isoformat(),
                         render_to_string('applicant/home.html', context),
                         render_to_string('applicant/offline.html', context),
                         render_to_string('applicant/forms/new_registration.html', context)])
     if settings.DEBUG:
-        for asset in ('js/web-offline.js', 'css/web-offline.css'):
+        for asset in ('js/web-offline.js', 'css/web-offline.css', 'js/document-check.js', 'css/document-check.css',
+                      'js/document-camera.js',
+                      'js/pages/applicant-forms-new_registration-1.js'):
             source = finders.find(asset)
             if source:
                 version += str(Path(source).stat().st_mtime_ns)

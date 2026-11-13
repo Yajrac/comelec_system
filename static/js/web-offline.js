@@ -35,6 +35,8 @@
     // Uploads confirmed in this tab. Their local copies are already deleted, so the
     // reference shown in the success dialog is the applicant's only record of it.
     const confirmed = [];
+    // Saved registrations the applicant chose to upload later (asked again on "Sync now").
+    const laterIds = new Set();
     async function showSuccess() {
         const dialog = document.getElementById('webSyncSuccessDialog');
         if (!dialog || dialog.open || notifying) return;
@@ -294,14 +296,32 @@
             if (!acquired) { notice('Another tab is syncing, or a closed session is recovering. Retry in 90 seconds.'); return; }
             heartbeat = setInterval(() => lease().catch(fail), 20000);
             const records = await read();
-            for (const record of records) {
-                if (!['pending', 'syncing'].includes(record.status)) continue;
+            const queue = records.filter(record => ['pending', 'syncing'].includes(record.status) && !laterIds.has(record.id));
+            let position = 0;
+            for (const record of queue) {
+                position++;
+                // The applicant reviews each AI document check, so only check while the page is visible.
+                if (window.documentCheck && document.hidden) break;
                 const active = await change(record.id, current => {
                     if (!current || !['pending', 'syncing'].includes(current.status)) throw new Error('Queue changed. Retry sync.');
                     return {...current, status: 'syncing', updated: Date.now()};
                 });
                 await renderRecords();
                 try {
+                    if (window.documentCheck) {
+                        const verdict = await window.documentCheck.reviewQueued(active.entries,
+                            queue.length > 1 ? ` (${position} of ${queue.length})` : '');
+                        if (verdict === 'later') {
+                            laterIds.add(active.id);
+                            await change(active.id, current => ({...current, status: 'pending', updated: Date.now()}));
+                            notice('Upload postponed. Press Sync now when you are ready.');
+                            continue;
+                        }
+                        if (verdict?.fix) {
+                            await change(active.id, current => ({...current, status: 'needs-correction', error: verdict.fix, updated: Date.now()}));
+                            continue;
+                        }
+                    }
                     const response = await fetch('/api/new-registration/', {method: 'POST', body: uploadBody(active.entries, active.id), signal: AbortSignal.timeout(60000), credentials: 'same-origin'});
                     const result = await interpret(response);
                     if (result.kind === 'success') {
@@ -416,7 +436,7 @@
                 } else if (record || requested) {
                     draftId = crypto.randomUUID();
                     notice('That draft is unavailable or already queued. A new form is ready.');
-                } else notice('You can save a draft or submit while offline after the offline pages are ready.');
+                } else notice('Your answers are saved on this device automatically. You can also submit while offline once the offline pages are ready.');
                 sessionStorage.setItem('web-registration-draft', draftId);
                 form.addEventListener('input', scheduleSave);
                 form.addEventListener('change', scheduleSave);
@@ -424,10 +444,7 @@
                     event.preventDefault();
                     if (form.reportValidity()) window.submitApplication();
                 });
-                const save = document.createElement('button');
-                save.type = 'button'; save.className = 'offline-button'; save.textContent = 'Save draft on this device';
-                save.addEventListener('click', () => { clearTimeout(timer); timer = null; writes = writes.then(saveDraft).catch(fail); });
-                form.append(save);
+                // Drafts save automatically on every change (scheduleSave), so no manual button.
                 window.addEventListener('beforeunload', event => {
                     if (!queueing && (dirty || saving)) { event.preventDefault(); event.returnValue = ''; }
                 });
@@ -437,7 +454,7 @@
             await showSuccess();
             await prepareOffline();
             await sync();
-            syncButton.addEventListener('click', sync);
+            syncButton.addEventListener('click', () => { laterIds.clear(); sync(); });
             // The network is often not usable the instant the "online" event fires, so retry a few times.
             window.addEventListener('online', () => {
                 for (const delay of [0, 3000, 10000, 30000]) setTimeout(() => sync().catch(fail), delay);

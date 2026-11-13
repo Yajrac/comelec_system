@@ -27,3 +27,10 @@
 .application-badge { white-space: normal; overflow-wrap: anywhere; text-align: left; line-height: 1.5; max-width: 34rem; }
 
 .badge { white-space: normal; overflow-wrap: anywhere; line-height: 1.5; }
+
+/* AI document check result on application detail pages. */
+.document-ai-check { margin: 0 0 14px; padding: 12px 14px; border: 1px solid #dce5f4; border-radius: 10px; background: #f8fafc; color: #142b54; font-size: 13px; }
+.document-ai-check strong { margin-right: 6px; }
+.document-ai-details { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; }
+.document-ai-details dt { color: #64748b; font-weight: 600; }
+.document-ai-details dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }

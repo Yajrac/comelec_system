@@ -206,3 +206,14 @@ if len(sys.argv) > 1 and sys.argv[1] == "test":
 
 # Age qualification date for the configured Barangay and SK election.
 VOTER_ELECTION_DATE = os.environ.get("VOTER_ELECTION_DATE", "2028-11-13")
+
+# AI check of uploaded valid IDs / birth certificates. Leave DOCUMENT_AI_PROVIDER empty to turn it off.
+DOCUMENT_AI_PROVIDER = os.environ.get("DOCUMENT_AI_PROVIDER", "").strip().lower()
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
+# Shared ceiling on AI calls (behind Nginx every visitor has the same address, so no per-IP limit yet).
+DOCUMENT_AI_MAX_PER_MINUTE = int(os.environ.get("DOCUMENT_AI_MAX_PER_MINUTE", "10"))
+# Keep well under Gunicorn's default 30-second worker timeout.
+DOCUMENT_AI_TIMEOUT_SECONDS = int(os.environ.get("DOCUMENT_AI_TIMEOUT_SECONDS", "20"))
+if len(sys.argv) > 1 and sys.argv[1] == "test":
+    DOCUMENT_AI_PROVIDER = ""  # tests never call the real AI; they mock it explicitly

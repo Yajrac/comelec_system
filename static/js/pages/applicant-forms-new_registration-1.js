@@ -315,6 +315,19 @@ function submitApplication() {
 
     const submitButton = document.getElementById("submitButton");
 
+    // AI document check first (valid ID / birth certificate and matching name).
+    // Offline it resolves true and the check runs before the saved form is uploaded.
+    if (window.documentCheck && !submitApplication.documentChecked) {
+        submitButton.disabled = true;
+        window.documentCheck.ensure(form).then(function (ok) {
+            submitButton.disabled = false;
+            if (!ok) return;
+            submitApplication.documentChecked = true;
+            try { submitApplication(); } finally { submitApplication.documentChecked = false; }
+        });
+        return;
+    }
+
     if (window.webOfflineRegistration) {
         window.webOfflineRegistration.submit(form, submitButton);
         return;

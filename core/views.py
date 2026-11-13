@@ -1,5 +1,6 @@
 from Applicants.profile_details import apply_profile_details
 from Applicants.application_types import APPLICATION_TYPE_LABELS
+from Applicants.document_check import latest_for as latest_document_check
 from .biometric_state import SIGNATURE_FIELDS, file_exists as biometric_file_exists, signatures_complete, capture_complete, sync_completion
 import base64
 import binascii
@@ -904,6 +905,7 @@ def admin_application_new_detail(request, application_id):
         "comelec/applications/new_detail.html",
         {
             "application": application,
+            "document_check": latest_document_check("NEW", application.id),
         }
     )
 
@@ -932,6 +934,7 @@ def admin_application_update_detail(request, application_id):
         "comelec/applications/update_detail.html",
         {
             "application": application,
+            "document_check": latest_document_check("UPDATE", application.id),
         }
     )
 
@@ -961,6 +964,7 @@ def admin_application_transfer_detail(request, application_id):
         "comelec/applications/transfer_detail.html",
         {
             "application": application,
+            "document_check": latest_document_check("TRANSFER", application.id),
         }
     )
 
@@ -988,6 +992,7 @@ def admin_application_reactivation_detail(request, application_id):
         "comelec/applications/reactivation_detail.html",
         {
             "application": application,
+            "document_check": latest_document_check("REACTIVATION", application.id),
         }
     )
 
@@ -1015,6 +1020,7 @@ def admin_application_reinstatement_detail(request, application_id):
         "comelec/applications/reinstatement_detail.html",
         {
             "application": application,
+            "document_check": latest_document_check("REINSTATEMENT", application.id),
         }
     )
 

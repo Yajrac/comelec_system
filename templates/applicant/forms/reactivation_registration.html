@@ -11,6 +11,7 @@
 {% block title %}APPLICATION FOR REACTIVATION OF REGISTRATION RECORD{% endblock %}
 
 {% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/document-check.css' %}">
     <link rel="stylesheet" href="{% static 'css/application-dialog.css' %}">
     <link
         rel="stylesheet"
@@ -201,7 +202,7 @@
             </section>
 
             <!-- REACTIVATION REQUEST FORM -->
-            <form method="post" enctype="multipart/form-data" id="reactivationForm" class="office-application-form">
+            <form method="post" enctype="multipart/form-data" id="reactivationForm"{% if document_ai_enabled %} data-document-check="REACTIVATION"{% if request.walk_in_base %} data-walk-in="1"{% endif %}{% endif %} class="office-application-form">
                 {% csrf_token %}
                 
                 {% include "components/profile_personal_section.html" %}
@@ -352,6 +353,8 @@
     </div>
 
     <script src="{% static 'js/application-submit-state.js' %}"></script>
+    <script src="{% static 'js/document-camera.js' %}"></script>
+    <script src="{% static 'js/document-check.js' %}"></script>
     <script src="{% static 'js/pages/applicant-forms-reactivation_registration-1.js' %}"></script>
     <script src="{% static 'js/replacement-document-preview.js' %}"></script>
 {% endblock %}

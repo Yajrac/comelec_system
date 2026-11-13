@@ -11,6 +11,7 @@
 {% block title %}APPLICATION FOR CHANGE OF NAME DUE TO MARRIAGE OR COURT ORDER / CORRECTION OF ENTRIES / REVERSION TO MAIDEN NAME IN THE VOTER’S REGISTRATION RECORD{% endblock %}
 
 {% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/document-check.css' %}">
     <link rel="stylesheet" href="{% static 'css/segmented-date.css' %}">
     <script src="{% static 'js/segmented-date.js' %}" defer></script>
     <link
@@ -212,7 +213,7 @@
                 <form
                     method="post"
                     enctype="multipart/form-data"
-                    id="updateRegistrationForm"
+                    id="updateRegistrationForm"{% if document_ai_enabled %} data-document-check="UPDATE"{% if request.walk_in_base %} data-walk-in="1"{% endif %}{% endif %}
                     class="office-application-form"
                 >
                     {% csrf_token %}
@@ -705,5 +706,7 @@
     </div>
 
     <script src="{% static 'js/application-submit-state.js' %}"></script>
+    <script src="{% static 'js/document-camera.js' %}"></script>
+    <script src="{% static 'js/document-check.js' %}"></script>
     <script src="{% static 'js/pages/applicant-forms-update_registration-1.js' %}"></script>
 {% endblock %}

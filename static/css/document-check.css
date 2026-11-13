@@ -1,0 +1,75 @@
+/* AI document check dialog and form notes. */
+.doc-check-dialog { width: min(460px, calc(100% - 32px)); padding: 28px; border: 1px solid #dce5f4; border-radius: 16px; color: #142b54; background: #fff; box-shadow: 0 20px 70px #142b5433; }
+.doc-check-dialog::backdrop { background: #142b5466; }
+.doc-check-icon { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 16px; border-radius: 50%; background: #edf3ff; color: #0038a8; font-size: 26px; font-weight: 700; }
+.doc-check-dialog[data-state="checking"] .doc-check-icon { border: 4px solid #dce5f4; border-top-color: #0038a8; background: transparent; animation: doc-check-spin .9s linear infinite; }
+.doc-check-dialog[data-state="passed"] .doc-check-icon { background: #eaf7ef; color: #168451; }
+.doc-check-dialog:is([data-state="invalid"], [data-state="mismatch"]) .doc-check-icon { background: #fff0f0; color: #c43742; }
+.doc-check-dialog[data-state="unavailable"] .doc-check-icon { background: #fff6df; color: #795700; }
+.doc-check-dialog h2 { margin: 0 0 10px; font-size: 20px; font-weight: 750; line-height: 1.35; outline: none; }
+.doc-check-message { margin: 0 0 14px; color: #526783; font-size: 14px; line-height: 1.6; }
+.doc-check-message:empty { display: none; }
+.doc-check-details { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0 0 16px; padding: 12px 14px; border: 1px solid #dce5f4; border-radius: 10px; background: #f8fafc; font-size: 13px; }
+.doc-check-details dt { color: #64748b; font-weight: 600; }
+.doc-check-details dd { margin: 0; color: #142b54; font-weight: 700; overflow-wrap: anywhere; }
+.doc-check-note { margin: 0 0 16px; color: #64748b; font-size: 12px; }
+.doc-check-buttons { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.doc-check-buttons:empty { display: none; }
+.doc-check-buttons button { min-height: 42px; padding: 10px 16px; border: 1px solid #dce5f4; border-radius: 8px; background: #fff; color: #526783; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.doc-check-buttons .doc-check-primary { border-color: #0038a8; background: #0038a8; color: #fff; }
+.doc-check-buttons button:focus-visible { outline: 3px solid #d5af3a; outline-offset: 2px; }
+.doc-check-privacy { margin: 8px 0 0; color: #64748b; font-size: 12px; line-height: 1.5; }
+.doc-check-override { display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; padding: 10px 12px; border: 1px solid #f0d996; border-radius: 8px; background: #fff6df; color: #5c4300; font-size: 13px; font-weight: 600; }
+@keyframes doc-check-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .doc-check-dialog[data-state="checking"] .doc-check-icon { animation-duration: 3s; } }
+@media (max-width: 480px) { .doc-check-buttons button { flex: 1 1 100%; } }
+
+/* Result shown right under the upload field. */
+.doc-check-inline { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 10px; margin-top: 10px; padding: 10px 12px; border: 1px solid #dce5f4; border-radius: 10px; background: #f8fafc; color: #142b54; font-size: 13px; line-height: 1.5; }
+.doc-check-inline-icon { display: grid; place-items: center; flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; background: #edf3ff; color: #0038a8; font-weight: 700; font-size: 12px; }
+.doc-check-inline-text { flex: 1 1 200px; font-weight: 600; }
+.doc-check-inline[data-state="checking"] .doc-check-inline-icon { border: 3px solid #dce5f4; border-top-color: #0038a8; background: transparent; animation: doc-check-spin .9s linear infinite; }
+.doc-check-inline:is([data-state="passed"], [data-state="valid"]) { border-color: #c8e6d2; background: #eaf7ef; color: #14532d; }
+.doc-check-inline:is([data-state="passed"], [data-state="valid"]) .doc-check-inline-icon { background: #168451; color: #fff; }
+.doc-check-inline:is([data-state="invalid"], [data-state="mismatch"]) { border-color: #f0caca; background: #fff0f0; color: #7f1d1d; }
+.doc-check-inline:is([data-state="invalid"], [data-state="mismatch"]) .doc-check-inline-icon { background: #c43742; color: #fff; }
+.doc-check-inline:is([data-state="unavailable"], [data-state="offline"]) { border-color: #f0d996; background: #fff6df; color: #5c4300; }
+.doc-check-inline-actions { display: flex; flex-wrap: wrap; gap: 8px; flex-basis: 100%; padding-left: 32px; }
+.doc-check-inline-actions button { min-height: 36px; padding: 6px 12px; border: 1px solid currentColor; border-radius: 8px; background: #fff; color: inherit; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.doc-check-inline-actions button:focus-visible { outline: 3px solid #d5af3a; outline-offset: 2px; }
+
+/* Spinners: always a perfect circle, whatever the surrounding flex/grid layout does. */
+.doc-check-inline[data-state="checking"] .doc-check-inline-icon,
+.doc-check-dialog[data-state="checking"] .doc-check-icon {
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    border-style: solid;
+    border-color: #dce5f4;
+    border-top-color: #0038a8;
+    background: transparent;
+    color: transparent;
+    animation: doc-check-spin .8s linear infinite;
+}
+.doc-check-inline[data-state="checking"] .doc-check-inline-icon { width: 20px; height: 20px; min-width: 20px; border-width: 3px; }
+.doc-check-dialog[data-state="checking"] .doc-check-icon { width: 48px; height: 48px; min-width: 48px; border-width: 4px; }
+.doc-check-inline[data-state="checking"] { align-items: center; }
+
+/* "Take a photo" next to the document upload. */
+.doc-camera-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 10px; }
+.doc-camera-or { color: #64748b; font-size: 13px; }
+.doc-camera-button { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 8px 14px; border: 1px solid #0038a8; border-radius: 8px; background: #fff; color: #0038a8; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.doc-camera-button:hover { background: #edf3ff; }
+.doc-camera-button:focus-visible { outline: 3px solid #d5af3a; outline-offset: 2px; }
+.doc-camera-message { flex-basis: 100%; margin: 0; color: #a61b1b; font-size: 12px; }
+.doc-camera-dialog { width: min(640px, calc(100% - 24px)); padding: 20px; border: 1px solid #dce5f4; border-radius: 16px; background: #fff; color: #142b54; box-shadow: 0 20px 70px #142b5433; }
+.doc-camera-dialog::backdrop { background: #142b5499; }
+.doc-camera-dialog h2 { margin: 0 0 6px; font-size: 18px; font-weight: 750; }
+.doc-camera-tip { margin: 0 0 12px; color: #526783; font-size: 13px; }
+.doc-camera-dialog video { display: block; width: 100%; max-height: 60vh; border-radius: 10px; background: #0f172a; object-fit: contain; }
+.doc-camera-status { margin: 8px 0 0; color: #526783; font-size: 13px; }
+.doc-camera-status:empty { display: none; }
+.doc-camera-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
+.doc-camera-buttons button { min-height: 42px; padding: 10px 18px; border: 1px solid #dce5f4; border-radius: 8px; background: #fff; color: #526783; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.doc-camera-buttons .doc-camera-capture { border-color: #0038a8; background: #0038a8; color: #fff; }

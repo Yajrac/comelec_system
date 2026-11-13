@@ -12,8 +12,9 @@
         <link rel="stylesheet" href="{% static 'css/input-validation.css' %}">
         <link rel="stylesheet" href="{% static 'css/scrollbars.css' %}">
         <link rel="stylesheet" href="{% static 'css/web-offline.css' %}?v=sticky-header-3">
+        <link rel="stylesheet" href="{% static 'css/document-check.css' %}">
     </head>
-    <body class="{% block body_class %}{% endblock %}">
+    <body class="{% block body_class %}{% endblock %}"{% if document_ai_enabled %} data-document-ai="1"{% endif %}>
         <header class="header public-header">
             <div class="header-inner public-header-inner">
                 <a class="brand" href="{% url 'home' %}">
@@ -51,6 +52,7 @@
         <script src="{% static 'js/input-validation.js' %}" defer></script>
         <script src="{% static 'js/template-actions.js' %}" defer></script>
         <script src="{% static 'js/public-connection.js' %}" defer></script>
+        <script src="{% static 'js/document-check.js' %}" defer></script>
         <script src="{% static 'js/web-offline.js' %}" defer></script>
     </body>
 </html>

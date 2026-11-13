@@ -1,3 +1,5 @@
+from .document_check import (enforce as enforce_document, link as link_document_check,
+                             expected_name_from, expected_name_of)
 from pathlib import Path
 from Applicants.validation import validate_request
 from Applicants.submission_lock import registration_identity_lock
@@ -282,6 +284,15 @@ def new_registration(request):
             )
 
         # =====================================================
+        # AI DOCUMENT CHECK (valid document + matching name)
+        # =====================================================
+
+        document_check, document_error = enforce_document(
+            request, uploaded_document, expected_name_from(request.POST), "NEW")
+        if document_error:
+            return render_error(document_error)
+
+        # =====================================================
         # CREATE APPLICANT
         # =====================================================
 
@@ -327,6 +338,7 @@ def new_registration(request):
         for field, value in profile_values(request).items():
             setattr(applicant, field, value)
         applicant.save()
+        link_document_check(document_check, "NEW", applicant.id)
 
         # =====================================================
         # REDIRECT TO SUCCESS PAGE
@@ -839,6 +851,12 @@ def update_registration(request):
         # CREATE UPDATE REQUEST
         # -----------------------------------------------------
 
+        document_check, document_error = enforce_document(
+            request, valid_id_document,
+            {"last_name": lastname, "first_name": firstname, "middle_name": middlename}, "UPDATE")
+        if document_error:
+            return render_page(applicant=applicant, error=document_error, form_data=form_data)
+
         update_request = ApplicantUpdateRequest.objects.create(
             **profile_values(request, applicant),
             applicant=applicant,
@@ -875,6 +893,8 @@ def update_registration(request):
 
             status="PENDING",
         )
+
+        link_document_check(document_check, "UPDATE", update_request.id)
 
         return redirect(
             "update-success",
@@ -1100,6 +1120,11 @@ def transfer_registration(request):
         # -----------------------------------------------------
         # SAVE TRANSFER REQUEST AND UPLOADED ID
         # -----------------------------------------------------
+        document_check, document_error = enforce_document(
+            request, valid_id_document, expected_name_of(applicant), "TRANSFER")
+        if document_error:
+            return show_error(document_error)
+
         transfer_request = ApplicantTransferRequest.objects.create(
             **profile_values(request, applicant),
             applicant=applicant,
@@ -1113,6 +1138,8 @@ def transfer_registration(request):
             valid_id_document=valid_id_document or applicant.valid_id_document.name,
             status="PENDING",
         )
+
+        link_document_check(document_check, "TRANSFER", transfer_request.id)
 
         return redirect(
             "transfer-success",
@@ -1324,6 +1351,11 @@ def reactivate_registration(request):
         # SAVE REQUEST AND UPLOADED ID
         # -------------------------------------------------
 
+        document_check, document_error = enforce_document(
+            request, valid_id_document, expected_name_of(applicant), "REACTIVATION")
+        if document_error:
+            return render_page(applicant=applicant, error=document_error, form_data=request.POST)
+
         reactivation_request = ApplicantReactivationRequest.objects.create(
             **profile_values(request, applicant),
             applicant=applicant,
@@ -1331,6 +1363,8 @@ def reactivate_registration(request):
             valid_id_document=valid_id_document or applicant.valid_id_document.name,
             status="PENDING",
         )
+
+        link_document_check(document_check, "REACTIVATION", reactivation_request.id)
 
         return redirect(
             "reactivation-success",
@@ -1545,6 +1579,15 @@ def reinstate_registration(request):
         # CREATE REINSTATEMENT REQUEST
         # =====================================================
 
+        document_check, document_error = enforce_document(
+            request, valid_id_document, expected_name_of(applicant), "REINSTATEMENT")
+        if document_error:
+            return render(request, template_name, {
+                "applicant": applicant,
+                "error": document_error,
+                "form_data": request.POST,
+            })
+
         reinstatement_request = (
             ApplicantReinstatementRequest.objects.create(
                 **profile_values(request, applicant),
@@ -1554,6 +1597,8 @@ def reinstate_registration(request):
                 status="PENDING",
             )
         )
+
+        link_document_check(document_check, "REINSTATEMENT", reinstatement_request.id)
 
         return redirect(
             "reinstatement-success",

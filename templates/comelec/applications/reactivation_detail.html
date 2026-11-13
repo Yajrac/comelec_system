@@ -419,7 +419,7 @@
             <div class="card-header"><h2 class="h5 mb-0">Valid ID and Birth Certificate</h2></div>
             <div class="card-body">
                 {% if application.valid_id_document %}
-                    {% include "components/document_preview.html" with document=application.valid_id_document document_label="View full document" only %}
+                    {% include "components/document_check_badge.html" %}{% include "components/document_preview.html" with document=application.valid_id_document document_label="View full document" only %}
                 {% else %}<p>No Valid ID and Birth Certificate were attached to this request.</p>{% endif %}
                 {% if application.applicant.valid_id_document %}
                     {% include "components/document_preview.html" with document=application.applicant.valid_id_document document_label="View original document" only %}
