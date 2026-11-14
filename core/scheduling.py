@@ -1,9 +1,8 @@
-"""Office visit scheduling: the first open office day after approval, with a daily limit."""
+"""Office visit window: the applicant may come any open office day for N days after approval."""
 from datetime import timedelta
 
+from django.conf import settings
 from django.utils import timezone
-
-OFFICE_DAILY_CAPACITY = 50
 
 # Regular holidays with fixed dates (Republic Act No. 9492 and amendments). Holidays whose dates
 # change every year (Holy Week, Eid, National Heroes Day, special days) and local holidays are
@@ -23,22 +22,55 @@ def is_office_closed(day, extra_holidays=frozenset()):
     return day.weekday() >= 5 or (day.month, day.day) in FIXED_HOLIDAYS or day in extra_holidays
 
 
-def assign_office_appointment(applicant):
-    """Schedule the visit on the first open office day after today that still has a free slot."""
-    from Applicants.models import Applicant
-    from .models import OfficeHoliday
+def lead_days():
+    """Open office days in the visit window (OFFICE_VISIT_LEAD_DAYS, default 3)."""
+    return max(1, int(getattr(settings, "OFFICE_VISIT_LEAD_DAYS", 3)))
 
-    today = timezone.localdate()
-    holidays = set(OfficeHoliday.objects.filter(date__gt=today).values_list("date", flat=True))
-    day = today + timedelta(days=1)  # never the same day: approval may come late in the afternoon
-    while True:
-        if is_office_closed(day, holidays):
-            day += timedelta(days=1)
-            continue
-        scheduled = Applicant.objects.filter(office_visit_date=day).count()
-        if scheduled < OFFICE_DAILY_CAPACITY:
-            applicant.office_visit_date = day
-            applicant.office_visit_slot = scheduled + 1
-            applicant.save(update_fields=["office_visit_date", "office_visit_slot"])
-            return day, scheduled + 1
+
+def _office_holidays(start, end):
+    from .models import OfficeHoliday
+    return set(OfficeHoliday.objects.filter(date__gte=start, date__lte=end).values_list("date", flat=True))
+
+
+def visit_window_from(approved_on):
+    """(first, last) open office days the applicant may visit, starting the day after approval."""
+    holidays = _office_holidays(approved_on, approved_on + timedelta(days=60))
+    day, open_days = approved_on, []
+    while len(open_days) < lead_days():
         day += timedelta(days=1)
+        if not is_office_closed(day, holidays):
+            open_days.append(day)
+    return open_days[0], open_days[-1]
+
+
+def visit_window(applicant):
+    """(first, last) visit days for an approved applicant, or None. The last day is stored."""
+    last = applicant.office_visit_date
+    if not last:
+        return None
+    holidays = _office_holidays(last - timedelta(days=60), last)
+    day, counted = last, 1
+    while counted < lead_days():
+        day -= timedelta(days=1)
+        if not is_office_closed(day, holidays):
+            counted += 1
+    return day, last
+
+
+def visit_overdue(applicant):
+    return bool(applicant.office_visit_date) and timezone.localdate() > applicant.office_visit_date
+
+
+def format_window(first, last):
+    """'Nov 17 to Nov 19, 2026', or 'Dec 29, 2026 to Jan 04, 2027' across years."""
+    start = f"{first:%b %d}" if first.year == last.year else f"{first:%b %d, %Y}"
+    return f"{start} to {last:%b %d, %Y}" if first != last else f"{last:%b %d, %Y}"
+
+
+def assign_office_appointment(applicant):
+    """Store the last day of the visit window; no daily limit, any open day in the window works."""
+    first, last = visit_window_from(timezone.localdate())
+    applicant.office_visit_date = last
+    applicant.office_visit_slot = None
+    applicant.save(update_fields=["office_visit_date", "office_visit_slot"])
+    return first, last

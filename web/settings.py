@@ -28,6 +28,8 @@ SEMAPHORE_SENDER_NAME = os.environ.get("SEMAPHORE_SENDER_NAME", "")
 IPROG_SMS_API_TOKEN = os.environ.get("IPROG_SMS_API_TOKEN", "")
 # Which SMS service sends application notifications: "iprog" (default) or "semaphore".
 SMS_PROVIDER = os.environ.get("SMS_PROVIDER", "iprog").strip().lower()
+# Office visit is scheduled this many open office days after approval (weekends and holidays not counted).
+OFFICE_VISIT_LEAD_DAYS = int(os.environ.get("OFFICE_VISIT_LEAD_DAYS", "3"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/

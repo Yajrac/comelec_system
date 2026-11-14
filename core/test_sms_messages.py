@@ -21,7 +21,8 @@ class SmsMessageTests(TestCase):
         number, message = iprog.call_args.args
         self.assertEqual(number, '09171234567')
         self.assertEqual(message, f'Hi Maria Pena, your Transfer is APPROVED. Ref: {self.applicant.registration_reference}. '
-                                  'Visit Pio Duran Registration Office on Sep 30, 2026 for fingerprints and signature.')
+                                  'Visit Pio Duran Registration Office any working day from Sep 28 to Sep 30, 2026 '
+                                  'for fingerprints and signature.')
         self.assertTrue(message.isascii())
         self.assertLessEqual(len(message), 306)  # at most two SMS parts
 

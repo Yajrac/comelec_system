@@ -108,7 +108,14 @@
             </div>
         {% endif %}
 
-        {% if recapture_round %}
+{% if visit_window %}
+            <div class="bio-notice {% if visit_overdue %}warning{% else %}info{% endif %}">
+                <strong>Office visit window: {{ visit_window }}</strong>
+                {% if visit_overdue %}<br>The visit window has passed. Biometrics can still be captured.{% endif %}
+            </div>
+        {% endif %}
+
+                {% if recapture_round %}
             <div class="bio-notice warning">
                 <strong>New biometrics required: {{ recapture_round }}</strong>
                 <br>

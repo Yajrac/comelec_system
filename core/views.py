@@ -1137,7 +1137,7 @@ def send_semaphore_sms(number, message):
         return False
 
 
-from .scheduling import OFFICE_DAILY_CAPACITY, assign_office_appointment
+from .scheduling import assign_office_appointment, visit_window, visit_overdue, format_window
 DISAPPROVED_STATUS = 7
 
 
@@ -1174,9 +1174,12 @@ def send_approval_sms(
     application_name
 ):
     reference = applicant.registration_reference
+    window = visit_window(applicant)
     visit = (
-        f"Visit Pio Duran Registration Office on {applicant.office_visit_date:%b %d, %Y}"
-        if applicant.office_visit_date else "Visit Pio Duran Registration Office"
+        f"Visit Pio Duran Registration Office any working day from {format_window(*window)}"
+        if window and window[0] != window[1] else
+        f"Visit Pio Duran Registration Office on {format_window(*window)}" if window
+        else "Visit Pio Duran Registration Office"
     )
     message = (
         f"Hi {sms_name(applicant)}, your {application_name} is APPROVED. "
@@ -2034,6 +2037,8 @@ def admin_applicant_biometric(request, applicant_id):
             "signatures_complete": signatures_complete(biometric),
             "capture_complete": capture_complete(biometric),
             "recapture_round": round_label(biometric.application_type, biometric.application_request_id) if biometric.application_type != "NEW" else "",
+            "visit_window": format_window(*visit_window(applicant)) if visit_window(applicant) else "",
+            "visit_overdue": visit_overdue(applicant) and applicant.verification_status != "VERIFIED",
         }
     )
 
@@ -2591,6 +2596,8 @@ def admin_applicant_detail(request, applicant_id):
             "application_history": history,
             "highlight": request.GET.get("highlight", ""),
             "current_round": round_label(biometric.application_type, biometric.application_request_id),
+            "visit_window": format_window(*visit_window(applicant)) if visit_window(applicant) else "",
+            "visit_overdue": visit_overdue(applicant) and applicant.verification_status != "VERIFIED",
             "previous_biometrics": previous_biometrics,
             "receipts": receipts,
             "signature_slots": [{"slot": slot, "field": getattr(biometric, field) if biometric_file_exists(getattr(biometric, field)) else None} for slot, field in SIGNATURE_FIELDS.items()],

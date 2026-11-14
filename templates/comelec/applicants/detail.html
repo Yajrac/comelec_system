@@ -634,6 +634,12 @@
 
     </div>
 
+    {% if visit_window %}
+    <div class="alert {% if visit_overdue %}alert-warning{% else %}alert-info{% endif %} mt-4 mb-0" role="status">
+        <strong>Office visit window:</strong> {{ visit_window }}{% if visit_overdue %} &middot; <strong>Lampas na</strong> - biometrics can still be captured.{% endif %}
+    </div>
+    {% endif %}
+
     <section class="card mt-4" aria-labelledby="previousBiometricsTitle">
         <div class="card-header"><h2 class="h5 mb-0" id="previousBiometricsTitle">Previous Biometrics</h2></div>
         <div class="card-body">
