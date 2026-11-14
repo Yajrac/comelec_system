@@ -15,3 +15,15 @@ class AdminLoginThrottle(models.Model):
 
 class ReceiptSettings(models.Model):
     officer_name = models.CharField(max_length=100, blank=True)
+
+
+class OfficeHoliday(models.Model):
+    """A day the registration office is closed (holidays with changing dates, local holidays, closures)."""
+    date = models.DateField(unique=True)
+    name = models.CharField(max_length=120)
+
+    class Meta:
+        ordering = ["date"]
+
+    def __str__(self):
+        return f"{self.date:%b %d, %Y} - {self.name}"

@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import OfficeHoliday
+
+
+@admin.register(OfficeHoliday)
+class OfficeHolidayAdmin(admin.ModelAdmin):
+    list_display = ("date", "name")
+    search_fields = ("name",)
+    date_hierarchy = "date"

@@ -1137,81 +1137,8 @@ def send_semaphore_sms(number, message):
         return False
 
 
-OFFICE_DAILY_CAPACITY = 50
+from .scheduling import OFFICE_DAILY_CAPACITY, assign_office_appointment
 DISAPPROVED_STATUS = 7
-
-def assign_office_appointment(applicant):
-
-    today = timezone.localdate()
-
-    appointment_date = today
-
-    while True:
-
-        # =====================================================
-        # SKIP SATURDAY
-        # =====================================================
-
-        if appointment_date.weekday() == 5:
-
-            appointment_date += timedelta(days=1)
-
-            continue
-
-        # =====================================================
-        # SKIP SUNDAY
-        # =====================================================
-
-        if appointment_date.weekday() == 6:
-
-            appointment_date += timedelta(days=1)
-
-            continue
-
-        # =====================================================
-        # COUNT APPLICANTS ALREADY SCHEDULED
-        # =====================================================
-
-        scheduled_count = Applicant.objects.filter(
-            office_visit_date=appointment_date
-        ).count()
-
-        # =====================================================
-        # CHECK DAILY CAPACITY
-        # =====================================================
-
-        if scheduled_count < OFFICE_DAILY_CAPACITY:
-
-            appointment_slot = (
-                scheduled_count + 1
-            )
-
-            applicant.office_visit_date = (
-                appointment_date
-            )
-
-            applicant.office_visit_slot = (
-                appointment_slot
-            )
-
-            applicant.save(
-                update_fields=[
-                    "office_visit_date",
-                    "office_visit_slot",
-                ]
-            )
-
-            return (
-                appointment_date,
-                appointment_slot
-            )
-
-        # =====================================================
-        # DAY IS FULL
-        # MOVE TO NEXT DAY
-        # =====================================================
-
-        appointment_date += timedelta(days=1)
 
 
 def get_applicant_full_name(applicant):
