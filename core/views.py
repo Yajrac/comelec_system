@@ -6,6 +6,7 @@ import base64
 import binascii
 import json
 import re
+import unicodedata
 import io
 from io import BytesIO
 
@@ -1222,60 +1223,47 @@ def get_applicant_full_name(applicant):
     ).strip()
 
 
+def sms_text(text):
+    """Plain letters only: one non-GSM character (such as "ñ") would cut each SMS from 160 to 70 characters."""
+    text = unicodedata.normalize("NFKD", str(text))
+    text = "".join(ch for ch in text if not unicodedata.combining(ch))
+    return " ".join(text.encode("ascii", "ignore").decode().split())
+
+
+def sms_name(applicant):
+    return f"{applicant.firstname} {applicant.lastname}"
+
+
+def send_sms(number, message):
+    """Send through the provider chosen in SMS_PROVIDER (iprog by default, or semaphore). No fallback."""
+    message = sms_text(message)
+    if getattr(settings, "SMS_PROVIDER", "iprog") == "semaphore":
+        return send_semaphore_sms(number, message)
+    return send_iprog_sms(number, message)
+
+
 def send_approval_sms(
     applicant,
     application_name
 ):
-
-    applicant_name = get_applicant_full_name(
-        applicant
+    reference = applicant.registration_reference
+    visit = (
+        f"Visit Pio Duran Registration Office on {applicant.office_visit_date:%b %d, %Y}"
+        if applicant.office_visit_date else "Visit Pio Duran Registration Office"
     )
-
-    appointment_date = (
-        applicant.office_visit_date
-    )
-
-    appointment_slot = (
-        applicant.office_visit_slot
-    )
-
-    if appointment_date:
-
-        formatted_date = appointment_date.strftime(
-            "%B %d, %Y"
-        )
-
-    else:
-
-        formatted_date = "To be announced"
-
-    if appointment_slot:
-
-        appointment_number = (
-            f"{appointment_slot} / "
-            f"{OFFICE_DAILY_CAPACITY}"
-        )
-
-    else:
-
-        appointment_number = "To be announced"
-
     message = (
-        "Voter Registration Services: "
-        f"{applicant_name}, your {application_name} "
-        "application has been APPROVED. "
-        f"Your office appointment is {formatted_date}. "
-        f"Appointment No. {appointment_number}. "
-        "Please visit the Pio Duran Registration Office "
-        "to complete your fingerprint biometrics and "
-        "electronic signature. "
-        "Your registration is NOT YET VERIFIED until "
-        "all biometric requirements are completed."
+        f"Hi {sms_name(applicant)}, your {application_name} is APPROVED. "
+        + (f"Ref: {reference}. " if reference else "")
+        + f"{visit} for fingerprints and signature."
     )
+    return send_sms(applicant.phone, message)
 
-    return send_iprog_sms(
+
+def send_disapproval_sms(applicant, application_name):
+    return send_sms(
         applicant.phone,
-        message
+        f"Hi {sms_name(applicant)}, your {application_name} was DISAPPROVED. "
+        "Please visit the Pio Duran Registration Office for details.",
     )
 
 
@@ -1432,20 +1420,7 @@ def admin_application_action(
                 # iProg SMS
                 # =============================================
 
-                send_iprog_sms(
-                    application.phone,
-                    (
-                        "Voter Registration Services: "
-                        f"{applicant_name}, your voter "
-                        "registration application has been "
-                        "DISAPPROVED. The application may "
-                        "contain incorrect or incomplete "
-                        "information or may duplicate an "
-                        "existing registration or application. "
-                        "Please visit the Pio Duran Registration "
-                        "Office for clarification."
-                    )
-                )
+                send_disapproval_sms(application, "voter registration application")
 
                 return redirect(
                     "admin-application-new-detail",
@@ -1652,19 +1627,7 @@ def admin_application_action(
                 # iProg SMS
                 # =============================================
 
-                send_iprog_sms(
-                    applicant.phone,
-                    (
-                        "Voter Registration Services: "
-                        f"{applicant_name}, your registration "
-                        "UPDATE request has been DISAPPROVED. "
-                        "The request may contain incorrect or "
-                        "incomplete information or may duplicate "
-                        "an existing registration or application. "
-                        "Please visit the Pio Duran Registration "
-                        "Office for clarification."
-                    )
-                )
+                send_disapproval_sms(applicant, "Registration Update request")
 
                 return redirect(
                     "admin-application-update-detail",
@@ -1813,19 +1776,7 @@ def admin_application_action(
                 # iProg SMS
                 # =============================================
 
-                send_iprog_sms(
-                    applicant.phone,
-                    (
-                        "Voter Registration Services: "
-                        f"{applicant_name}, your TRANSFER "
-                        "request has been DISAPPROVED. The "
-                        "request may contain incorrect or "
-                        "incomplete information or may duplicate "
-                        "an existing registration or application. "
-                        "Please visit the Pio Duran Registration "
-                        "Office for clarification."
-                    )
-                )
+                send_disapproval_sms(applicant, "Transfer request")
 
                 return redirect(
                     "admin-application-transfer-detail",
@@ -1956,19 +1907,7 @@ def admin_application_action(
                 # iProg SMS
                 # =============================================
 
-                send_iprog_sms(
-                    applicant.phone,
-                    (
-                        "Voter Registration Services: "
-                        f"{applicant_name}, your REACTIVATION "
-                        "request has been DISAPPROVED. The "
-                        "request may contain incorrect or "
-                        "incomplete information or may duplicate "
-                        "an existing registration or application. "
-                        "Please visit the Pio Duran Registration "
-                        "Office for clarification."
-                    )
-                )
+                send_disapproval_sms(applicant, "Reactivation request")
 
                 return redirect(
                     "admin-application-reactivation-detail",
@@ -2099,19 +2038,7 @@ def admin_application_action(
                 # iProg SMS
                 # =============================================
 
-                send_iprog_sms(
-                    applicant.phone,
-                    (
-                        "Voter Registration Services: "
-                        f"{applicant_name}, your REINSTATEMENT "
-                        "request has been DISAPPROVED. The "
-                        "request may contain incorrect or "
-                        "incomplete information or may duplicate "
-                        "an existing registration or application. "
-                        "Please visit the Pio Duran Registration "
-                        "Office for clarification."
-                    )
-                )
+                send_disapproval_sms(applicant, "Reinstatement request")
 
                 return redirect(
                     "admin-application-reinstatement-detail",
