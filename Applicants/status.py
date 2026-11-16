@@ -71,6 +71,10 @@ def registration_status(applicant):
     label, tone = REQUEST_STATUS.get(applicant.status, (applicant.get_status_display(), "pending"))
     rows.append(("New Registration", label, tone))
     if applicant.status != "APPROVED":
+        if applicant.possible_duplicate_of_id:
+            rows[-1] = ("New Registration", "Pending - possible duplicate", "pending")
+            return rows, ("Your registration has the same name and birthdate as an existing record. "
+                          "The office will review it and send you an SMS.")
         return rows, "The office will review your application. You will receive an SMS once it is approved."
     if applicant.verification_status == "VERIFIED":
         rows.append(("Verification", "Verified - registration complete", "approved"))

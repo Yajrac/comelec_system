@@ -185,6 +185,16 @@ class Applicant(ProfileDetails):
         blank=True,
     )
 
+    # Set when an offline-saved registration matched an existing name and birthdate on sync:
+    # it is kept as PENDING for the office to review instead of being rejected.
+    possible_duplicate_of = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="possible_duplicates",
+    )
+
     @property
     def current_age(self):
         from django.utils import timezone

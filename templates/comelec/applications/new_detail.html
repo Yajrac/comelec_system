@@ -34,6 +34,19 @@
 
     <div class="container-fluid px-0 registration-detail">
 
+        {% if application.possible_duplicate_of %}
+            <div class="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2" role="alert">
+                <div>
+                    <strong>Possible duplicate.</strong>
+                    This registration was saved offline and has the same name and birthdate as
+                    <strong>{{ application.possible_duplicate_of.lastname }}, {{ application.possible_duplicate_of.firstname }}</strong>
+                    ({{ application.possible_duplicate_of.get_status_display }}). Compare both records before approving;
+                    disapprove this one if it is the same person.
+                </div>
+                <a class="btn btn-sm btn-outline-dark" href="{% url 'admin-application-new-detail' application.possible_duplicate_of.id %}">Open existing record</a>
+            </div>
+        {% endif %}
+
         <!-- =========================================================
      HEADER
 ========================================================= -->

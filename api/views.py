@@ -397,18 +397,18 @@ def new_registration_api(request):
         firstname__iexact=firstname,
         middlename__iexact=middlename,
         birthdate=birthdate,
-    ).order_by("-id").first()
-    if existing:
-        # Offline-saved forms are synced while the applicant may not be looking: tell them by SMS.
-        if data.get("submitted_offline") == "1":
-            from core.views import send_duplicate_registration_sms
-            send_duplicate_registration_sms(existing, firstname, lastname, data.get("phone", ""),
-                                            data.get("client_reference", ""))
+    ).order_by("id").first()  # the original registration, not a later possible duplicate
+    # Offline-saved forms synced later are kept as PENDING possible duplicates for the office to
+    # review, and the applicant is told by SMS. Online submissions are refused on the page.
+    possible_duplicate = existing if existing and data.get("submitted_offline") == "1" else None
+    if existing and not possible_duplicate:
         return JsonResponse({
             "success": False,
             "error": "A registration with this full name and birthdate already exists. Please choose Update Information, Transfer, Reactivation, or Reinstatement instead.",
         }, status=400)
 
+    if possible_duplicate and email and Applicant.objects.filter(email__iexact=email).exists():
+        email = ""  # the email stays on the existing record; it must be unique
     if email and Applicant.objects.filter(
         email__iexact=email
     ).exists():
@@ -529,6 +529,10 @@ def new_registration_api(request):
     # =========================================================
 
     link_document_check(document_check, "NEW", applicant.id)
+    if possible_duplicate:
+        Applicant.objects.filter(pk=applicant.pk).update(possible_duplicate_of=possible_duplicate)
+        from core.views import send_duplicate_registration_sms
+        send_duplicate_registration_sms(applicant, data.get("client_reference", ""))
 
     return JsonResponse(
         {

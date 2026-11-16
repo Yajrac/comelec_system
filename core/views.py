@@ -631,6 +631,7 @@ def admin_applications(request):
                 "status_display": applicant.get_status_display(),
                 "date": application_date,
                 "url_name": "admin-application-new-detail",
+                "possible_duplicate": applicant.possible_duplicate_of_id is not None,
             })
 
     # =========================================================
@@ -1199,19 +1200,17 @@ def normalized_phone(number):
     return number if re.fullmatch(r"639\d{9}", number) else ""
 
 
-def send_duplicate_registration_sms(existing, firstname, lastname, phone, client_reference):
-    """Tell the applicant an offline-saved registration was not submitted because it is a duplicate.
+def send_duplicate_registration_sms(applicant, client_reference):
+    """After sync, tell the applicant their registration is pending because it may be a duplicate.
 
-    Same phone as the existing registration: the same person, so the status and reference are given.
-    Different phone: only that a registration already exists. One SMS per form, one per number a day.
+    Only the applicant's own new reference is included (nothing about the existing record).
+    One SMS per form and one per number a day.
     """
     from datetime import timedelta
     from Applicants.models import DuplicateRegistrationNotice
 
-    number = normalized_phone(phone)
+    number = normalized_phone(applicant.phone)
     if not number or not client_reference:
-        return False
-    if DuplicateRegistrationNotice.objects.filter(client_reference=client_reference).exists():
         return False
     recently = DuplicateRegistrationNotice.objects.filter(
         phone=number, sent=True, created_at__gte=timezone.now() - timedelta(hours=24)).exists()
@@ -1219,21 +1218,10 @@ def send_duplicate_registration_sms(existing, firstname, lastname, phone, client
         client_reference=client_reference, defaults={"phone": number})
     if not created or recently:
         return False
-
-    name = f"{firstname} {lastname}"
-    reference = existing.registration_reference
-    same_person = normalized_phone(existing.phone) == number
-    if same_person and existing.status in ("PENDING", "REVIEW"):
-        message = (f"Hi {name}, your saved registration was not submitted again because you already have "
-                   f"a registration pending review (Ref: {reference}). Please wait for our SMS.")
-    elif same_person and existing.status == "APPROVED":
-        message = (f"Hi {name}, your saved registration was not submitted because you are already registered "
-                   f"(Ref: {reference}). For changes, use Update, Transfer, Reactivation or Reinstatement.")
-    else:
-        message = (f"Hi {name}, your saved registration was not submitted because a registration with the same "
-                   "name and birthdate already exists. Please visit Pio Duran Registration Office.")
+    message = (f"Hi {sms_name(applicant)}, your registration (Ref: {applicant.registration_reference}) "
+               "is pending due to a possible duplicate record. The office will review it and send you an SMS.")
     try:
-        notice.sent = bool(send_sms(phone, message))
+        notice.sent = bool(send_sms(applicant.phone, message))
     except Exception:  # an SMS problem must never break the registration response
         logger.exception("Duplicate registration SMS failed.")
         notice.sent = False
@@ -1402,7 +1390,16 @@ def admin_application_action(
                 # iProg SMS
                 # =============================================
 
-                send_disapproval_sms(application, "voter registration application")
+                if application.possible_duplicate_of_id:
+                    # The office confirmed the possible duplicate is the same person.
+                    send_sms(
+                        application.phone,
+                        f"Hi {sms_name(application)}, your new registration was DISAPPROVED because you "
+                        "already have a registration with the same name and birthdate. "
+                        "Please visit the Pio Duran Registration Office for details.",
+                    )
+                else:
+                    send_disapproval_sms(application, "voter registration application")
 
                 return redirect(
                     "admin-application-new-detail",
