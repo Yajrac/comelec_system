@@ -115,7 +115,7 @@ These tests use isolated test records and in-memory image storage. They do not s
 
 ### Client admin handover and login limits
 
-The custom administrator login locks a username for 15 minutes after 5 failed attempts. A separate IP bucket locks after 20 failures in 15 minutes. Limits are stored in the database and use REMOTE_ADDR; forwarded headers are not trusted. Behind a reverse proxy, configure trusted client IP handling before relying on per-IP differentiation.
+The custom administrator login locks a username after 5 failed attempts for 1, then 2, 5 and 15 minutes on repeated locks (ADMIN_LOGIN_LOCK_STEPS; reset after a successful sign-in or 24 hours). A separate IP bucket locks after 20 failures in 15 minutes. Limits are stored in the database and use REMOTE_ADDR; forwarded headers are not trusted. Behind a reverse proxy, configure trusted client IP handling before relying on per-IP differentiation.
 
 Prepare a client account with `python manage.py prepare_admin_handover clientadmin`. The command securely prompts for a temporary password (not echoed), creates a new superuser or resets the named existing superuser, and requires replacement before access to the workspace. Existing accounts are not flagged automatically. Do not run this command on your working account unless you intend to reset it. Django password validators and current-password verification apply to the replacement. All authenticated requests by a flagged admin are redirected until the password is changed, except change-password and sign-out.
 

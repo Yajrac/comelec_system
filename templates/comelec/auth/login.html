@@ -72,9 +72,9 @@
                         <h2 id="login-title">Welcome back</h2>
                         <p class="form-intro">Sign in with your administrator account to continue.</p>
                         {% if error %}
-                            <div class="error-message" role="alert">
+                            <div class="error-message" role="alert"{% if lock_seconds %} data-lock-seconds="{{ lock_seconds }}"{% endif %}>
                                 <strong>Unable to sign in</strong>
-                                <span>{{ error }}</span>
+                                <span id="loginErrorText">{{ error }}</span>
                             </div>
                         {% endif %}
                         <form method="post" id="loginForm">
@@ -138,7 +138,7 @@
                                 <p id="loginStatus" class="sr-only" role="status"></p>
                                 <p
                                     class="access-note"
-                                >After 5 unsuccessful attempts, sign-in is locked for 15 minutes.</p>
+                                >After 5 unsuccessful attempts, sign-in is locked for 1 minute, and longer if it happens again.</p>
                             </form>
                             <p class="access-note">
                                 <svg
@@ -159,6 +159,6 @@
                 <footer>
                     Pio Duran Voter Registration <span>&bull;</span> Pio Duran, Albay <span class="footer-end">Voter Registration Services</span>
                 </footer>
-                <script src="{% static 'js/admin-login.js' %}" defer></script>
+                <script src="{% static 'js/admin-login.js' %}?v=countdown-1" defer></script>
             </body>
         </html>

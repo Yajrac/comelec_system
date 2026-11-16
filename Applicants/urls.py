@@ -3,10 +3,12 @@ from django.urls import path
 from . import views
 from . import offline
 from .document_check import document_check_view
+from .status import status_lookup
 
 
 urlpatterns = [
     path('document-check/', document_check_view, name='document-check'),
+    path('check-status/', status_lookup, name='check-status'),
     path('offline/', offline.saved_applications, name='applicant-offline'),
     path('web-offline-sw.js', offline.service_worker, name='web-offline-worker'),
     path('offline/connection/', offline.connection_status, name='web-connection-status'),

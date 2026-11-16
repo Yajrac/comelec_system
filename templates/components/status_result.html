@@ -1,0 +1,27 @@
+{% if status_result %}
+<div class="status-result {% if status_result.found %}is-found{% else %}is-missing{% endif %}">
+    {% if status_result.found %}
+        <div class="status-result-head">
+            <strong>{{ status_result.name }}</strong>
+            <span>Ref: {{ status_result.reference }}</span>
+        </div>
+        <dl class="status-rows">
+            {% for row in status_result.rows %}
+                <dt>{{ row.label }}</dt>
+                <dd><span class="status-pill tone-{{ row.tone }}">{{ row.status }}</span></dd>
+            {% endfor %}
+        </dl>
+        {% if status_result.note %}<p class="status-note">{{ status_result.note }}</p>{% endif %}
+        {% if status_result.requests %}
+            <h3 class="status-requests-title">Other requests</h3>
+            <ul class="status-requests">
+                {% for item in status_result.requests %}
+                    <li><span>{{ item.label }}{% if item.date %} &middot; {{ item.date }}{% endif %}</span><span class="status-pill tone-{{ item.tone }}">{{ item.status }}</span></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% else %}
+        <p class="status-missing">{{ status_result.message }}</p>
+    {% endif %}
+</div>
+{% endif %}

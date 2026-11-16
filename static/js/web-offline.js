@@ -83,10 +83,11 @@
         }
         return {kind: 'retry'};
     }
-    function uploadBody(entries, reference) {
+    function uploadBody(entries, reference, savedOffline = false) {
         const body = new FormData();
         for (const [name, value] of entries) body.append(name, value);
         body.set('client_reference', reference);
+        if (savedOffline) body.set('submitted_offline', '1'); // server may text the applicant about duplicates
         return body;
     }
     function notice(text) {
@@ -322,7 +323,7 @@
                             continue;
                         }
                     }
-                    const response = await fetch('/api/new-registration/', {method: 'POST', body: uploadBody(active.entries, active.id), signal: AbortSignal.timeout(60000), credentials: 'same-origin'});
+                    const response = await fetch('/api/new-registration/', {method: 'POST', body: uploadBody(active.entries, active.id, true), signal: AbortSignal.timeout(60000), credentials: 'same-origin'});
                     const result = await interpret(response);
                     if (result.kind === 'success') {
                         const {data} = result;

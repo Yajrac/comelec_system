@@ -1,3 +1,4 @@
+import math
 from datetime import timedelta
 
 from django.contrib.auth import authenticate, update_session_auth_hash
@@ -16,10 +17,33 @@ from django.utils.crypto import salted_hmac
 from .models import AdminAccountSecurity, AdminLoginThrottle
 
 
+def lock_steps():
+    """Lock lengths in seconds for the 1st, 2nd, 3rd... lock (ADMIN_LOGIN_LOCK_STEPS, default 1, 2, 5, 15 minutes)."""
+    from django.conf import settings
+    steps = [int(value) for value in str(getattr(settings, "ADMIN_LOGIN_LOCK_STEPS", "60,120,300,900")).split(",")
+             if value.strip().isdigit() and int(value) > 0]
+    return steps or [60]
+
+
+def lock_message(seconds):
+    if seconds < 120:
+        wait = f"{seconds} seconds"
+    else:
+        wait = f"{math.ceil(seconds / 60)} minutes"
+    return f"Too many unsuccessful attempts. Please try again in {wait}."
+
+
 def authenticate_admin(request, username, password):
-    """Persistent account + IP throttling; never trust client-forwarded IP headers."""
+    """Persistent account + IP throttling; never trust client-forwarded IP headers.
+
+    Returns (user, error, retry_after_seconds). Failures are counted over 15 minutes.
+    Each time the limit is reached the lock gets longer (lock_steps); the steps start over
+    after a successful sign-in or 24 hours without a new lock.
+    """
     now = timezone.now()
     window = timedelta(minutes=15)
+    forget_locks_after = timedelta(hours=24)
+    steps = lock_steps()
     keys = [(salted_hmac("admin-account", username.casefold()).hexdigest(), 5),
             (salted_hmac("admin-ip", request.META.get("REMOTE_ADDR", "unknown")).hexdigest(), 20)]
     with transaction.atomic():
@@ -28,26 +52,33 @@ def authenticate_admin(request, username, password):
             AdminLoginThrottle.objects.get_or_create(key=key, defaults={"window_started": now})
             bucket = AdminLoginThrottle.objects.select_for_update().get(key=key)
             if bucket.locked_until and bucket.locked_until > now:
-                return None, "Too many unsuccessful attempts. Please try again in 15 minutes."
-            if bucket.window_started + window <= now or bucket.locked_until:
+                remaining = max(1, math.ceil((bucket.locked_until - now).total_seconds()))
+                return None, lock_message(remaining), remaining
+            if bucket.locked_until and now - bucket.locked_until > forget_locks_after:
+                bucket.lock_count, bucket.locked_until = 0, None
+            # Start counting again when the window ran out or a lock just ended
+            # (locked_until is kept so the next lock can be longer).
+            if bucket.window_started + window <= now or (bucket.locked_until and bucket.failures >= limit):
                 bucket.failures = 0
                 bucket.window_started = now
-                bucket.locked_until = None
             buckets.append((bucket, limit))
         user = authenticate(request, username=username, password=password)
         if user is not None and user.is_active and user.is_superuser:
             # Clear the account bucket only. Successful logins cannot reset IP abuse limits.
             AdminLoginThrottle.objects.filter(key=keys[0][0]).delete()
-            return user, None
-        locked = False
+            return user, None, 0
+        lock = 0
         for bucket, limit in buckets:
             bucket.failures += 1
             if bucket.failures >= limit:
-                bucket.locked_until = now + window
-                locked = True
+                seconds = steps[min(bucket.lock_count, len(steps) - 1)]
+                bucket.locked_until = now + timedelta(seconds=seconds)
+                bucket.lock_count += 1
+                lock = max(lock, seconds)
             bucket.save()
-        return None, ("Too many unsuccessful attempts. Please try again in 15 minutes."
-                      if locked else "Invalid username or password.")
+        if lock:
+            return None, lock_message(lock), lock
+        return None, "Invalid username or password.", 0
 
 
 @login_required

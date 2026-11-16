@@ -59,3 +59,5 @@ footer > span:not(.footer-end) { margin: 0 7px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
 @media (max-width: 700px) { .login-layout { grid-template-columns: 1fr; max-width: 440px; } .welcome-panel { padding: 23px; } .welcome-content { padding: 20px 0 0; } .welcome-seal, .office-label { display: none; } h1 { font-size: 25px; } h1 br { display: none; } .welcome-content p { max-width: none; font-size: 11px; } .form-panel { padding: 28px 25px; } .lock-icon { display: none; } .login-header { padding: 15px 18px; flex-wrap: wrap; gap: 13px; } .brand strong { font-size: 11px; } .brand img { width: 42px; height: 42px; } main { padding: 25px 16px; } .return-link { margin-left: auto; } .footer-end { display: block; float: none; margin-top: 7px; } }
 @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+.error-message.is-unlocked { background: #eaf7ef; border-color: #c8e6d2; color: #176b39; }
+#loginButton:disabled { cursor: not-allowed; opacity: .6; }

@@ -22,11 +22,38 @@ class AdminSecurityTests(TestCase):
         for number in range(5):
             response = self.attempt("incorrect")
         self.assertEqual(response.status_code, 429)
+        self.assertEqual(response["Retry-After"], "60")
+        self.assertContains(response, 'data-lock-seconds="60"', status_code=429)
+        self.assertContains(response, "try again in 60 seconds", status_code=429)
+        AdminLoginThrottle.objects.update(locked_until=timezone.now() + timedelta(seconds=20))
+        self.assertLessEqual(int(self.attempt(self.password)["Retry-After"]), 20)
         self.assertEqual(self.attempt(self.password).status_code, 429)
         AdminLoginThrottle.objects.update(locked_until=timezone.now() - timedelta(seconds=1))
         response = self.attempt(self.password)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(self.client.session["_auth_user_id"], str(self.user.pk))
+
+    def test_each_lock_is_longer_and_success_starts_over(self):
+        def lock_once():
+            AdminLoginThrottle.objects.update(locked_until=timezone.now() - timedelta(seconds=1))
+            for number in range(5):
+                response = self.attempt("incorrect")
+            return int(response["Retry-After"])
+
+        self.assertEqual([lock_once() for _ in range(5)], [60, 120, 300, 900, 900])
+        self.assertContains(self.attempt("incorrect"), "try again in 15 minutes", status_code=429)
+        AdminLoginThrottle.objects.update(locked_until=timezone.now() - timedelta(seconds=1))
+        self.assertEqual(self.attempt(self.password).status_code, 302)  # success clears the account bucket
+        self.client.logout()
+        self.assertEqual(lock_once(), 60)
+
+    def test_lock_steps_are_forgotten_after_a_quiet_day(self):
+        for number in range(5):
+            self.attempt("incorrect")
+        AdminLoginThrottle.objects.update(locked_until=timezone.now() - timedelta(hours=25))
+        for number in range(5):
+            response = self.attempt("incorrect")
+        self.assertEqual(response["Retry-After"], "60")
 
     def test_success_clears_account_failures(self):
         self.attempt("incorrect")

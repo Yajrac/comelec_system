@@ -4,7 +4,7 @@
 {% block body_class %}applicant-home{% endblock %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/application-help.css' %}">
-<link rel="stylesheet" href="{% static 'css/applicant-home.css' %}?v=landing-about-6">
+<link rel="stylesheet" href="{% static 'css/applicant-home.css' %}?v=status-link-1">
 {% endblock %}
 {% block content %}
 <section class="home-intro home-hero" aria-labelledby="homeTitle">
@@ -17,6 +17,7 @@
             <a class="home-hero-secondary" href="#servicesTitle">Application guide <span aria-hidden="true">&darr;</span></a>
         </div>
         <div class="home-intro-note"><span aria-hidden="true">&#10003;</span> Apply online. Complete your biometrics at the office.</div>
+        <a class="home-status-link" href="{% url 'check-status' %}">Already applied? Check your application status <span aria-hidden="true">&rarr;</span></a>
     </div>
     <div class="home-hero-visual" aria-hidden="true">
         <div class="home-hero-orbit"></div>

@@ -31,6 +31,7 @@
                     <a href="{% url 'home' %}" {% if request.resolver_match.url_name == 'home' or offline_page == 'home' %}aria-current="page"{% endif %}>Home</a>
                     <a href="{% url 'home' %}#about">About</a>
                     <a href="{% url 'new-registration' %}" {% if request.resolver_match.url_name == 'new-registration' or offline_page == 'registration' %}aria-current="page"{% endif %}>New registration</a>
+                    <a href="{% url 'check-status' %}" {% if request.resolver_match.url_name == 'check-status' %}aria-current="page"{% endif %}>Check status</a>
                     <a href="{% url 'applicant-offline' %}" {% if request.resolver_match.url_name == 'applicant-offline' or offline_page == 'saved' %}aria-current="page"{% endif %}>Offline</a>
                 </nav>
                 <span id="publicConnectionBadge" class="public-connection-badge" data-state="checking" role="status" aria-live="polite">

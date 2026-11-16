@@ -11,6 +11,8 @@ class AdminLoginThrottle(models.Model):
     failures = models.PositiveIntegerField(default=0)
     window_started = models.DateTimeField()
     locked_until = models.DateTimeField(null=True, blank=True)
+    # How many times this bucket has been locked; each lock is longer (reset on success or after 24 h).
+    lock_count = models.PositiveIntegerField(default=0)
 
 
 class ReceiptSettings(models.Model):

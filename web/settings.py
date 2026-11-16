@@ -200,6 +200,12 @@ FINGERPRINT_DEVICE_TOKEN = os.environ.get(
     "",
 )
 
+# Admin sign-in lock after 5 failed attempts (counted over 15 minutes): 1st, 2nd, 3rd, 4th+ lock in seconds.
+ADMIN_LOGIN_LOCK_STEPS = os.environ.get("ADMIN_LOGIN_LOCK_STEPS", "60,120,300,900")
+
+# Public "Check your application status" lookups allowed per minute (shared across visitors).
+STATUS_LOOKUP_MAX_PER_MINUTE = int(os.environ.get("STATUS_LOOKUP_MAX_PER_MINUTE", "60"))
+
 # Browser page burst protection. Configure a shared cache on multi-worker deployments.
 PAGE_RATE_LIMIT_REQUESTS = 30
 PAGE_RATE_LIMIT_SECONDS = 10

@@ -95,12 +95,13 @@ def admin_login(request):
             )
 
         from .admin_security import authenticate_admin
-        user, error = authenticate_admin(request, username, password)
+        user, error, retry_after = authenticate_admin(request, username, password)
         if error:
-            response = render(request, "comelec/auth/login.html", {"error": error})
-            if error.startswith("Too many"):
+            response = render(request, "comelec/auth/login.html",
+                              {"error": error, "lock_seconds": retry_after, "username": username})
+            if retry_after:
                 response.status_code = 429
-                response["Retry-After"] = "900"
+                response["Retry-After"] = str(retry_after)
             return response
 
         login(request, user)
@@ -1187,6 +1188,57 @@ def send_approval_sms(
         + f"{visit} for fingerprints and signature."
     )
     return send_sms(applicant.phone, message)
+
+
+def normalized_phone(number):
+    number = re.sub(r"\D", "", str(number or ""))
+    if number.startswith("09"):
+        number = "63" + number[1:]
+    elif number.startswith("9") and len(number) == 10:
+        number = "63" + number
+    return number if re.fullmatch(r"639\d{9}", number) else ""
+
+
+def send_duplicate_registration_sms(existing, firstname, lastname, phone, client_reference):
+    """Tell the applicant an offline-saved registration was not submitted because it is a duplicate.
+
+    Same phone as the existing registration: the same person, so the status and reference are given.
+    Different phone: only that a registration already exists. One SMS per form, one per number a day.
+    """
+    from datetime import timedelta
+    from Applicants.models import DuplicateRegistrationNotice
+
+    number = normalized_phone(phone)
+    if not number or not client_reference:
+        return False
+    if DuplicateRegistrationNotice.objects.filter(client_reference=client_reference).exists():
+        return False
+    recently = DuplicateRegistrationNotice.objects.filter(
+        phone=number, sent=True, created_at__gte=timezone.now() - timedelta(hours=24)).exists()
+    notice, created = DuplicateRegistrationNotice.objects.get_or_create(
+        client_reference=client_reference, defaults={"phone": number})
+    if not created or recently:
+        return False
+
+    name = f"{firstname} {lastname}"
+    reference = existing.registration_reference
+    same_person = normalized_phone(existing.phone) == number
+    if same_person and existing.status in ("PENDING", "REVIEW"):
+        message = (f"Hi {name}, your saved registration was not submitted again because you already have "
+                   f"a registration pending review (Ref: {reference}). Please wait for our SMS.")
+    elif same_person and existing.status == "APPROVED":
+        message = (f"Hi {name}, your saved registration was not submitted because you are already registered "
+                   f"(Ref: {reference}). For changes, use Update, Transfer, Reactivation or Reinstatement.")
+    else:
+        message = (f"Hi {name}, your saved registration was not submitted because a registration with the same "
+                   "name and birthdate already exists. Please visit Pio Duran Registration Office.")
+    try:
+        notice.sent = bool(send_sms(phone, message))
+    except Exception:  # an SMS problem must never break the registration response
+        logger.exception("Duplicate registration SMS failed.")
+        notice.sent = False
+    notice.save(update_fields=["sent"])
+    return notice.sent
 
 
 def send_disapproval_sms(applicant, application_name):

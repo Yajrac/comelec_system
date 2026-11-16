@@ -790,3 +790,11 @@ class DocumentCheck(models.Model):
     class Meta:
         ordering = ["-created_at", "-id"]
         indexes = [models.Index(fields=["application_type", "record_id"])]
+
+
+class DuplicateRegistrationNotice(models.Model):
+    """SMS sent when an offline-saved registration turned out to be a duplicate (one per form, one per number a day)."""
+    client_reference = models.CharField(max_length=100, unique=True)
+    phone = models.CharField(max_length=15, db_index=True)
+    sent = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)

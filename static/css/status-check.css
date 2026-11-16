@@ -1,0 +1,22 @@
+/* Result of "Check application status". */
+.status-result { margin-top: 14px; padding: 14px 16px; border: 1px solid #dce5f4; border-radius: 12px; background: #f8fafc; color: #142b54; font-size: 13px; }
+.status-result.is-missing { border-color: #f0caca; background: #fff6f6; color: #7f1d1d; }
+.status-missing { margin: 0; font-weight: 600; }
+.status-result-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; margin-bottom: 10px; }
+.status-result-head strong { font-size: 15px; }
+.status-result-head span { color: #66758a; font-size: 12px; overflow-wrap: anywhere; }
+.status-rows { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; align-items: center; margin: 0; }
+.status-rows dt { color: #526783; font-weight: 600; }
+.status-rows dd { margin: 0; }
+.status-pill { display: inline-block; padding: 3px 10px; border-radius: 999px; background: #edf3ff; color: #0038a8; font-size: 12px; font-weight: 700; }
+.status-pill.tone-pending { background: #fff6df; color: #795700; }
+.status-pill.tone-review { background: #e9f7fb; color: #176477; }
+.status-pill.tone-approved { background: #eaf7ef; color: #176b39; }
+.status-pill.tone-disapproved { background: #fff0f0; color: #a61b1b; }
+.status-note { margin: 12px 0 0; color: #526783; line-height: 1.55; }
+.status-requests-title { margin: 14px 0 6px; font-size: 13px; font-weight: 700; color: #142b54; }
+.status-requests { margin: 0; padding: 0; list-style: none; }
+.status-requests li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 10px; padding: 6px 0; border-top: 1px solid #e6ecf5; }
+#statusResult:empty { display: none; }
+#statusResult .status-result { margin: 20px 0 4px; }
+@media (max-width: 480px) { .status-rows { grid-template-columns: 1fr; gap: 2px; } .status-rows dd { margin-bottom: 8px; } }

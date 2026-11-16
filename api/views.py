@@ -392,12 +392,18 @@ def new_registration_api(request):
     # EMAIL CHECK
     # =========================================================
 
-    if Applicant.objects.filter(
+    existing = Applicant.objects.filter(
         lastname__iexact=lastname,
         firstname__iexact=firstname,
         middlename__iexact=middlename,
         birthdate=birthdate,
-    ).exists():
+    ).order_by("-id").first()
+    if existing:
+        # Offline-saved forms are synced while the applicant may not be looking: tell them by SMS.
+        if data.get("submitted_offline") == "1":
+            from core.views import send_duplicate_registration_sms
+            send_duplicate_registration_sms(existing, firstname, lastname, data.get("phone", ""),
+                                            data.get("client_reference", ""))
         return JsonResponse({
             "success": False,
             "error": "A registration with this full name and birthdate already exists. Please choose Update Information, Transfer, Reactivation, or Reinstatement instead.",

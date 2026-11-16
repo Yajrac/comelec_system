@@ -148,3 +148,7 @@
   .home-offline-shortcut > a { margin-left: 54px; }
   .applicant-home .application-help-panel { padding: 20px; }
 }
+
+/* Link to the status check page under the hero. */
+.home-status-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; color: #0038a8; font-size: 14px; font-weight: 700; text-decoration: none; }
+.home-status-link:hover { text-decoration: underline; }
