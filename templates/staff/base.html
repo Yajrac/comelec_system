@@ -13,6 +13,7 @@
         <link rel="stylesheet" href="{% static 'css/scrollbars.css' %}">
         <link rel="stylesheet" href="{% static 'css/web-offline.css' %}?v=sticky-header-3">
         <link rel="stylesheet" href="{% static 'css/document-check.css' %}">
+        <link rel="stylesheet" href="{% static 'css/application-dialog.css' %}">
     </head>
     <body class="{% block body_class %}{% endblock %}"{% if document_ai_enabled %} data-document-ai="1"{% endif %}>
         <header class="header public-header">
@@ -54,6 +55,7 @@
         <script src="{% static 'js/template-actions.js' %}" defer></script>
         <script src="{% static 'js/public-connection.js' %}" defer></script>
         <script src="{% static 'js/document-check.js' %}" defer></script>
+        <script src="{% static 'js/duplicate-registration-dialog.js' %}" defer></script>
         <script src="{% static 'js/web-offline.js' %}" defer></script>
     </body>
 </html>

@@ -1,4 +1,4 @@
-/* AI check of the uploaded valid ID / birth certificate before submitting.
+/* Automatic verification of the uploaded valid ID / birth certificate before submitting.
  * Forms opt in with data-document-check="NEW|UPDATE|TRANSFER|REACTIVATION|REINSTATEMENT".
  * The server checks again on submit; this script only gives the applicant the result first. */
 (() => {
@@ -60,7 +60,7 @@
     });
   }
 
-  function showChecking(text = 'Checking your document…') {
+  function showChecking(text = 'Verifying your document…') {
     render('checking', { title: text, message: 'This takes a few seconds. Please keep this page open.' });
   }
 
@@ -80,7 +80,7 @@
         buttons: [['Back', 'back'], ['Continue', 'continue', true]] });
     }
     if (result.status === 'unavailable') {
-      return render('unavailable', { title: 'Document check is unavailable right now.',
+      return render('unavailable', { title: 'Document verification is unavailable right now.',
         message: 'You can continue. The office will review your document.', buttons: [['Continue', 'continue', true]] });
     }
     const buttons = [['Upload another file', 'upload', true], ['Retake photo', 'retake']];
@@ -183,13 +183,13 @@
   function renderInline(form, result) {
     const type = result.document_type ? ` (${result.document_type})` : '';
     switch (result.status) {
-      case 'checking': return showInline(form, 'checking', 'Checking your document…');
+      case 'checking': return showInline(form, 'checking', 'Verifying your document…');
       case 'valid': return showInline(form, 'valid', `Valid document${type}. Your name will be matched with the document when you submit.`);
       case 'passed': return showInline(form, 'passed', `Valid document${type}. The name matches${result.document_name ? `: ${result.document_name}` : ''}.`);
       case 'invalid': return showInline(form, 'invalid', `This document is not valid. ${result.reason || ''}`.trim(), fixActions(form, result));
       case 'mismatch': return showInline(form, 'mismatch',
         'This document is valid, but the name on it does not match the name you entered.', fixActions(form, result));
-      case 'unavailable': return showInline(form, 'unavailable', 'Document check is unavailable right now. The office will review your document.');
+      case 'unavailable': return showInline(form, 'unavailable', 'Document verification is unavailable right now. The office will review your document.');
       case 'offline': return showInline(form, 'offline', 'You are offline. The document will be checked before it is uploaded.');
       case 'error': return showInline(form, 'invalid', result.message || 'This document could not be checked.', fixActions(form, result));
       default: inlineBox(form).hidden = true;
@@ -228,7 +228,7 @@
     try {
       let result = known?.key === key && known.result.status !== 'checking' ? known.result : null;
       if (!result) {
-        showChecking('Checking your document…');
+        showChecking('Verifying your document…');
         result = await requestCheck(file, fields);
         results.set(form, { key, result, accepted: ACCEPTED.has(result.status) });
         renderInline(form, result);
@@ -257,7 +257,7 @@
     if (!(file instanceof Blob)) return 'upload';
     const fields = { application_type: 'NEW', lastname: entriesValue(entries, 'lastname'),
       firstname: entriesValue(entries, 'firstname'), middlename: entriesValue(entries, 'middlename') };
-    showChecking(`Checking document before upload${position}…`);
+    showChecking(`Verifying document before upload${position}…`);
     const result = await requestCheck(file instanceof File ? file : new File([file], 'document'), fields);
     if (result.status === 'offline') { closeDialog(); throw new Error('offline'); }
     if (result.status === 'disabled' || result.status === 'unavailable') { closeDialog(); return 'upload'; }
@@ -285,7 +285,7 @@
     if (form.dataset.walkIn === '1') {
       const label = el('label', { class: 'doc-check-override' });
       const box = el('input', { type: 'checkbox', name: 'officer_verified', value: '1' });
-      label.append(box, document.createTextNode(' Manually verified by officer (skip the AI result for this document)'));
+      label.append(box, document.createTextNode(' Manually verified by officer (skip the automatic document check)'));
       input.insertAdjacentElement('afterend', label);
     }
     input.addEventListener('change', () => setTimeout(() => inlineCheck(form), 0));

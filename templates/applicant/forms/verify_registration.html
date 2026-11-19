@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/application-dialog.css' %}">
     <link rel="stylesheet" href="{% static 'css/segmented-date.css' %}">
     <script src="{% static 'js/segmented-date.js' %}" defer></script>
 
@@ -17,6 +18,7 @@
 {% endblock %}
 
 {% block content %}
+{% include "components/duplicate_registration_dialog.html" %}
 
     <div class="container py-4">
 
@@ -397,4 +399,7 @@
 
     </div>
 
+{% endblock %}
+{% block extra_js %}
+    <script src="{% static 'js/duplicate-registration-dialog.js' %}" defer></script>
 {% endblock %}

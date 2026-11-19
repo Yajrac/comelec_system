@@ -225,5 +225,8 @@ GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
 DOCUMENT_AI_MAX_PER_MINUTE = int(os.environ.get("DOCUMENT_AI_MAX_PER_MINUTE", "10"))
 # Keep well under Gunicorn's default 30-second worker timeout.
 DOCUMENT_AI_TIMEOUT_SECONDS = int(os.environ.get("DOCUMENT_AI_TIMEOUT_SECONDS", "20"))
+# New Registration and service requests must name the document type and include a selfie.
+REQUIRE_ID_TYPE_AND_SELFIE = True
 if len(sys.argv) > 1 and sys.argv[1] == "test":
+    REQUIRE_ID_TYPE_AND_SELFIE = False  # most tests post minimal forms; test_id_type_selfie turns it on
     DOCUMENT_AI_PROVIDER = ""  # tests never call the real AI; they mock it explicitly

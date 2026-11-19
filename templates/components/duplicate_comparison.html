@@ -1,0 +1,33 @@
+{% comment %}Side-by-side comparison of a possible duplicate (new) and the existing record (old).{% endcomment %}
+<section class="duplicate-compare alert alert-warning" aria-labelledby="duplicateCompareTitle">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-2">
+        <div>
+            <h2 class="h6 mb-1" id="duplicateCompareTitle"><strong>Possible duplicate.</strong> Compare both records before deciding.</h2>
+            <small>Same or similar name and the same birthdate. Disapprove this one if it is the same person; approve it if they are different people.</small>
+        </div>
+        <a class="btn btn-sm btn-outline-dark" href="{% url 'admin-application-new-detail' old.id %}">Open existing record</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered align-middle mb-0 duplicate-compare-table">
+            <thead class="table-light">
+                <tr><th scope="col">Detail</th><th scope="col">This registration</th><th scope="col">Existing record</th></tr>
+            </thead>
+            <tbody>
+                <tr><th scope="row">Name</th><td>{{ new.lastname }}, {{ new.firstname }} {{ new.middlename }} {{ new.suffix }}</td><td>{{ old.lastname }}, {{ old.firstname }} {{ old.middlename }} {{ old.suffix }}</td></tr>
+                <tr><th scope="row">Birthdate</th><td>{{ new.birthdate|date:"M d, Y" }}</td><td>{{ old.birthdate|date:"M d, Y" }}</td></tr>
+                <tr><th scope="row">Birthplace</th><td>{{ new.birthplace|default:"—" }}</td><td>{{ old.birthplace|default:"—" }}</td></tr>
+                <tr><th scope="row">Sex</th><td>{{ new.sex|default:"—" }}</td><td>{{ old.sex|default:"—" }}</td></tr>
+                <tr><th scope="row">Father</th><td>{{ new.father|default:"—" }}</td><td>{{ old.father|default:"—" }}</td></tr>
+                <tr><th scope="row">Mother</th><td>{{ new.mother|default:"—" }}</td><td>{{ old.mother|default:"—" }}</td></tr>
+                <tr><th scope="row">Barangay</th><td>{{ new.brgy.name|default:"—" }}</td><td>{{ old.brgy.name|default:"—" }}</td></tr>
+                <tr><th scope="row">Phone</th><td>{{ new.phone|default:"—" }}</td><td>{{ old.phone|default:"—" }}</td></tr>
+                <tr><th scope="row">Submitted</th><td>{{ new.date_joined|date:"M d, Y" }}</td><td>{{ old.date_joined|date:"M d, Y" }}</td></tr>
+                <tr><th scope="row">Status</th><td>{{ new.get_status_display }}</td><td>{{ old.get_status_display }} &middot; {{ old.get_verification_status_display }}</td></tr>
+                <tr><th scope="row">Photo</th>
+                    <td>{% if new.photo %}<a href="{{ new.photo.url }}" target="_blank" rel="noopener"><img src="{{ new.photo.url }}" alt="Photo in this registration" width="72" height="72" loading="lazy" class="rounded border"></a>{% else %}—{% endif %}</td>
+                    <td>{% if old.photo %}<a href="{{ old.photo.url }}" target="_blank" rel="noopener"><img src="{{ old.photo.url }}" alt="Photo in the existing record" width="72" height="72" loading="lazy" class="rounded border"></a>{% else %}—{% endif %}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>

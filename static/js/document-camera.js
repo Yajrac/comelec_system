@@ -1,7 +1,7 @@
 /* "Take a photo" for the Valid ID / Birth Certificate upload.
  * Phones open the back camera app; computers show a live webcam preview.
  * The photo is put into the normal file input, so validation, previews,
- * offline drafts and the AI document check all work as with an uploaded file. */
+ * offline drafts and the document verification all work as with an uploaded file. */
 (() => {
   if (window.documentCamera) return;
 

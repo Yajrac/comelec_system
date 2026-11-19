@@ -593,7 +593,9 @@ def admin_applications(request):
                 Q(phone__icontains=search)
             )
 
-        if status:
+        if status == "POSSIBLE_DUPLICATE":
+            applicants = applicants.filter(possible_duplicate_of__isnull=False)
+        elif status:
             applicants = applicants.filter(
                 status=status
             )

@@ -305,6 +305,11 @@ function submitApplication() {
         return;
     }
 
+    if (window.requireSelfie && !window.requireSelfie()) {
+        backToForm();
+        return;
+    }
+
     const applicationType = form.querySelector(
         'input[name="application_type"]'
     );
@@ -315,7 +320,7 @@ function submitApplication() {
 
     const submitButton = document.getElementById("submitButton");
 
-    // AI document check first (valid ID / birth certificate and matching name).
+    // Document verification first (valid ID / birth certificate and matching name).
     // Offline it resolves true and the check runs before the saved form is uploaded.
     if (window.documentCheck && !submitApplication.documentChecked) {
         submitButton.disabled = true;

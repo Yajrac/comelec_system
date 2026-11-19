@@ -595,6 +595,7 @@
                                     <path d="M12 3v12" />
                                 </svg>
 
+                                {% include "components/valid_id_type_field.html" %}
                                 <label for="valid_id_document" class="form-label">
                                     Upload Valid ID and Birth Certificate{% if applicant.valid_id_document %} (optional){% else %} <span class="required-mark">*</span>{% endif %}
                                 </label>

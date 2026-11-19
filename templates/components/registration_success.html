@@ -40,6 +40,13 @@
 
             <!-- BODY -->
             <div class="success-body">
+                {% if applicant.possible_duplicate_of_id %}
+                    <div class="notice-box" role="status">
+                        <p><strong>Pending &ndash; possible duplicate.</strong></p>
+                        <p>Your registration was received, but it is similar to an existing record with the same
+                        name and birthdate. The office will review it and send you an SMS.</p>
+                    </div>
+                {% endif %}
                 <section class="registration-reference-card" aria-labelledby="reference-title">
                     <h3 id="reference-title">Your registration reference</h3>
                     <div class="reference-copy-row">

@@ -1,0 +1,34 @@
+{% load static %}
+{% comment %}
+"Registration already exists" modal. duplicate_dialog = {"officer": bool, "existing": Applicant}.
+Applicants see no details of the existing record; officers (walk-in) see its name and status.
+{% endcomment %}
+{% if duplicate_dialog %}
+    <dialog id="duplicateRegistrationDialog" class="pending-correction-dialog duplicate-registration-dialog" data-auto-open
+            aria-labelledby="duplicateRegistrationTitle" aria-describedby="duplicateRegistrationMessage" open>
+        <div class="pending-correction-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.5" r=".9" fill="currentColor" stroke="none"/></svg>
+        </div>
+        <h2 id="duplicateRegistrationTitle" tabindex="-1">Registration already exists</h2>
+        {% if duplicate_dialog.officer %}
+            <p id="duplicateRegistrationMessage">
+                A registration with this name and birthdate already exists:
+                <strong>{{ duplicate_dialog.existing.lastname }}, {{ duplicate_dialog.existing.firstname }} {{ duplicate_dialog.existing.middlename }}</strong>
+                ({{ duplicate_dialog.existing.get_status_display }}).
+            </p>
+            <div class="duplicate-dialog-actions">
+                <a class="duplicate-dialog-primary" href="{% url 'admin-application-new-detail' duplicate_dialog.existing.id %}">Open existing record</a>
+                <form method="dialog"><button type="submit">Back</button></form>
+            </div>
+        {% else %}
+            <p id="duplicateRegistrationMessage">
+                A registration with this name and birthdate already exists. If this is you, you don't need to register again.
+            </p>
+            <div class="duplicate-dialog-actions">
+                <a class="duplicate-dialog-primary" href="{% url 'check-status' %}">Check my status</a>
+                <a href="{% url 'home' %}#applicationHelp">Choose another service</a>
+                <form method="dialog"><button type="submit">Back</button></form>
+            </div>
+        {% endif %}
+    </dialog>
+{% endif %}

@@ -10,6 +10,7 @@
     >
 {% endblock %}
 {% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/application-dialog.css' %}">
     <link rel="stylesheet" href="{% static 'css/document-check.css' %}">
     <link rel="stylesheet" href="{% static 'css/segmented-date.css' %}">
     <script src="{% static 'js/segmented-date.js' %}" defer></script>
@@ -20,6 +21,7 @@
 {% endblock %}
 
 {% block content %}
+{% include "components/duplicate_registration_dialog.html" %}
     {% if not request.walk_in_base %}
         {% include 'components/web_offline_panel.html' with form_only=True %}
         <p id="webRegistrationStatus" class="web-registration-status" role="status" aria-live="polite"></p>
@@ -438,6 +440,7 @@
                     <div class="form-section-body">
                         <div class="document-upload-box">
 
+                            {% include "components/valid_id_type_field.html" with required=True %}
                             <label for="valid_id_document" class="form-label">
                                 Upload Valid ID and Birth Certificate
                                 <span class="required">*</span>
@@ -558,6 +561,7 @@
 {% endblock %}
 
 {% block extra_js %}
+    <script src="{% static 'js/duplicate-registration-dialog.js' %}" defer></script>
     <script src="{% static 'js/application-submit-state.js' %}"></script>
     <script src="{% static 'js/document-camera.js' %}"></script>
     <script src="{% static 'js/document-check.js' %}"></script>

@@ -17,3 +17,15 @@
 @keyframes correction-backdrop-in { from { background-color: transparent; } to { background-color: #142b5466; } }
 @keyframes correction-backdrop-out { from { background-color: #142b5466; } to { background-color: transparent; } }
 @media (prefers-reduced-motion: reduce) { .pending-correction-dialog[open], .pending-correction-dialog[open]::backdrop { animation: none; } }
+
+/* Duplicate registration modal: up to three actions, wrapping on phones. */
+.duplicate-dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.duplicate-dialog-actions form { margin: 0; }
+.duplicate-dialog-actions a, .duplicate-dialog-actions button { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 10px 16px; border: 1px solid #dce5f4; border-radius: 8px; background: #fff; color: #526783; font: inherit; font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer; }
+.duplicate-dialog-actions .duplicate-dialog-primary { border-color: #0038a8; background: #0038a8; color: #fff; }
+.duplicate-dialog-actions a:focus-visible, .duplicate-dialog-actions button:focus-visible { outline: 3px solid #d5af3a; outline-offset: 2px; }
+.duplicate-registration-dialog .duplicate-dialog-references { margin: 0 0 20px; padding: 0; list-style: none; }
+.duplicate-registration-dialog .duplicate-dialog-references li { display: grid; gap: 2px; padding: 10px 12px; border: 1px solid #dce5f4; border-radius: 10px; background: #f8fafc; }
+.duplicate-registration-dialog .duplicate-dialog-references span { color: #64748b; font-size: 12px; font-weight: 600; }
+.duplicate-registration-dialog .duplicate-dialog-references strong { color: #142b54; font-size: 13px; overflow-wrap: anywhere; }
+@media (max-width: 480px) { .duplicate-dialog-actions a, .duplicate-dialog-actions button, .duplicate-dialog-actions form { flex: 1 1 100%; } .duplicate-dialog-actions form button { width: 100%; } }

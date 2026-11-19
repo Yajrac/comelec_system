@@ -214,7 +214,7 @@ class ProfileSubmissionTests(TestCase):
         data = {**self.personal_data(), "firstname": "juan", "lastname": "cruz",
                 "valid_id_document": SimpleUploadedFile("id.pdf", b"%PDF-1.7 document")}
         response = self.client.post(reverse("new-registration"), data)
-        self.assertContains(response, "full name and birthdate already exists")
+        self.assertContains(response, "Registration already exists")  # duplicate modal
         self.assertEqual(Applicant.objects.count(), 1)
         self.assertContains(response, 'value="juan"')
 

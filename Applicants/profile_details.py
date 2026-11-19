@@ -53,6 +53,8 @@ def profile_values(request, applicant=None):
 
 
 def apply_profile_details(application, applicant):
+    if getattr(application, "valid_id_type", ""):
+        applicant.valid_id_type = application.valid_id_type
     if application.profile_details_provided:
         for field in ("suffix", "is_indigenous", "is_illiterate", "photo"):
             setattr(applicant, field, getattr(application, field))

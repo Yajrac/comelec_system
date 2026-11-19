@@ -45,18 +45,18 @@
             takeLabel.textContent = "Retake Selfie";
             status.textContent = "Photo selected. It will be saved when you submit the application.";
         } catch {
-            status.textContent = "Your browser cannot attach a camera photo. Please use the photo upload field instead.";
+            status.textContent = "Your browser cannot attach a camera photo. Please use another browser or phone.";
         }
     }
 
     take.addEventListener("click", async () => {
         if (!window.isSecureContext) {
-            status.textContent = "Live camera requires HTTPS or localhost. You can use the device camera picker or upload a photo instead.";
+            status.textContent = "Opening your device camera.";
             native.click();
             return;
         }
         if (!navigator.mediaDevices?.getUserMedia) {
-            status.textContent = "Use your device's camera picker, or upload a photo if a camera is unavailable.";
+            status.textContent = "Opening your device camera.";
             native.click();
             return;
         }
@@ -84,11 +84,11 @@
             if (current !== session) return;
             stopCamera();
             const messages = {
-                NotAllowedError: "Camera access was blocked. Allow camera access in your browser, then try again, or upload a photo.",
-                NotFoundError: "No camera was found. Connect a camera or upload a photo.",
-                NotReadableError: "The camera is busy or unavailable. Close other camera apps and try again, or upload a photo."
+                NotAllowedError: "Camera access was blocked. Allow camera access in your browser settings, then try again.",
+                NotFoundError: "No camera was found. Use a phone or a computer with a camera.",
+                NotReadableError: "The camera is busy or unavailable. Close other camera apps and try again."
             };
-            status.textContent = messages[failure.name] || "Could not open the camera. Try again or upload a photo.";
+            status.textContent = messages[failure.name] || "Could not open the camera. Please try again.";
         }
     });
 
@@ -107,7 +107,7 @@
         const context = canvas.getContext("2d");
         if (!context) {
             capture.disabled = false;
-            status.textContent = "Could not capture the photo. Please upload a photo instead.";
+            status.textContent = "Could not capture the photo. Please try again.";
             return;
         }
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -135,6 +135,21 @@
         if (native.files[0]) selectPhoto(native.files[0]);
         native.value = "";
     });
+
+    // A selfie is required; block submitting without one and point the applicant to the camera.
+    window.requireSelfie = () => {
+        if (photo.files && photo.files.length) return true;
+        error.textContent = "Take a selfie before submitting.";
+        photo.closest(".profile-fields")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        take.focus({ preventScroll: true });
+        return false;
+    };
+    photo.addEventListener("change", () => { if (photo.files.length) error.textContent = ""; });
+    document.addEventListener("submit", event => {
+        if (event.target !== photo.form || window.requireSelfie()) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+    }, true);
 
     window.addEventListener("pagehide", stopCamera);
     document.addEventListener("visibilitychange", () => {

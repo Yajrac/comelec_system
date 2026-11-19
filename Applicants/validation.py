@@ -43,6 +43,10 @@ def validate_inputs(data, files=None):
                 continue
             if len(value) > 255 or not name_is_valid(value):
                 errors[key] = LABELS[key] + " must contain letters, spaces, hyphens, apostrophes, or periods only (maximum 255 characters)."
+        elif key == "valid_id_type":
+            from .id_types import VALID_ID_CODES
+            if raw not in VALID_ID_CODES and raw != "":
+                errors[key] = "Select a valid type of document."
         elif key == "phone" and not re.fullmatch(r"09[0-9]{9}", str(raw).strip()):
             errors[key] = "Enter an 11-digit Philippine mobile number starting with 09."
         elif key == "email":
@@ -113,6 +117,34 @@ def validate_inputs(data, files=None):
     return errors
 
 
+# Web submissions that must name the document type and include a selfie (view -> submit action).
+SUBMISSIONS = {
+    "new_registration": None, "new_registration_api": None,
+    "update_registration": "submit_update", "transfer_registration": "submit_transfer",
+    "reactivate_registration": "submit_reactivation", "reinstate_registration": "submit_reinstatement",
+}
+
+
+def submission_requirements(view_name, request, data):
+    """Document type for every uploaded document, and a selfie on every web submission."""
+    from django.conf import settings
+    from .id_types import VALID_ID_CODES
+    if view_name not in SUBMISSIONS or not getattr(settings, "REQUIRE_ID_TYPE_AND_SELFIE", True):
+        return {}
+    if request.content_type == "application/json":
+        return {}  # the old mobile app does not send these
+    action = SUBMISSIONS[view_name]
+    if action is not None and data.get("action") != action:
+        return {}
+    errors = {}
+    new_document = request.FILES.get("valid_id_document")
+    if (new_document or action is None) and data.get("valid_id_type") not in VALID_ID_CODES:
+        errors["valid_id_type"] = "Choose the type of document you are uploading."
+    if not request.FILES.get("photo"):
+        errors["photo"] = "Take a selfie before submitting."
+    return errors
+
+
 def validate_request(template=None, api=False):
     def decorate(view):
         @wraps(view)
@@ -142,6 +174,7 @@ def validate_request(template=None, api=False):
                 except (ValueError, TypeError):
                     pass
             errors = validate_inputs(data, request.FILES)
+            errors.update(submission_requirements(view.__name__, request, data))
             if api and data.get("profile_details_provided") == "1" and view.__name__ in {
                 "create_applicant_update_request", "create_applicant_transfer_request",
                 "create_applicant_reactivation_request", "create_applicant_reinstatement_request",

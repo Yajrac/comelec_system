@@ -14,6 +14,13 @@ from datetime import date
 from django.utils.dateparse import parse_date
 from django.utils import timezone
 
+def duplicate_dialog_for(request, existing):
+    """Officers at a walk-in see which record it is; applicants see no details of it."""
+    user = getattr(request, "user", None)
+    officer = bool(getattr(request, "walk_in_base", None) and user and user.is_authenticated and user.is_superuser)
+    return {"officer": officer, "existing": existing}
+
+
 def home(request):
     return render(request, "applicant/home.html")
 
@@ -194,17 +201,18 @@ def new_registration(request):
                 "Please enter a valid email address."
             )
 
-        if Applicant.objects.filter(
-            lastname__iexact=lastname,
-            firstname__iexact=firstname,
-            middlename__iexact=middlename,
-            birthdate=parsed_birthdate,
-        ).exists():
-            return render_error(
-                "A registration with this full name and birthdate already exists. "
-                "Please choose Update / Correction, Transfer, Reactivation, or Reinstatement instead."
-            )
+        from .duplicates import CERTAIN, find_duplicate
+        level, existing = find_duplicate(lastname, firstname, middlename, parsed_birthdate)
+        possible_duplicate = existing if level and level != CERTAIN else None
+        if level == CERTAIN:
+            return render(request, template_name, {
+                "barangays": barangays,
+                "form_data": request.POST,
+                "duplicate_dialog": duplicate_dialog_for(request, existing),
+            })
 
+        if possible_duplicate and email and Applicant.objects.filter(email__iexact=email).exists():
+            email = ""  # the email stays on the existing record; it must be unique
         if email and Applicant.objects.filter(email__iexact=email).exists():
             return render_error(
                 "An applicant with this email address already exists."
@@ -330,6 +338,7 @@ def new_registration(request):
 
             # UPLOADED DOCUMENT
             valid_id_document=uploaded_document,
+            valid_id_type=request.POST.get("valid_id_type", ""),
 
             is_active=True,
             is_senior=applicant_age >= 60,
@@ -339,6 +348,8 @@ def new_registration(request):
             setattr(applicant, field, value)
         applicant.save()
         link_document_check(document_check, "NEW", applicant.id)
+        if possible_duplicate:
+            Applicant.objects.filter(pk=applicant.pk).update(possible_duplicate_of=possible_duplicate)
 
         # =====================================================
         # REDIRECT TO SUCCESS PAGE
@@ -433,21 +444,18 @@ def verify_new_registration(request):
                 }
             )
 
-        applicant = Applicant.objects.filter(
-            lastname__iexact=lastname,
-            firstname__iexact=firstname,
-            middlename__iexact=middlename,
-            birthdate=birthdate,
-        ).first()
+        from .duplicates import CERTAIN, find_duplicate
+        level, applicant = find_duplicate(lastname, firstname, middlename, birthdate)
 
-        if applicant:
+        # Only a certain match stops here; a possible one continues and is reviewed by the office.
+        if level == CERTAIN:
 
             return render(
                 request,
                 "applicant/forms/verify_registration.html",
                 {
-                    "applicant": applicant,
                     "form_data": request.POST,
+                    "duplicate_dialog": duplicate_dialog_for(request, applicant),
                 }
             )
 
@@ -890,6 +898,7 @@ def update_registration(request):
 
             # Requires a FileField on ApplicantUpdateRequest.
             valid_id_document=valid_id_document or applicant.valid_id_document.name,
+            valid_id_type=request.POST.get("valid_id_type", "") if valid_id_document else applicant.valid_id_type,
 
             status="PENDING",
         )
@@ -1136,6 +1145,7 @@ def transfer_registration(request):
             new_province=new_province,
             reason=reason,
             valid_id_document=valid_id_document or applicant.valid_id_document.name,
+            valid_id_type=request.POST.get("valid_id_type", "") if valid_id_document else applicant.valid_id_type,
             status="PENDING",
         )
 
@@ -1361,6 +1371,7 @@ def reactivate_registration(request):
             applicant=applicant,
             reason=reason,
             valid_id_document=valid_id_document or applicant.valid_id_document.name,
+            valid_id_type=request.POST.get("valid_id_type", "") if valid_id_document else applicant.valid_id_type,
             status="PENDING",
         )
 
@@ -1594,6 +1605,7 @@ def reinstate_registration(request):
                 applicant=applicant,
                 reason=reason,
                 valid_id_document=valid_id_document or applicant.valid_id_document.name,
+            valid_id_type=request.POST.get("valid_id_type", "") if valid_id_document else applicant.valid_id_type,
                 status="PENDING",
             )
         )

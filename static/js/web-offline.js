@@ -44,7 +44,17 @@
         try {
             const references = document.getElementById('webSyncSuccessReferences');
             references.replaceChildren();
-            const items = confirmed.splice(0);
+            const all = confirmed.splice(0);
+            // Saved but pending as a possible duplicate: a separate modal, not "submitted successfully".
+            const duplicates = all.filter(item => item.possibleDuplicate);
+            const items = all.filter(item => !item.possibleDuplicate);
+            if (duplicates.length) {
+                duplicates.forEach(item => resetSubmittedForm(item.id));
+                await renderRecords();
+                if (window.showDuplicateDialog) {
+                    await window.showDuplicateDialog({mode: 'pending', references: duplicates.map(item => item.reference)});
+                }
+            }
             // Older versions kept confirmed uploads as "submitted"; show unseen ones once, then remove them.
             for (const record of await read()) {
                 if (record.status !== 'submitted') continue;
@@ -79,7 +89,7 @@
         if (response.ok && data?.success && data.registration_reference) return {kind: 'success', data};
         if (response.status === 413) return {kind: 'invalid', error: 'The attached files are too large. Use smaller or compressed photos of your documents, then submit again.'};
         if (response.status >= 400 && response.status < 500 && ![408, 429].includes(response.status)) {
-            return {kind: 'invalid', error: data?.error || data?.message || 'Please review the application.'};
+            return {kind: 'invalid', error: data?.error || data?.message || 'Please review the application.', code: data?.code};
         }
         return {kind: 'retry'};
     }
@@ -301,7 +311,7 @@
             let position = 0;
             for (const record of queue) {
                 position++;
-                // The applicant reviews each AI document check, so only check while the page is visible.
+                // The applicant reviews each document verification, so only check while the page is visible.
                 if (window.documentCheck && document.hidden) break;
                 const active = await change(record.id, current => {
                     if (!current || !['pending', 'syncing'].includes(current.status)) throw new Error('Queue changed. Retry sync.');
@@ -329,7 +339,8 @@
                         const {data} = result;
                         // Confirmed by the server: drop the local copy and its attachments.
                         await change(active.id, () => null);
-                        confirmed.push({id: active.id, reference: data.registration_reference, applicantId: data.applicant_id, successUrl: data.success_url});
+                        confirmed.push({id: active.id, reference: data.registration_reference, applicantId: data.applicant_id, successUrl: data.success_url,
+                            possibleDuplicate: Boolean(data.possible_duplicate)});
                         notice('Application uploaded successfully.');
                     } else if (result.kind === 'invalid') {
                         await change(active.id, current => ({...current, status: 'needs-correction', error: result.error, updated: Date.now()}));
@@ -380,6 +391,7 @@
                     if (result.kind === 'invalid') {
                         notice(result.error);
                         if (typeof window.backToForm === 'function') window.backToForm();
+                        if (result.code === 'DUPLICATE_REGISTRATION') window.showDuplicateDialog?.({mode: 'exists'});
                         return;
                     }
                     // Connection dropped or server unavailable: fall through and queue it. The same

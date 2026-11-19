@@ -3,17 +3,30 @@ import uuid
 from django.conf import settings
 from django.db import models
 from .application_types import APPLICATION_TYPE_CHOICES
+from .id_types import VALID_ID_TYPES
 from .profile_details import SUFFIX_CHOICES, validate_photo, photo_upload_path
 
 
 class ProfileDetails(models.Model):
     suffix = models.CharField(max_length=5, choices=SUFFIX_CHOICES, blank=True, default="")
+    # Type of identification document the applicant said they uploaded (see id_types.py).
+    valid_id_type = models.CharField(max_length=30, choices=VALID_ID_TYPES, blank=True, default="")
     photo = models.ImageField(upload_to=photo_upload_path, blank=True, validators=[validate_photo])
     is_indigenous = models.BooleanField(default=False)
     is_illiterate = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
+
+    TIDY_FIELDS = ("lastname", "firstname", "middlename", "birthplace", "father", "mother")
+
+    def save(self, *args, **kwargs):
+        # Remove stray spaces so names compare, search and print consistently.
+        from .duplicates import tidy
+        for field in self.TIDY_FIELDS:
+            if isinstance(getattr(self, field, None), str):
+                setattr(self, field, tidy(getattr(self, field)))
+        super().save(*args, **kwargs)
 
 
 class RequestedProfileDetails(ProfileDetails):

@@ -392,18 +392,16 @@ def new_registration_api(request):
     # EMAIL CHECK
     # =========================================================
 
-    existing = Applicant.objects.filter(
-        lastname__iexact=lastname,
-        firstname__iexact=firstname,
-        middlename__iexact=middlename,
-        birthdate=birthdate,
-    ).order_by("id").first()  # the original registration, not a later possible duplicate
-    # Offline-saved forms synced later are kept as PENDING possible duplicates for the office to
-    # review, and the applicant is told by SMS. Online submissions are refused on the page.
-    possible_duplicate = existing if existing and data.get("submitted_offline") == "1" else None
+    # Certain duplicates are refused online; possible ones (blank or initial middle name...) and
+    # every duplicate synced from offline are kept as PENDING possible duplicates for the office.
+    from Applicants.duplicates import CERTAIN, find_duplicate
+    submitted_offline = data.get("submitted_offline") == "1"
+    level, existing = find_duplicate(lastname, firstname, middlename, birthdate)
+    possible_duplicate = existing if existing and (submitted_offline or level != CERTAIN) else None
     if existing and not possible_duplicate:
         return JsonResponse({
             "success": False,
+            "code": "DUPLICATE_REGISTRATION",
             "error": "A registration with this full name and birthdate already exists. Please choose Update Information, Transfer, Reactivation, or Reinstatement instead.",
         }, status=400)
 
@@ -462,6 +460,7 @@ def new_registration_api(request):
             is_illiterate=data.get("is_illiterate") == "on",
             photo=request.FILES.get("photo") or "",
             valid_id_document=request.FILES.get("valid_id_document"),
+            valid_id_type=str(data.get("valid_id_type", ""))[:30],
 
             lastname=lastname,
 
@@ -531,8 +530,9 @@ def new_registration_api(request):
     link_document_check(document_check, "NEW", applicant.id)
     if possible_duplicate:
         Applicant.objects.filter(pk=applicant.pk).update(possible_duplicate_of=possible_duplicate)
-        from core.views import send_duplicate_registration_sms
-        send_duplicate_registration_sms(applicant, data.get("client_reference", ""))
+        if submitted_offline:  # online applicants see it on the page instead
+            from core.views import send_duplicate_registration_sms
+            send_duplicate_registration_sms(applicant, data.get("client_reference", ""))
 
     return JsonResponse(
         {
@@ -541,6 +541,7 @@ def new_registration_api(request):
             "applicant_id": applicant.id,
             "registration_reference": applicant.registration_reference,
             "success_url": reverse('registration-success', args=[applicant.id]),
+            "possible_duplicate": bool(possible_duplicate),
             "application_type": applicant.application_type,
             "status": applicant.status,
             "verification_status": applicant.verification_status,
