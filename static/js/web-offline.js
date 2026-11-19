@@ -360,6 +360,8 @@
             if (!submitting) await showSuccess().catch(fail);
         }
     }
+    // Back from the success page (page restored from memory): allow a new submission.
+    window.addEventListener('pageshow', event => { if (event.persisted) { queueing = false; submitting = false; } });
     window.webOfflineRegistration = {
         async submit(currentForm, button) {
             if (queueing || submitting) return;
@@ -411,7 +413,11 @@
                 notice('No connection. Saved on this device; it will upload automatically when you are back online.');
                 location.href = '/offline/';
             } catch (error) { fail(error); queueing = false; }
-            finally { button.disabled = false; submitting = false; }
+            finally {
+                submitting = false;
+                // Leaving for the success or offline page: keep the spinner until the page changes.
+                if (!queueing) { button.disabled = false; window.resetApplicationButton?.(button); }
+            }
         }
     };
     async function prepareOffline() {

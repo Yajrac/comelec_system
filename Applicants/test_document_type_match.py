@@ -93,3 +93,36 @@ class TypeFlowTests(TestCase):
         response = self.client.get(f'/comelec/admin-applications/new/{applicant.pk}/')
         self.assertContains(response, 'Postal ID')
         self.assertContains(response, "LTO Driver&#x27;s License / Student Permit")
+
+
+class NotAcceptedTests(SimpleTestCase):
+    def test_school_id_is_blocked_even_when_read_as_valid(self):
+        for name in ('School ID', 'Student ID', 'University ID', 'Cedula', 'Community Tax Certificate',
+                     'PNP Clearance', 'Police Clearance', 'Library Card'):
+            school = dict(coded(''), document_type=name)
+            status, reason = evaluate(school, EXPECTED, 'PHILSYS')
+            self.assertEqual(status, 'invalid', name)
+            self.assertIn('not accepted', reason)
+
+    def test_accepted_names_are_not_caught(self):
+        for name in ("LTO Student Permit", 'NBI Clearance', 'PSA Birth Certificate', 'Barangay Certification'):
+            self.assertEqual(evaluate(dict(coded(''), document_type=name), EXPECTED, '')[0], 'passed', name)
+
+
+@override_settings(**AI_ON)
+class StaleReadingTests(TestCase):
+    @patch('Applicants.document_check.ask_gemini')
+    def test_reading_from_older_instructions_is_read_again(self, ask):
+        from Applicants.document_check import check_document
+        import hashlib
+        file = pdf(b'school')
+        digest = hashlib.sha256(file.read()).hexdigest()
+        file.seek(0)
+        old = dict(reading(), document_type='School ID')  # saved before the new rules: no version
+        DocumentCheck.objects.create(status='passed', ai_checked=True, ai_result=old, file_digest=digest)
+        ask.return_value = coded('', valid=False, reason='A school ID is not accepted.')
+        check = check_document(file, EXPECTED, 'NEW', 'PHILSYS')
+        self.assertEqual(ask.call_count, 1)
+        self.assertEqual(check.status, 'invalid')
+        check_document(file, EXPECTED, 'NEW', 'PHILSYS')
+        self.assertEqual(ask.call_count, 1)  # the new reading is reused

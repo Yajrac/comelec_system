@@ -352,6 +352,7 @@ function submitApplication() {
     }
 
     if (window.webOfflineRegistration) {
+        window.setApplicationSubmitting(submitButton);
         window.webOfflineRegistration.submit(form, submitButton);
         return;
     }
