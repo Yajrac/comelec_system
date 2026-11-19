@@ -207,6 +207,24 @@ function showReview() {
         return;
     }
 
+    if (window.requireSelfie && !window.requireSelfie()) {
+        return;
+    }
+
+    // Verify the document (type, validity and name) before showing the review.
+    const reviewButton = document.getElementById("reviewButton");
+    if (window.documentCheck && !showReview.documentChecked) {
+        if (reviewButton.disabled) return;
+        window.setApplicationSubmitting(reviewButton, "Checking document...");
+        window.documentCheck.ensure(form).then(function (ok) {
+            window.resetApplicationButton(reviewButton);
+            if (!ok) return;
+            showReview.documentChecked = true;
+            try { showReview(); } finally { showReview.documentChecked = false; }
+        });
+        return;
+    }
+
     setReview("review_lastname", getValue("lastname"));
     setReview("review_firstname", getValue("firstname"));
 

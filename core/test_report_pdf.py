@@ -13,7 +13,7 @@ class SummaryLogoTests(SimpleTestCase):
             return original(canvas, *args, **kwargs)
         rows = [{"name": "Barangay " + str(index), "total": index} for index in range(100)]
         with patch.object(Canvas, "drawImage", autospec=True, side_effect=draw):
-            response = download_summary("Barangay Report", rows, [("name", "Barangay"), ("total", "Total")], "All years")
+            response = download_summary("Municipal Report", rows, [("name", "Barangay"), ("total", "Total")], "All years")
         self.assertTrue(response.content.startswith(b"%PDF-"))
         self.assertIn(b"/Subtype /Image", response.content)
         self.assertGreater(len(pages), 1)

@@ -107,11 +107,6 @@ urlpatterns = [
     ),
 
     path(
-        "admin-applicants/<int:applicant_id>/suspend/",
-        views.admin_suspend_applicant,
-        name="admin-suspend-applicant"
-    ),
-    path(
         "admin-reports/",
         views.admin_reports,
         name="admin-reports"

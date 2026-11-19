@@ -639,26 +639,10 @@
     </div>
 
 
-    <dialog id="deleteApplicationDialog" class="admin-action-dialog delete-application-dialog" data-kind="delete" aria-labelledby="deleteApplicationTitle" aria-describedby="deleteApplicationSummary">
-        <div class="admin-action-dialog-icon" aria-hidden="true"><i class="bi bi-exclamation-triangle"></i></div>
-        <h2 id="deleteApplicationTitle" tabindex="-1">Permanently delete?</h2>
-        <p id="deleteApplicationSummary" class="delete-application-summary"></p>
-        <div class="delete-application-warning" role="note">
-            <strong>This cannot be undone.</strong>
-            <ul id="deleteApplicationEffects"></ul>
-        </div>
-        <label for="deleteApplicationConfirm" class="delete-application-label">Type <strong>DELETE</strong> to confirm</label>
-        <input id="deleteApplicationConfirm" class="form-control delete-application-input" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="deleteApplicationHint">
-        <p id="deleteApplicationHint" class="delete-application-hint">Capital letters, exactly as shown.</p>
-        <div class="admin-action-dialog-buttons">
-            <button type="button" id="deleteApplicationCancel">Cancel</button>
-            <button type="button" id="deleteApplicationSubmit" class="delete-application-submit" disabled>Delete permanently</button>
-        </div>
-    </dialog>
+    {% include "components/delete_application_dialog.html" %}
 
 {% endblock %}
 {% block extra_js %}
-    <script src="{% static 'js/delete-application-dialog.js' %}" defer></script>
     <script src="{% static 'js/application-date-filters.js' %}" defer></script>
     <script src="{% static 'js/application-search.js' %}" defer></script>
 {% endblock %}

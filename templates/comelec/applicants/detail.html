@@ -47,16 +47,22 @@
 
                 <form
                     method="post"
-                    action="{% url 'admin-suspend-applicant' applicant.id %}"
-                    data-confirm-submit="Are you sure you want to suspend this applicant?"
+                    action="{% url 'delete-application' 'new' applicant.id %}"
+                    data-delete-application
+                    data-applicant="{{ applicant }}"
+                    data-type-label="New registration"
+                    data-status="{{ applicant.get_status_display }}"
+                    data-whole-applicant="true"
                 >
 
                     {% csrf_token %}
+                    <input type="hidden" name="confirm_text" value="">
+                    <input type="hidden" name="next" value="{% url 'admin-applicants' %}">
 
                     <button type="submit" class="btn btn-outline-danger">
-                        <i class="bi bi-pause-circle me-1">
+                        <i class="bi bi-trash me-1" aria-hidden="true">
                         </i>
-                        Suspend Applicant
+                        Delete Applicant
                     </button>
 
                 </form>
@@ -695,4 +701,5 @@
             </table>
         </div>
     </section>
+    {% include "components/delete_application_dialog.html" %}
 {% endblock %}

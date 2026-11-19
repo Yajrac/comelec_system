@@ -792,6 +792,7 @@ class DocumentCheck(models.Model):
         ("passed", "Passed"),
         ("invalid", "Not a valid document"),
         ("mismatch", "Name does not match"),
+        ("type_mismatch", "Type does not match"),
         ("unavailable", "Not checked"),
         ("override", "Verified by officer"),
     ]

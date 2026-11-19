@@ -37,7 +37,7 @@
   function render(state, { title, message = '', details = [], note = '', buttons = [] }) {
     const box = ensureDialog();
     box.dataset.state = state;
-    box.querySelector('.doc-check-icon').textContent = { checking: '', passed: '✓', invalid: '✕', mismatch: '!', unavailable: 'i' }[state] || '';
+    box.querySelector('.doc-check-icon').textContent = { checking: '', passed: '✓', invalid: '✕', mismatch: '!', type_mismatch: '!', unavailable: 'i' }[state] || '';
     box.querySelector('h2').textContent = title;
     box.querySelector('.doc-check-message').textContent = message;
     const list = box.querySelector('dl');
@@ -85,6 +85,10 @@
     }
     const buttons = [['Upload another file', 'upload', true], ['Retake photo', 'retake']];
     if (result.status === 'mismatch' && canEdit) buttons.push(['Edit details', 'edit']);
+    if (result.status === 'type_mismatch') {
+      return render('type_mismatch', { title: 'The document does not match the type you chose.', message: result.reason,
+        details: detailsFor(result), buttons: [['Change type', 'type', true], ['Upload another file', 'upload'], ['Retake photo', 'retake']] });
+    }
     return render(result.status, {
       title: result.status === 'mismatch' ? 'This document is valid, but your name does not match.' : 'This document is not valid.',
       message: result.status === 'invalid' ? result.reason : 'Make sure the document belongs to you and your name is typed exactly as it appears.',
@@ -111,7 +115,7 @@
 
   function formFields(form) {
     const value = name => form.elements.namedItem(name)?.value?.trim() || '';
-    const fields = { application_type: form.dataset.documentCheck };
+    const fields = { application_type: form.dataset.documentCheck, valid_id_type: value('valid_id_type') };
     if (form.elements.namedItem('lastname')) {
       Object.assign(fields, { lastname: value('lastname'), firstname: value('firstname'), middlename: value('middlename') });
     } else {
@@ -121,7 +125,7 @@
   }
 
   function stateKey(file, fields) {
-    return [file.name, file.size, file.lastModified, fields.lastname, fields.firstname, fields.middlename, fields.applicant_id].join('|');
+    return [file.name, file.size, file.lastModified, fields.valid_id_type, fields.lastname, fields.firstname, fields.middlename, fields.applicant_id].join('|');
   }
 
   function fileInput(form) { return form.elements.namedItem('valid_id_document'); }
@@ -156,7 +160,7 @@
     const box = inlineBox(form);
     box.dataset.state = state;
     box.replaceChildren(el('span', { class: 'doc-check-inline-icon', 'aria-hidden': 'true' },
-      { checking: '', passed: '✓', valid: '✓', invalid: '✕', mismatch: '!', unavailable: 'i', offline: 'i' }[state] || ''),
+      { checking: '', passed: '✓', valid: '✓', invalid: '✕', mismatch: '!', type_mismatch: '!', unavailable: 'i', offline: 'i' }[state] || ''),
       el('span', { class: 'doc-check-inline-text' }, text));
     if (actions.length) {
       const row = el('div', { class: 'doc-check-inline-actions' });
@@ -174,10 +178,18 @@
     const input = fileInput(form);
     const actions = [['Upload another file', () => { input.value = ''; input.click(); }],
                      ['Retake photo', () => retake(input)]];
+    if (result.status === 'type_mismatch') actions.unshift(['Change type', () => chooseType(form)]);
     if (result.status === 'mismatch' && form.elements.namedItem('lastname')) {
       actions.push(['Edit details', () => { window.backToForm?.(); form.elements.namedItem('lastname').focus(); }]);
     }
     return actions;
+  }
+
+  function chooseType(form) {
+    window.backToForm?.();
+    const select = form.elements.namedItem('valid_id_type');
+    select?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    select?.focus({ preventScroll: true });
   }
 
   function renderInline(form, result) {
@@ -189,6 +201,7 @@
       case 'invalid': return showInline(form, 'invalid', `This document is not valid. ${result.reason || ''}`.trim(), fixActions(form, result));
       case 'mismatch': return showInline(form, 'mismatch',
         'This document is valid, but the name on it does not match the name you entered.', fixActions(form, result));
+      case 'type_mismatch': return showInline(form, 'type_mismatch', result.reason || 'The document does not match the type you chose.', fixActions(form, result));
       case 'unavailable': return showInline(form, 'unavailable', 'Document verification is unavailable right now. The office will review your document.');
       case 'offline': return showInline(form, 'offline', 'You are offline. The document will be checked before it is uploaded.');
       case 'error': return showInline(form, 'invalid', result.message || 'This document could not be checked.', fixActions(form, result));
@@ -240,6 +253,7 @@
       if (action === 'upload') { input.value = ''; input.click(); }
       if (action === 'retake') retake(input);
       if (action === 'edit') { window.backToForm?.(); form.elements.namedItem('lastname')?.focus(); }
+      if (action === 'type') chooseType(form);
       return false;
     } finally {
       busy = false;
@@ -255,7 +269,7 @@
   async function reviewQueued(entries, position = '') {
     const file = entriesValue(entries, 'valid_id_document');
     if (!(file instanceof Blob)) return 'upload';
-    const fields = { application_type: 'NEW', lastname: entriesValue(entries, 'lastname'),
+    const fields = { application_type: 'NEW', valid_id_type: entriesValue(entries, 'valid_id_type'), lastname: entriesValue(entries, 'lastname'),
       firstname: entriesValue(entries, 'firstname'), middlename: entriesValue(entries, 'middlename') };
     showChecking(`Verifying document before upload${position}…`);
     const result = await requestCheck(file instanceof File ? file : new File([file], 'document'), fields);
@@ -269,9 +283,12 @@
     }
     const message = result.status === 'mismatch'
       ? 'This document is valid, but the name on it does not match the name you entered.'
+      : result.status === 'type_mismatch' ? result.reason
       : `This document is not valid. ${result.reason || result.message || ''}`.trim();
-    await render(result.status === 'mismatch' ? 'mismatch' : 'invalid', {
-      title: result.status === 'mismatch' ? 'This document is valid, but your name does not match.' : 'This document is not valid.',
+    const state = ['mismatch', 'type_mismatch'].includes(result.status) ? result.status : 'invalid';
+    await render(state, {
+      title: { mismatch: 'This document is valid, but your name does not match.',
+               type_mismatch: 'The document does not match the type you chose.' }[state] || 'This document is not valid.',
       message: 'This saved registration was not uploaded. Open it from Saved applications to replace the file or correct the name.',
       details: detailsFor(result), buttons: [['OK', 'ok', true]] });
     return { fix: message };
@@ -289,6 +306,12 @@
       input.insertAdjacentElement('afterend', label);
     }
     input.addEventListener('change', () => setTimeout(() => inlineCheck(form), 0));
+    form.elements.namedItem('valid_id_type')?.addEventListener('change', () => {
+      if (input.files?.length) inlineCheck(form);
+    });
+    const forget = () => { results.delete(form); renderInline(form, {}); };
+    form.addEventListener('offline:submitted', forget);
+    form.addEventListener('reset', () => setTimeout(forget));
     ['lastname', 'firstname', 'middlename'].forEach(name => {
       form.elements.namedItem(name)?.addEventListener('change', () => {
         if (input.files?.length) inlineCheck(form);

@@ -99,7 +99,7 @@ class ReportPrintTests(TestCase):
         self.assertContains(response, "report-tables.js")
 
     def test_summary_print_and_matching_header_controls(self):
-        for table, title in [("types", "APPLICATION TYPE REPORT"), ("barangays", "BARANGAY REPORT")]:
+        for table, title in [("types", "APPLICATION TYPE REPORT"), ("barangays", "MUNICIPAL REPORT")]:
             response = self.client.get(reverse("admin-reports"), {"format": "print", "table": table, "year": "2025"})
             self.assertTemplateUsed(response, "comelec/reports_summary_print.html")
             self.assertContains(response, title)

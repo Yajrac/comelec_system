@@ -383,6 +383,7 @@
                             await writes.catch(() => {});
                             await change(draftId, () => null).catch(() => {});
                         }
+                        resetSubmittedForm(draftId);
                         sessionStorage.removeItem('web-registration-draft');
                         dirty = false;
                         location.href = result.data.success_url || '/';

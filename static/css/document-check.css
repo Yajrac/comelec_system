@@ -4,7 +4,7 @@
 .doc-check-icon { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 16px; border-radius: 50%; background: #edf3ff; color: #0038a8; font-size: 26px; font-weight: 700; }
 .doc-check-dialog[data-state="checking"] .doc-check-icon { border: 4px solid #dce5f4; border-top-color: #0038a8; background: transparent; animation: doc-check-spin .9s linear infinite; }
 .doc-check-dialog[data-state="passed"] .doc-check-icon { background: #eaf7ef; color: #168451; }
-.doc-check-dialog:is([data-state="invalid"], [data-state="mismatch"]) .doc-check-icon { background: #fff0f0; color: #c43742; }
+.doc-check-dialog:is([data-state="invalid"], [data-state="mismatch"], [data-state="type_mismatch"]) .doc-check-icon { background: #fff0f0; color: #c43742; }
 .doc-check-dialog[data-state="unavailable"] .doc-check-icon { background: #fff6df; color: #795700; }
 .doc-check-dialog h2 { margin: 0 0 10px; font-size: 20px; font-weight: 750; line-height: 1.35; outline: none; }
 .doc-check-message { margin: 0 0 14px; color: #526783; font-size: 14px; line-height: 1.6; }
@@ -31,8 +31,8 @@
 .doc-check-inline[data-state="checking"] .doc-check-inline-icon { border: 3px solid #dce5f4; border-top-color: #0038a8; background: transparent; animation: doc-check-spin .9s linear infinite; }
 .doc-check-inline:is([data-state="passed"], [data-state="valid"]) { border-color: #c8e6d2; background: #eaf7ef; color: #14532d; }
 .doc-check-inline:is([data-state="passed"], [data-state="valid"]) .doc-check-inline-icon { background: #168451; color: #fff; }
-.doc-check-inline:is([data-state="invalid"], [data-state="mismatch"]) { border-color: #f0caca; background: #fff0f0; color: #7f1d1d; }
-.doc-check-inline:is([data-state="invalid"], [data-state="mismatch"]) .doc-check-inline-icon { background: #c43742; color: #fff; }
+.doc-check-inline:is([data-state="invalid"], [data-state="mismatch"], [data-state="type_mismatch"]) { border-color: #f0caca; background: #fff0f0; color: #7f1d1d; }
+.doc-check-inline:is([data-state="invalid"], [data-state="mismatch"], [data-state="type_mismatch"]) .doc-check-inline-icon { background: #c43742; color: #fff; }
 .doc-check-inline:is([data-state="unavailable"], [data-state="offline"]) { border-color: #f0d996; background: #fff6df; color: #5c4300; }
 .doc-check-inline-actions { display: flex; flex-wrap: wrap; gap: 8px; flex-basis: 100%; padding-left: 32px; }
 .doc-check-inline-actions button { min-height: 36px; padding: 6px 12px; border: 1px solid currentColor; border-radius: 8px; background: #fff; color: inherit; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }

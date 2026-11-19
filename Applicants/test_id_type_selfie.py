@@ -42,6 +42,17 @@ class IdTypeAndSelfieTests(TestCase):
         self.assertNotIn('Upload Photo or Selfie (optional)', html)
         self.assertIn('Take a selfie', html)
 
+    def test_upload_waits_for_the_document_type(self):
+        for url in ('/new-registration/', '/comelec/walk-in/new/'):
+            if url.startswith('/comelec/'):
+                self.client.force_login(get_user_model().objects.create_superuser(username='walkintype', password='x'))
+            html = self.client.get(url).content.decode()
+            self.assertIn('[data-awaiting-id-type] > .valid-id-type-field ~ *', html)
+            self.assertIn('js/valid-id-type.js', html)
+            self.assertIn('Choose type of document', html)
+            self.assertIn('>Other</option>', html)
+            self.assertNotIn('Other government-issued ID', html)
+
     def test_document_type_is_required(self):
         response = self.client.post('/new-registration/', self.form(valid_id_type=None))
         self.assertContains(response, 'Choose the type of document you are uploading.')

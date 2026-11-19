@@ -1,11 +1,14 @@
-{% comment %}Type of identification document; required=True on New Registration (a document is always uploaded).{% endcomment %}
+{% load static %}{% comment %}Type of identification document; required=True on New Registration (a document is always uploaded).
+The upload controls after this field stay hidden until a type is chosen (valid-id-type.js).{% endcomment %}
+<style>[data-awaiting-id-type] > .valid-id-type-field ~ * { display: none !important; }</style>
 <div class="valid-id-type-field mb-3">
     <label for="valid_id_type" class="form-label">Type of document <span class="required">*</span></label>
     <select id="valid_id_type" name="valid_id_type" class="form-select"{% if required %} required{% endif %} aria-describedby="validIdTypeHelp">
-        <option value="">Select the document you will upload</option>
+        <option value="">Choose type of document</option>
         {% for code, label in valid_id_types %}
             <option value="{{ code }}"{% if form_data.valid_id_type == code %} selected{% endif %}>{{ label }}</option>
         {% endfor %}
     </select>
-    <small id="validIdTypeHelp" class="form-text">{{ valid_id_note }}</small>
+    <small id="validIdTypeHelp" class="form-text">{{ valid_id_note }} Choose the type first, then upload or take a photo.</small>
 </div>
+<script src="{% static 'js/valid-id-type.js' %}" defer></script>

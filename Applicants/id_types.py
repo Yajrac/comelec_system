@@ -16,7 +16,12 @@ VALID_ID_TYPES = [
     ("NCIP", "NCIP Certificate of Confirmation"),
     ("BARANGAY", "Barangay ID / Certification with photo"),
     ("PSA_BIRTH_CERTIFICATE", "PSA Birth Certificate"),
-    ("OTHER_GOVERNMENT", "Other government-issued ID"),
+    ("OTHER_GOVERNMENT", "Other"),
 ]
 VALID_ID_CODES = {code for code, _ in VALID_ID_TYPES}
+VALID_ID_LABELS = dict(VALID_ID_TYPES)
+
+
+def id_type_label(code):
+    return VALID_ID_LABELS.get(code, "")
 NOT_ACCEPTED_NOTE = "Not accepted: Student ID, Cedula (Community Tax Certificate) and PNP clearance."

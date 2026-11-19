@@ -2656,18 +2656,6 @@ def admin_applicant_detail(request, applicant_id):
     )
 
 
-@login_required
-def admin_suspend_applicant(request, applicant_id):
-
-    access = admin_superuser_required(request)
-
-    if access:
-        return access
-
-    if request.method != "POST":
-        return redirect(
-            "admin-applicants"
-        )
 
     applicant = get_object_or_404(
         Applicant,
@@ -2952,10 +2940,6 @@ def admin_reports(request):
         verification_status="BIOMETRICS_PENDING"
     ).count()
 
-    suspended_total = applicants.filter(
-        is_active=False
-    ).count()
-
     # =========================================================
     # APPLICATION TYPE REPORT
     # =========================================================
@@ -3163,14 +3147,14 @@ def admin_reports(request):
             columns = [("name", "Application Type"), ("total", "Total"), ("pending", "Pending"),
                 ("review", "Review"), ("approved", "Approved"), ("disapproved", "Disapproved")]
         elif request.GET["table"] == "barangays":
-            title, records = "Barangay Report", barangay_report
+            title, records = "Municipal Report", barangay_report
             columns = [("name", "Barangay"), ("new", "New"), ("update", "Update"), ("transfer", "Transfer"),
                 ("reactivation", "Reactivation"), ("reinstatement", "Reinstatement"), ("total", "Total"), ("verified", "Verified")]
         elif request.GET["table"] == "trends":
             title, records, columns = "Registration Trends", report_analytics["trends"], TREND_COLUMNS
         else:
             title, records, columns = "Applicant Demographics", report_analytics["demographics"], DEMOGRAPHIC_COLUMNS
-        summary_note = ("Unique applicants registered in the selected period. Age as of " + str(report_analytics["as_of"]) if request.GET["table"] == "demographics" else "Application submissions by month or year; change is the count difference from the previous period." if request.GET["table"] == "trends" else "")
+        summary_note = ("Municipality of Pio Duran, Albay: applications and verified applicants per barangay." if request.GET["table"] == "barangays" else "Unique applicants registered in the selected period. Age as of " + str(report_analytics["as_of"]) if request.GET["table"] == "demographics" else "Application submissions by month or year; change is the count difference from the previous period." if request.GET["table"] == "trends" else "")
         if request.GET["format"] == "pdf":
             from .report_pdf import download_summary
             return download_summary(title, records, columns, period_label, note=summary_note)
@@ -3212,8 +3196,6 @@ def admin_reports(request):
 
             "verified_total": verified_total,
             "biometrics_pending_total": biometrics_pending_total,
-            "suspended_total": suspended_total,
-
             "application_type_report": application_type_report,
             "barangay_report": barangay_report,
             "barangays": barangays,
@@ -3438,9 +3420,14 @@ def delete_application(request, application_type, id):
     model, label = entry
     record = get_object_or_404(model, pk=id)
 
+    from django.utils.http import url_has_allowed_host_and_scheme
+    back = request.POST.get("next", "")
+    if not url_has_allowed_host_and_scheme(back, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        back = "admin-applications"
+
     if request.POST.get("confirm_text", "").strip() != "DELETE":
         messages.error(request, f"{label} #{id} was not deleted. Type DELETE to confirm.")
-        return redirect("admin-applications")
+        return redirect(back)
 
     try:
         with transaction.atomic():
@@ -3456,11 +3443,11 @@ def delete_application(request, application_type, id):
                 record.delete()
     except ProtectedError:
         messages.error(request, f"{label} #{id} cannot be deleted because other records depend on it.")
-        return redirect("admin-applications")
+        return redirect(back)
 
     logger.warning("Application deleted: type=%s id=%s by=%s", application_type, id, request.user.get_username())
     messages.success(request, f"{label} #{id} was permanently deleted.")
-    return redirect("admin-applications")
+    return redirect(back)
 
 
 

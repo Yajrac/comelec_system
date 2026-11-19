@@ -37,7 +37,7 @@ class BarangayTypeFilterTests(TestCase):
         self.assertEqual(response.context['applicants'].count(), 0)
         self.assertContains(response, 'No Matching Verified Applicants')
 
-    def test_applicants_page_shows_history_with_profile_columns_and_suspend(self):
+    def test_applicants_page_shows_history_with_profile_columns_and_delete(self):
         for applicant in self.records:
             ApplicantBiometric.objects.create(applicant=applicant, biometrics_completed=True, completed=True)
         url = reverse('admin-applicants')
@@ -47,7 +47,10 @@ class BarangayTypeFilterTests(TestCase):
         self.assertNotContains(response, 'Verified Applicants</a>')
         for heading in ('<th>Barangay</th>', '<th>Contact</th>', '<th>Verification</th>'):
             self.assertContains(response, heading)
-        self.assertContains(response, reverse('admin-suspend-applicant', args=[self.records[0].pk]))
+        transfer = self.records[0].transfer_requests.get()
+        self.assertContains(response, reverse('delete-application', args=['transfer', transfer.pk]))
+        self.assertContains(response, 'id="deleteApplicationDialog"')
+        self.assertNotContains(response, 'suspend')
         self.assertContains(response, '09171234567')
         response = self.client.get(url, {'view':'history', 'application_type':'TRANSFER', 'barangay':self.barangay.pk})
         self.assertEqual(response.context['page_obj'].paginator.count, 2)
