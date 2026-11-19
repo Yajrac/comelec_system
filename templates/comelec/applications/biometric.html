@@ -34,10 +34,10 @@
             <strong>Fingerprint device instructions</strong>
             <br>
             Keep the fingerprint device powered on and connected to Wi-Fi.
-            Select a finger and place it on the AS608 scanner when prompted.
+            Select a thumb and place the applicant's thumb flat on the AS608 scanner when prompted.
             Fingerprint images and templates are stored separately.
-            Fingerprint templates are optional. Both fingerprint images and three signature samples are required for verification.
-            You may recapture either finger to replace its existing image.
+            Thumbprint templates are optional. Both thumbprint images and three signature samples are required for verification.
+            You may recapture either thumb to replace its existing image.
         </div>
 
         <!-- APPLICANT DETAILS -->
@@ -95,7 +95,7 @@
                     Fingerprint Capture Complete
                 </strong>
                 <br>
-                Both left and right fingerprint images have been saved successfully. All three signature samples are also required for verification.
+                Both left and right thumbprint images have been saved successfully. All three signature samples are also required for verification.
                 Fingerprint templates and the applicant signature are optional for
                 image completion.
             </div>
@@ -103,7 +103,7 @@
             <div class="bio-notice warning">
                 <strong>Fingerprint Capture Pending</strong>
                 <br>
-                Both left and right fingerprint images must be saved before biometric
+                Both left and right thumbprint images must be saved before biometric
                 capture is marked complete. All three signature samples are also required.
             </div>
         {% endif %}
@@ -127,7 +127,7 @@
         {% if capture_complete and applicant.verification_status == "VERIFIED" %}
             <div class="bio-notice success">
                 <strong>Biometrics and signatures complete</strong>
-                <p>Both fingerprint images and all three signature samples are saved.</p>
+                <p>Both thumbprint images and all three signature samples are saved.</p>
                 <a
                     href="{% url 'print-slip-account' applicant.id %}"
                     class="btn btn-success"
@@ -231,7 +231,7 @@
                     <div class="bio-capture-header">
                         <h5>
                             <span class="bio-step-number">2</span>
-                            Left Fingerprint
+                            Left Thumbprint
                         </h5>
 
                         <span
@@ -261,21 +261,21 @@
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    <img src="{{ biometric.left_finger.url }}" alt="Left fingerprint image">
+                                    <img src="{{ biometric.left_finger.url }}" alt="Left thumbprint image">
                                 </a>
                             {% elif biometric and biometric.left_finger_template %}
                                 <div class="bio-placeholder">
                                     <i class="bi bi-fingerprint">
                                     </i>
                                     <strong>Template Saved</strong>
-                                    <span>The left fingerprint image has not been uploaded.</span>
+                                    <span>The left thumbprint image has not been uploaded.</span>
                                 </div>
                             {% else %}
                                 <div class="bio-placeholder">
                                     <i class="bi bi-fingerprint">
                                     </i>
                                     <strong>No Fingerprint Image</strong>
-                                    <span>Capture the left finger using the connected scanner.</span>
+                                    <span>Capture the left thumb using the connected scanner.</span>
                                 </div>
                             {% endif %}
 
@@ -288,12 +288,12 @@
                             aria-live="polite"
                         >
                             {% if biometric and biometric.left_finger %}
-                                Left fingerprint image is saved successfully.
+                                Left thumbprint image is saved successfully.
                                 The template is optional.
                             {% elif biometric and biometric.left_finger_template %}
                                 Template saved. The fingerprint image is still required.
                             {% else %}
-                                Click Capture Left Finger and follow the scanner instructions.
+                                Click Capture Left Thumb and follow the scanner instructions.
                             {% endif %}
                         </div>
 
@@ -329,9 +329,9 @@
                             <i class="bi bi-fingerprint me-1">
                             </i>
                             {% if biometric and biometric.left_finger %}
-                                Recapture Left Finger
+                                Recapture Left Thumb
                             {% else %}
-                                Capture Left Finger
+                                Capture Left Thumb
                             {% endif %}
                         </button>
 
@@ -346,7 +346,7 @@
                     <div class="bio-capture-header">
                         <h5>
                             <span class="bio-step-number">3</span>
-                            Right Fingerprint
+                            Right Thumbprint
                         </h5>
 
                         <span
@@ -376,21 +376,21 @@
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    <img src="{{ biometric.right_finger.url }}" alt="Right fingerprint image">
+                                    <img src="{{ biometric.right_finger.url }}" alt="Right thumbprint image">
                                 </a>
                             {% elif biometric and biometric.right_finger_template %}
                                 <div class="bio-placeholder">
                                     <i class="bi bi-fingerprint">
                                     </i>
                                     <strong>Template Saved</strong>
-                                    <span>The right fingerprint image has not been uploaded.</span>
+                                    <span>The right thumbprint image has not been uploaded.</span>
                                 </div>
                             {% else %}
                                 <div class="bio-placeholder">
                                     <i class="bi bi-fingerprint">
                                     </i>
                                     <strong>No Fingerprint Image</strong>
-                                    <span>Capture the right finger using the connected scanner.</span>
+                                    <span>Capture the right thumb using the connected scanner.</span>
                                 </div>
                             {% endif %}
 
@@ -403,12 +403,12 @@
                             aria-live="polite"
                         >
                             {% if biometric and biometric.right_finger %}
-                                Right fingerprint image is saved successfully.
+                                Right thumbprint image is saved successfully.
                                 The template is optional.
                             {% elif biometric and biometric.right_finger_template %}
                                 Template saved. The fingerprint image is still required.
                             {% else %}
-                                Click Capture Right Finger and follow the scanner instructions.
+                                Click Capture Right Thumb and follow the scanner instructions.
                             {% endif %}
                         </div>
 
@@ -444,9 +444,9 @@
                             <i class="bi bi-fingerprint me-1">
                             </i>
                             {% if biometric and biometric.right_finger %}
-                                Recapture Right Finger
+                                Recapture Right Thumb
                             {% else %}
-                                Capture Right Finger
+                                Capture Right Thumb
                             {% endif %}
                         </button>
 
@@ -476,13 +476,13 @@
                             <strong>Fingerprints</strong>
                             <span id="summaryFingerprints">
                                 {% if biometric and biometric.left_finger and biometric.right_finger %}
-                                    Both fingerprint images saved
+                                    Both thumbprint images saved
                                 {% elif biometric and biometric.left_finger %}
-                                    Left image saved; right fingerprint pending
+                                    Left image saved; right thumbprint pending
                                 {% elif biometric and biometric.right_finger %}
-                                    Right image saved; left fingerprint pending
+                                    Right image saved; left thumbprint pending
                                 {% else %}
-                                    Both fingerprint images required
+                                    Both thumbprint images required
                                 {% endif %}
                             </span>
                         </div>
@@ -509,7 +509,7 @@
 
     <div class="d-flex flex-wrap justify-content-end align-items-center gap-3 mt-3 mb-4">
         <p id="finishVerificationHelp" class="text-muted small mb-0" role="status">
-            {% if capture_complete %}All required captures are saved. You can finish verification.{% else %}Save both fingerprints and all 3 signature samples to finish verification.{% endif %}
+            {% if capture_complete %}All required captures are saved. You can finish verification.{% else %}Save both thumbprints and all 3 signature samples to finish verification.{% endif %}
         </p>
         <form method="post" action="{% url 'admin-finish-verification' applicant.id %}" id="finishVerificationForm" class="m-0">
         {% csrf_token %}

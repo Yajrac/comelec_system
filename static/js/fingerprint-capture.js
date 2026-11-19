@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
         cancel.className = "btn btn-outline-danger bio-action mt-2";
         cancel.hidden = true;
         cancel.innerHTML = '<i class="bi bi-x-circle me-1" aria-hidden="true"></i>Cancel Capture';
-        cancel.setAttribute("aria-label", `Cancel ${finger} fingerprint capture`);
+        cancel.setAttribute("aria-label", `Cancel ${finger} thumbprint capture`);
         cancel.addEventListener("click", () => cancelCapture(finger));
         captureButton.insertAdjacentElement("afterend", cancel);
         return cancel;
@@ -121,8 +121,8 @@ document.addEventListener("DOMContentLoaded", function () {
             finger === "left" ? "Left" : "Right";
 
         const label = alreadySaved
-            ? `Recapture ${fingerName} Finger`
-            : `Capture ${fingerName} Finger`;
+            ? `Recapture ${fingerName} Thumb`
+            : `Capture ${fingerName} Thumb`;
 
         return '<i class="bi bi-fingerprint me-1"></i>' + label;
     }
@@ -263,7 +263,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         setMessage(
             message,
-            `Sending the ${finger} fingerprint capture request...`,
+            `Sending the ${finger} thumbprint capture request...`,
             "info"
         );
 
@@ -304,7 +304,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             setMessage(
                 message,
-                "Request created. Place the selected finger on the scanner when prompted.",
+                "Request created. Place the selected thumb flat on the scanner when prompted.",
                 "info"
             );
 
@@ -330,7 +330,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     setStatus(status, "Check", "warning");
                     setMessage(
                         message,
-                        "Capture cancelled while the scanner was reading. Refresh the page to confirm which fingerprint is saved.",
+                        "Capture cancelled while the scanner was reading. Refresh the page to confirm which thumbprint is saved.",
                         "info"
                     );
                     button.innerHTML = getFingerButtonLabel(finger);
@@ -341,7 +341,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 setMessage(
                     message,
                     saved
-                        ? "Capture cancelled. The previously saved fingerprint was kept."
+                        ? "Capture cancelled. The previously saved thumbprint was kept."
                         : "Capture cancelled.",
                     "info"
                 );

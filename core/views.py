@@ -3855,7 +3855,7 @@ def save_fingerprint(request, applicant_id):
 
     if completed:
         message = (
-            "Both left and right fingerprint images are saved. "
+            "Both left and right thumbprint images are saved. "
             "Biometrics are COMPLETE."
         )
     else:
