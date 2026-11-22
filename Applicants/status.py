@@ -63,16 +63,16 @@ def registration_status(applicant):
 
     rows, note = [], ""
     if applicant.status == "DISAPPROVED":
-        rows.append(("New Registration", "Disapproved - please visit the office", "disapproved"))
+        rows.append((applicant.registration_label, "Disapproved - please visit the office", "disapproved"))
         return rows, "Please visit the Pio Duran Registration Office for details."
     if not applicant.is_active:
         rows.append(("Registration", "On hold", "disapproved"))
         return rows, "Please visit the Pio Duran Registration Office."
     label, tone = REQUEST_STATUS.get(applicant.status, (applicant.get_status_display(), "pending"))
-    rows.append(("New Registration", label, tone))
+    rows.append((applicant.registration_label, label, tone))
     if applicant.status != "APPROVED":
         if applicant.possible_duplicate_of_id:
-            rows[-1] = ("New Registration", "Pending - possible duplicate", "pending")
+            rows[-1] = (applicant.registration_label, "Pending - possible duplicate", "pending")
             return rows, ("Your registration has the same name and birthdate as an existing record. "
                           "The office will review it and send you an SMS.")
         return rows, "The office will review your application. You will receive an SMS once it is approved."

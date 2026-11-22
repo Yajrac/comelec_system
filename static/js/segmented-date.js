@@ -58,7 +58,9 @@
     const initial = original.value;
     original.type = 'hidden'; original.required = false;
     original.after(wrapper);
-    if (electionDate) wrapper.after(eligibility);
+    eligibility.id = `${original.id}-feedback`;
+    wrapper.after(eligibility);
+    year.setAttribute('aria-describedby', eligibility.id);
     document.querySelector(`label[for="${original.id}"]`)?.setAttribute('for', month.id);
     function sync(emit = true) {
       year.setCustomValidity(''); day.setCustomValidity('');
@@ -84,9 +86,17 @@
           eligibility.classList.add('is-ineligible');
         } else {
           const category = age < 18 ? 'SK age requirement met' : age <= 30 ? 'Regular voter and SK age requirements met' : 'Regular voter age requirement met';
-          eligibility.textContent = `Age ${age} on ${label}: ${category}.`;
+          const sk = age < 18 && original.form?.id === 'registrationForm' ? ' This will be an SK Registration.' : '';
+          eligibility.textContent = `Age ${age} on ${label}: ${category}.${sk}`;
         }
       }
+      // Show date problems right away (not only when the form is reviewed); "required" stays silent while typing.
+      const problem = year.validity.customError ? year.validationMessage : day.validity.customError ? day.validationMessage : '';
+      if (problem && !eligibility.textContent) {
+        eligibility.textContent = problem;
+        eligibility.classList.add('is-ineligible');
+      }
+      wrapper.classList.toggle('is-invalid', Boolean(problem));
       original.value = iso;
       if (emit) {
         original.dispatchEvent(new Event('input', { bubbles: true }));

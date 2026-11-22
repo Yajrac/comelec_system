@@ -209,6 +209,16 @@ class Applicant(ProfileDetails):
     )
 
     @property
+    def is_sk(self):
+        """New registration of someone 15-17 on election day (becomes regular at 18 by itself)."""
+        from .eligibility import is_sk
+        return is_sk(self.birthdate)
+
+    @property
+    def registration_label(self):
+        return "SK Registration" if self.is_sk else "New Registration"
+
+    @property
     def current_age(self):
         from django.utils import timezone
         today = timezone.localdate()

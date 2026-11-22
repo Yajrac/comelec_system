@@ -5,10 +5,11 @@
   const fields = 'input:not([type="hidden"]):not([type="button"]):not([type="submit"]), select, textarea';
   function messageFor(input) {
     if (input.disabled || input.readOnly || input.type === 'checkbox' || input.type === 'radio') return '';
+    if (input.dataset.ownError) return ''; // the page shows its own message (no second error)
     const key = input.name;
     const value = input.value.trim();
     if (key === 'middlename' && !value) return '';
-    if (input.required && !value) return 'This field is required.';
+    if (input.required && !value) return input.dataset.requiredMessage || 'This field is required.';
     if (!value) return '';
     if (names.has(key) && (value.length > 255 || !namePattern.test(value) || !/\p{L}/u.test(value))) return 'Use letters, spaces, hyphens, apostrophes, or periods only (maximum 255 characters).';
     if (key === 'phone' && !/^09[0-9]{9}$/.test(value)) return 'Enter 11 digits starting with 09.';

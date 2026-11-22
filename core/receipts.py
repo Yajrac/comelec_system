@@ -11,7 +11,7 @@ from .receipt_rendering import render_receipt
 @require_GET
 def acknowledgment_receipt(request, applicant_id, receipt_id=None):
     from .views import admin_superuser_required
-    from Applicants.application_types import APPLICATION_TYPE_LABELS
+    from Applicants.application_types import APPLICATION_TYPE_LABELS, SK_REGISTRATION_LABEL
     access = admin_superuser_required(request)
     if access:
         return access
@@ -30,7 +30,7 @@ def acknowledgment_receipt(request, applicant_id, receipt_id=None):
                             "application_request_id": biometric.application_request_id}
             receipt = AcknowledgmentReceipt.objects.filter(**round_filter).first()
             if receipt is None:
-                details = {"lastname": applicant.lastname, "firstname": applicant.firstname, "middlename": applicant.middlename, "receipt_date": timezone.localdate().isoformat(), "officer": request.user.get_full_name() or request.user.get_username(), "application_type": APPLICATION_TYPE_LABELS.get(biometric.application_type, applicant.get_application_type_display())}
+                details = {"lastname": applicant.lastname, "firstname": applicant.firstname, "middlename": applicant.middlename, "receipt_date": timezone.localdate().isoformat(), "officer": request.user.get_full_name() or request.user.get_username(), "application_type": SK_REGISTRATION_LABEL if biometric.application_type == "NEW" and applicant.is_sk else APPLICATION_TYPE_LABELS.get(biometric.application_type, applicant.get_application_type_display())}
                 for attempt in range(10):
                     try:
                         with transaction.atomic():

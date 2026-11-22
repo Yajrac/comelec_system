@@ -294,3 +294,6 @@
  .dashboard-intro-card p { font-size: 11px; line-height: 1.6; }
  .dashboard-intro-card .text-primary.fs-3 { font-size: 20px !important; }
 }
+
+/* SK Registrations card (peach: lavender is already Pending). */
+.dashboard-card-sk { --card-bg: #f5e1d1; --icon-bg: #ebcab0; --icon-color: #7a4a26; border-top: 3px solid #d3a17c !important; }

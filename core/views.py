@@ -1,5 +1,6 @@
 from Applicants.profile_details import apply_profile_details
-from Applicants.application_types import APPLICATION_TYPE_LABELS
+from Applicants.application_types import APPLICATION_TYPE_LABELS, SK_REGISTRATION_LABEL
+from Applicants.eligibility import sk_filter
 from Applicants.document_check import latest_for as latest_document_check
 from .biometric_state import SIGNATURE_FIELDS, file_exists as biometric_file_exists, signatures_complete, capture_complete, sync_completion
 import base64
@@ -409,6 +410,7 @@ def admin_dashboard(request):
             # Verification
             "biometrics_pending": biometrics_pending,
             "fully_verified": fully_verified,
+            "sk_registrations": Applicant.objects.filter(sk_filter()).count(),
 
             # Recent applications
             "recent_applicants": recent_applicants,
@@ -576,13 +578,17 @@ def admin_applications(request):
     # NEW REGISTRATIONS
     # =========================================================
 
-    if not application_type or application_type == "NEW":
+    if not application_type or application_type in ("NEW", "SK"):
 
         applicants = (
             Applicant.objects
             .all()
             .select_related("brgy")
         )
+        if application_type == "NEW":
+            applicants = applicants.exclude(sk_filter())
+        elif application_type == "SK":
+            applicants = applicants.filter(sk_filter())
 
         if search:
             applicants = applicants.filter(
@@ -628,7 +634,8 @@ def admin_applications(request):
                 "applicant": applicant,
                 "applicant_name": str(applicant),
                 "type": "NEW",
-                "type_display": APPLICATION_TYPE_LABELS["NEW"],
+                "is_sk": applicant.is_sk,
+                "type_display": SK_REGISTRATION_LABEL if applicant.is_sk else APPLICATION_TYPE_LABELS["NEW"],
                 "status": applicant.status,
                 "status_display": applicant.get_status_display(),
                 "date": application_date,
@@ -1354,7 +1361,7 @@ def admin_application_action(
 
                 send_approval_sms(
                     applicant=application,
-                    application_name="New Registration"
+                    application_name=application.registration_label
                 )
 
                 return redirect(
@@ -2583,7 +2590,7 @@ def admin_applicants(request):
     # =========================================================
 
     application_type = request.GET.get("application_type", "").strip().upper()
-    type_choices = [("NEW", "New Registration"), ("UPDATE", "Correction / Update"),
+    type_choices = [("NEW", "New Registration"), ("SK", "SK Registration"), ("UPDATE", "Correction / Update"),
                     ("TRANSFER", "Transfer"), ("REACTIVATION", "Reactivation"),
                     ("REINSTATEMENT", "Reinstatement")]
     if application_type not in dict(type_choices):
@@ -2594,7 +2601,7 @@ def admin_applicants(request):
     rows = []
     for record in applicants.prefetch_related('update_requests', 'transfer_requests', 'reactivation_requests', 'reinstatement_requests'):
         for item in application_history(record):
-            if not application_type or item['type'] == application_type:
+            if not application_type or item['filter_type'] == application_type:
                 rows.append(dict(item, applicant=record))
     rows.sort(key=lambda item: item['submitted_at'], reverse=True)
     page_obj = Paginator(rows, 10).get_page(request.GET.get('page'))
@@ -2944,24 +2951,14 @@ def admin_reports(request):
     # APPLICATION TYPE REPORT
     # =========================================================
 
+    def status_counts(records):
+        counts = {key: records.filter(status=key.upper()).count() for key in ("pending", "review", "approved", "disapproved")}
+        return {"total": sum(counts.values()) + records.exclude(
+            status__in=["PENDING", "REVIEW", "APPROVED", "DISAPPROVED"]).count(), **counts}
+
     application_type_report = [
-        {
-            "code": "NEW",
-            "name": APPLICATION_TYPE_LABELS["NEW"],
-            "total": new_total,
-            "pending": applicants.filter(
-                status="PENDING"
-            ).count(),
-            "review": applicants.filter(
-                status="REVIEW"
-            ).count(),
-            "approved": applicants.filter(
-                status="APPROVED"
-            ).count(),
-            "disapproved": applicants.filter(
-                status="DISAPPROVED"
-            ).count(),
-        },
+        {"code": "NEW", "name": APPLICATION_TYPE_LABELS["NEW"], **status_counts(applicants.exclude(sk_filter()))},
+        {"code": "SK", "name": SK_REGISTRATION_LABEL, **status_counts(applicants.filter(sk_filter()))},
         {
             "code": "UPDATE",
             "name": APPLICATION_TYPE_LABELS["UPDATE"],
@@ -3046,7 +3043,9 @@ def admin_reports(request):
 
         new_count = applicants.filter(
             brgy=barangay
-        ).count()
+        ).exclude(sk_filter()).count()
+
+        sk_count = applicants.filter(brgy=barangay).filter(sk_filter()).count()
 
         update_count = update_requests.filter(
             brgy=barangay
@@ -3067,6 +3066,7 @@ def admin_reports(request):
 
         total = (
             new_count
+            + sk_count
             + update_count
             + transfer_count
             + reactivation_count
@@ -3086,6 +3086,7 @@ def admin_reports(request):
             "id": barangay.id,
             "name": barangay.name,
             "new": new_count,
+            "sk": sk_count,
             "update": update_count,
             "transfer": transfer_count,
             "reactivation": reactivation_count,
@@ -3148,7 +3149,7 @@ def admin_reports(request):
                 ("review", "Review"), ("approved", "Approved"), ("disapproved", "Disapproved")]
         elif request.GET["table"] == "barangays":
             title, records = "Municipal Report", barangay_report
-            columns = [("name", "Barangay"), ("new", "New"), ("update", "Update"), ("transfer", "Transfer"),
+            columns = [("name", "Barangay"), ("new", "New"), ("sk", "SK"), ("update", "Update"), ("transfer", "Transfer"),
                 ("reactivation", "Reactivation"), ("reinstatement", "Reinstatement"), ("total", "Total"), ("verified", "Verified")]
         elif request.GET["table"] == "trends":
             title, records, columns = "Registration Trends", report_analytics["trends"], TREND_COLUMNS
@@ -3257,7 +3258,7 @@ def admin_reports_export(request):
         writer.writerow([
             applicant.id,
             str(applicant),
-            "New Registration",
+            applicant.registration_label,
             applicant.get_status_display(),
             applicant.get_verification_status_display(),
             applicant.brgy.name if applicant.brgy else "",

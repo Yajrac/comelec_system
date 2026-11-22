@@ -132,6 +132,11 @@
     border-radius: 0 !important;
 }
 
+/* ...except the document check spinner and result icons, which stay round. */
+.office-application-form .registration-upload-grid .doc-check-inline-icon {
+    border-radius: 50% !important;
+}
+
 .office-application-form .registration-upload-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

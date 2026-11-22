@@ -625,3 +625,9 @@
 @media (max-width: 359.98px) {
     .applications-workspace #applicationFilters .col-6 { width: 100%; }
 }
+
+.application-new.application-sk {
+    background: #f3edff;
+    border-color: #dccdfb;
+    color: #5b2ea6;
+}

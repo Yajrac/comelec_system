@@ -91,7 +91,7 @@ function validateDocument() {
     if (!file) {
         input.classList.add("is-invalid");
         error.textContent =
-            "Please select a valid ID or supporting document.";
+            input.dataset.requiredMessage || "Upload your valid ID or birth certificate, or take a photo of it.";
         error.style.display = "block";
         return false;
     }
@@ -188,6 +188,26 @@ document.getElementById("phone").addEventListener("input", function () {
     birthdateInput.max = `${year}-${month}-${day}`;
 })();
 
+/* SK REGISTRATION: 15-17 years old on election day */
+function applicationTypeLabel() {
+    const input = document.getElementById("birthdate");
+    const election = input && input.dataset.electionDate;
+    if (!input || !input.value || !election) return "APPLICATION FOR NEW REGISTRATION";
+    const [ey, em, ed] = election.split("-").map(Number);
+    const [by, bm, bd] = input.value.split("-").map(Number);
+    const age = ey - by - ((em < bm || (em === bm && ed < bd)) ? 1 : 0);
+    return age >= 15 && age <= 17 ? "APPLICATION FOR SK REGISTRATION" : "APPLICATION FOR NEW REGISTRATION";
+}
+
+function updateApplicationTypeBadge() {
+    const badge = document.getElementById("applicationTypeBadge");
+    if (badge) badge.textContent = applicationTypeLabel();
+}
+
+document.getElementById("birthdate").addEventListener("change", updateApplicationTypeBadge);
+document.getElementById("birthdate").addEventListener("offline:restore", updateApplicationTypeBadge);
+updateApplicationTypeBadge();
+
 /* SHOW REVIEW */
 function showReview() {
     const form = document.getElementById("registrationForm");
@@ -238,6 +258,7 @@ function showReview() {
     setReview("review_photo", photo ? photo.name : "No photo selected");
     updateReviewAttachment("photo", photo);
     setReview("review_age", getValue("age"));
+    setReview("review_application_type", applicationTypeLabel());
     setReview("review_sex", getSelectedText("sex"));
     setReview("review_birthdate", getValue("birthdate"));
     setReview("review_birthplace", getValue("birthplace"));

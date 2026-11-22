@@ -63,6 +63,8 @@ def validate_inputs(data, files=None):
                 born = date.fromisoformat(str(raw))
                 if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", str(raw)) or born >= timezone.localdate():
                     raise ValueError()
+                if born.year < 1900:
+                    errors[key] = f"Enter a valid birth year from 1900 to {timezone.localdate().year}."
             except (ValueError, TypeError):
                 errors[key] = "Enter a valid birthdate earlier than today."
         elif key == "age":

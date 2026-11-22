@@ -105,6 +105,11 @@
                                     >New Registration</option>
 
                                     <option
+                                        value="SK"
+                                        {% if application_type == "SK" %} selected {% endif %}
+                                    >SK Registration</option>
+
+                                    <option
                                         value="UPDATE"
                                         {% if application_type == "UPDATE" %} selected {% endif %}
                                     >Change of Name / Correction</option>
@@ -332,7 +337,7 @@
                                         {% if application.type == "NEW" %}
 
                                             <span class="application-type-summary">
-                                                <span class="application-badge application-new" tabindex="0" aria-label="{{ application.type_display }}"><span class="application-badge-text">{{ application.type_display }}</span></span>
+                                                <span class="application-badge application-new{% if application.is_sk %} application-sk{% endif %}" tabindex="0" aria-label="{{ application.type_display }}"><span class="application-badge-text">{{ application.type_display }}</span></span>
                                                 <span class="application-type-tooltip" aria-hidden="true">{{ application.type_display }}</span>
                                             </span>
                                             {% if application.possible_duplicate %}<span class="badge bg-warning text-dark ms-1" title="Same name and birthdate as an existing registration">Possible duplicate</span>{% endif %}

@@ -2,11 +2,11 @@
 {% load static %}
 
 {% block title %}
-    New Registration
+    {{ application.registration_label }}
 {% endblock %}
 
 {% block page_title %}
-    New Registration
+    {{ application.registration_label }}
 {% endblock %}
 
 {% block page_subtitle %}
@@ -48,7 +48,7 @@
 
                 <div class="col-lg">
 
-                    <span class="review-eyebrow">NEW REGISTRATION</span>
+                    <span class="review-eyebrow">{{ application.registration_label|upper }}</span>{% if application.is_sk %} <span class="application-badge application-sk">SK</span>{% endif %}
                     <h4>{{ application.lastname }}, {{ application.firstname }} {{ application.middlename }}</h4>
 
                     <p class="text-muted mb-0 mt-1">

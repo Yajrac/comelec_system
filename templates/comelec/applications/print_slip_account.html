@@ -163,7 +163,7 @@
                                     <div class="info-label">Application Type</div>
                                     <div class="info-value">
                                         {% if applicant.application_type == "NEW" %}
-                                            New Registration
+                                            {{ applicant.registration_label }}
                                         {% elif applicant.application_type == "UPDATE" %}
                                             Update Information
                                         {% elif applicant.application_type == "TRANSFER" %}
@@ -551,7 +551,7 @@
                                     <div class="info-label">Application Type</div>
                                     <div class="info-value">
                                         {% if applicant.application_type == "NEW" %}
-                                            New Registration
+                                            {{ applicant.registration_label }}
                                         {% elif applicant.application_type == "UPDATE" %}
                                             Update Information
                                         {% elif applicant.application_type == "TRANSFER" %}

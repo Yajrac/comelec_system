@@ -34,3 +34,4 @@
 .document-ai-details { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; }
 .document-ai-details dt { color: #64748b; font-weight: 600; }
 .document-ai-details dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+.application-sk { --badge-bg: #f3edff; --badge-border: #dccdfb; --badge-color: #5b2ea6; }

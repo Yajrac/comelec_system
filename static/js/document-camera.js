@@ -74,6 +74,11 @@
   async function openWebcam(input) {
     ensurePanel();
     target = input;
+    const name = input.dataset.documentName;
+    panel.querySelector('h2').textContent = name ? `Take a photo of your ${name}` : 'Take a photo of your document';
+    panel.querySelector('.doc-camera-tip').textContent = name
+      ? `Place the whole ${name} inside the frame, in good light, and keep it steady.`
+      : 'Place the whole ID or birth certificate inside the frame, in good light, and keep it steady.';
     status.textContent = 'Allow camera access to take the photo.';
     panel.showModal();
     try {

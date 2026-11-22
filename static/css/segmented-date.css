@@ -12,3 +12,5 @@
 
 .birthdate-eligibility { display: block; margin-top: 7px; color: #187451; font-size: 11px; line-height: 1.6; }
 .birthdate-eligibility.is-ineligible { color: #b42318; }
+.segmented-date.is-invalid { border-color: #b42318; }
+.segmented-date.is-invalid:focus-within { border-color: #b42318; box-shadow: 0 0 0 3px #b4231815; }

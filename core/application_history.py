@@ -22,7 +22,8 @@ def round_label(application_type, request_id):
 def application_history(applicant):
     initial_date = timezone.make_aware(datetime.combine(applicant.date_joined, time.min))
     rows = [{
-        'type': 'NEW', 'key': 'NEW', 'id': applicant.pk, 'label': 'New Registration',
+        'type': 'NEW', 'key': 'NEW', 'id': applicant.pk, 'label': applicant.registration_label,
+        'filter_type': 'SK' if applicant.is_sk else 'NEW',
         'reference': applicant.registration_reference,
         'submitted_at': initial_date, 'reviewed_at': None,
         'status': applicant.status, 'status_label': applicant.get_status_display(),
@@ -31,7 +32,8 @@ def application_history(applicant):
     for code, label, relation, view in REQUEST_HISTORY:
         for record in getattr(applicant, relation).all():
             rows.append({
-                'type': code, 'key': f'{code}-{record.pk}', 'id': record.pk, 'label': label, 'reference': f'{code}-{record.pk}',
+                'type': code, 'filter_type': code, 'key': f'{code}-{record.pk}', 'id': record.pk, 'label': label,
+                'reference': f'{code}-{record.pk}',
                 'submitted_at': record.requested_at, 'reviewed_at': record.reviewed_at,
                 'status': record.status, 'status_label': record.get_status_display(),
                 'url': reverse(view, args=[record.pk]),

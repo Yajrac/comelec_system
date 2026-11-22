@@ -97,7 +97,7 @@
                             <div class="col-md-6 detail-item">
                                 <span class="detail-label">Application Type</span>
                                 <div class="detail-value">
-                                    {{ applicant.get_application_type_display|default:applicant.application_type|default:"Not specified" }}
+                                    {% if applicant.application_type == "NEW" and applicant.is_sk %}APPLICATION FOR SK REGISTRATION{% else %}{{ applicant.get_application_type_display|default:applicant.application_type|default:"Not specified" }}{% endif %}
                                 </div>
                             </div>
 
