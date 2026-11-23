@@ -12,12 +12,6 @@
         {% if registration_selfie %}
             <p id="selfieLocked" class="selfie-locked" role="status">Upload your document first. Then take a selfie.</p>
             <p id="selfieMatchNote" class="selfie-match-note" hidden></p>
-            {% if face_match_enabled %}
-                <label id="faceConsentRow" class="face-consent" hidden>
-                    <input type="checkbox" id="faceConsent" name="face_consent" value="1">
-                    <span>I agree that my selfie will be compared with the photo on my ID to confirm my identity.</span>
-                </label>
-            {% endif %}
         {% endif %}
         {% if request.walk_in_base %}
             <label for="photo" class="form-label">Upload photo (walk-in, when no camera is available)</label>

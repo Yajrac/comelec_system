@@ -33,6 +33,7 @@ class FaceRuleTests(SimpleTestCase):
         self.assertEqual(evaluate(answer('unsure')), 'unsure')
         self.assertEqual(evaluate(answer(selfie_face=False)), 'no_face')
         self.assertEqual(evaluate(answer('no', document_face=False)), 'unsure')
+        self.assertEqual(evaluate(dict(answer(), selfie_is_clear=False)), 'unclear')
 
 
 @override_settings(**FACE_ON)
@@ -70,11 +71,15 @@ class FaceFlowTests(TestCase):
         ask.assert_not_called()
 
     @patch('Applicants.face_match.ask_gemini', return_value=answer())
-    def test_consent_is_required_for_photo_ids(self, ask, _doc):
-        response = self.check(consent=False)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()['status'], 'consent')
-        ask.assert_not_called()
+    def test_no_consent_box_is_needed(self, ask, _doc):
+        self.assertEqual(self.check(consent=False).json()['status'], 'matched')
+
+    @patch('Applicants.face_match.ask_gemini', return_value=dict(answer(), selfie_is_clear=False))
+    def test_dark_or_blurry_selfie_must_be_retaken_then_is_flagged(self, ask, _doc):
+        body = self.check(selfie('white')).json()
+        self.assertEqual(body['status'], 'unclear')
+        self.assertIn('too dark or blurry', body['message'])
+        self.assertEqual(self.check(selfie('black')).json()['status'], 'flagged')
 
     @patch('Applicants.face_match.ask_gemini', return_value=answer('no'))
     def test_second_different_selfie_is_flagged_not_blocked(self, ask, _doc):
@@ -101,12 +106,6 @@ class FaceFlowTests(TestCase):
         self.assertFalse(Applicant.objects.exists())
 
     @patch('Applicants.face_match.ask_gemini', return_value=answer())
-    def test_missing_consent_blocks_the_submission(self, ask, _doc):
-        response = self.client.post('/api/new-registration/', self.registration(face_consent=None))
-        self.assertEqual(response.status_code, 400)
-        self.assertIn('Agree', response.json()['error'])
-
-    @patch('Applicants.face_match.ask_gemini', return_value=answer())
     def test_match_is_linked_and_shown_to_the_officer(self, ask, _doc):
         response = self.client.post('/api/new-registration/', self.registration())
         self.assertEqual(response.status_code, 201, response.content)
@@ -124,10 +123,10 @@ class FaceFlowTests(TestCase):
         applicant = Applicant.objects.get()
         self.assertEqual(FaceMatch.objects.get(record_id=applicant.pk).status, 'override')
 
-    def test_page_shows_consent_and_document_first_note(self, _doc):
+    def test_page_shows_the_document_first_note_without_a_consent_box(self, _doc):
         html = self.client.get('/new-registration/').content.decode()
         self.assertIn('id="selfieLocked"', html)
-        self.assertIn('name="face_consent"', html)
+        self.assertNotIn('name="face_consent"', html)
         self.assertIn('data-face-match="1"', html)
         self.assertIn('js/face-match.js', html)
 
@@ -139,9 +138,19 @@ class FaceMatchOffTests(TestCase):
                                                             'valid_id_type': 'PHILSYS'}).json()['status'], 'disabled')
         html = self.client.get('/new-registration/').content.decode()
         self.assertIn('id="selfieLocked"', html)          # document first still applies
-        self.assertNotIn('name="face_consent"', html)     # nothing is compared, so no consent box
         self.assertNotIn('data-face-match', html)
 
     def test_service_requests_are_unchanged(self):
         html = self.client.get('/update-registration/').content.decode()
         self.assertNotIn('id="selfieLocked"', html)
+
+
+class SelfieLightTests(SimpleTestCase):
+    def test_browser_checks_light_before_sending(self):
+        from pathlib import Path
+        from django.conf import settings
+        script = (Path(settings.BASE_DIR) / 'static/js/face-match.js').read_text(encoding='utf-8')
+        for text in ('const DARK = 70', 'const DARK_TRIES = 3', 'Your selfie is too dark.',
+                     'will be automatically compared with the photo on your'):
+            self.assertIn(text, script)
+        self.assertNotIn('face_consent', script)

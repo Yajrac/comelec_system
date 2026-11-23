@@ -233,10 +233,10 @@ function showReview() {
 
     // Verify the document (type, validity and name) before showing the review.
     const reviewButton = document.getElementById("reviewButton");
-    if (window.documentCheck && !showReview.documentChecked) {
+    if ((window.documentCheck || window.faceMatch) && !showReview.documentChecked) {
         if (reviewButton.disabled) return;
         window.setApplicationSubmitting(reviewButton, "Checking document...");
-        window.documentCheck.ensure(form).then(function (ok) {
+        (window.documentCheck ? window.documentCheck.ensure(form) : Promise.resolve(true)).then(function (ok) {
             return ok && window.faceMatch ? window.faceMatch.ensure(form) : ok;
         }).then(function (ok) {
             window.resetApplicationButton(reviewButton);
@@ -363,9 +363,9 @@ function submitApplication() {
 
     // Document verification first (valid ID / birth certificate and matching name).
     // Offline it resolves true and the check runs before the saved form is uploaded.
-    if (window.documentCheck && !submitApplication.documentChecked) {
+    if ((window.documentCheck || window.faceMatch) && !submitApplication.documentChecked) {
         submitButton.disabled = true;
-        window.documentCheck.ensure(form).then(function (ok) {
+        (window.documentCheck ? window.documentCheck.ensure(form) : Promise.resolve(true)).then(function (ok) {
             return ok && window.faceMatch ? window.faceMatch.ensure(form) : ok;
         }).then(function (ok) {
             submitButton.disabled = false;

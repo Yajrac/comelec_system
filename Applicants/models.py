@@ -833,6 +833,7 @@ class FaceMatch(models.Model):
         ("not_matched", "Face does not match the ID"),
         ("flagged", "Does not match - office review"),
         ("no_face", "No face in the selfie"),
+        ("unclear", "Selfie too dark or blurry"),
         ("unsure", "Not sure - review manually"),
         ("unavailable", "Not checked - review manually"),
         ("not_applicable", "Not applicable (no photo on the document)"),

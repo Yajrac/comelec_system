@@ -20,12 +20,15 @@ from .models import FaceMatch
 logger = logging.getLogger(__name__)
 
 NO_PHOTO_TYPES = {"PSA_BIRTH_CERTIFICATE"}
-BLOCKING = {"not_matched", "no_face"}
+BLOCKING = {"not_matched", "no_face", "unclear"}
+# A second failed selfie for the same document is let through for the office to review.
+FAILED = {"not_matched", "no_face", "unclear", "flagged"}
 
 PROMPT = """You compare two images for a voter registration office.
 Image 1 is a selfie. Image 2 is an identification document.
 Reply with one JSON object with exactly these keys:
-"selfie_has_face": true if image 1 clearly shows one person's face looking at the camera.
+"selfie_has_face": true if image 1 shows one person's face looking at the camera.
+"selfie_is_clear": true if that face is well lit and sharp; false if it is too dark, blurry or overexposed.
 "document_has_face": true if image 2 shows a photo of the document holder's face.
 "same_person": "yes" if the face in image 1 and the photo in image 2 are clearly the same person,
   "no" if they are clearly different people, "unsure" otherwise (small, blurry or old photo, covered face).
@@ -36,12 +39,12 @@ PROMPT_VERSION = hashlib.sha256(PROMPT.encode()).hexdigest()[:12]
 MESSAGES = {
     "matched": "Your selfie matches the photo on your ID.",
     "not_matched": "Your selfie does not match the photo on your ID. Retake your selfie facing the camera in good light.",
-    "flagged": "Your selfie still does not match the photo on your ID. You can continue; the office will compare them.",
+    "flagged": "Your selfie still could not be matched with the photo on your ID. You can continue; the office will compare them.",
     "no_face": "We could not see your face clearly. Retake your selfie facing the camera in good light.",
+    "unclear": "Your selfie is too dark or blurry. Retake it in good light, facing the camera.",
     "unsure": "Your selfie could not be compared with your ID. You can continue; the office will compare them.",
     "unavailable": "Face comparison is unavailable right now. You can continue; the office will compare them.",
 }
-CONSENT_MESSAGE = "Agree to have your selfie compared with the photo on your ID."
 
 
 def enabled():
@@ -85,6 +88,7 @@ def ask_gemini(selfie, selfie_mime, document, document_mime):
         raise DocumentAIUnavailable("bad reply")
     same = result.get("same_person")
     return {"selfie_has_face": result.get("selfie_has_face") is True,
+            "selfie_is_clear": result.get("selfie_is_clear") is not False,
             "document_has_face": result.get("document_has_face") is True,
             "same_person": same if same in {"yes", "no", "unsure"} else "unsure"}
 
@@ -92,6 +96,8 @@ def ask_gemini(selfie, selfie_mime, document, document_mime):
 def evaluate(reading):
     if not reading["selfie_has_face"]:
         return "no_face"
+    if reading.get("selfie_is_clear") is False:
+        return "unclear"
     if not reading["document_has_face"] or reading["same_person"] == "unsure":
         return "unsure"
     return "matched" if reading["same_person"] == "yes" else "not_matched"
@@ -122,10 +128,10 @@ def compare(selfie, document, id_type):
             return FaceMatch.objects.create(status="unavailable", **base)
 
     status = evaluate(reading)
-    if status == "not_matched" and FaceMatch.objects.filter(
-            document_digest=base["document_digest"], status__in=["not_matched", "flagged"]
+    if status in BLOCKING and FaceMatch.objects.filter(
+            document_digest=base["document_digest"], status__in=FAILED
     ).exclude(selfie_digest=base["selfie_digest"]).exists():
-        status = "flagged"  # second selfie that does not match: let the applicant continue, office reviews
+        status = "flagged"  # second failed selfie: let the applicant continue, the office reviews it
     return FaceMatch.objects.create(status=status, ai_checked=True, ai_result=reading, model_name=model_name, **base)
 
 
@@ -133,8 +139,6 @@ def enforce(request, selfie, document, id_type):
     """Check a New Registration submission. Returns (check, error_message); (None, None) when it does not apply."""
     if not enabled() or not selfie or not document:
         return None, None
-    if has_photo(id_type) and request.POST.get("face_consent") != "1":
-        return None, CONSENT_MESSAGE
     check = compare(selfie, document, id_type)
     if check.status not in BLOCKING:
         return check, None
@@ -166,8 +170,5 @@ def face_check_view(request):
     selfie, document = request.FILES.get("photo"), request.FILES.get("valid_id_document")
     if not selfie or not document or max(selfie.size, document.size) > MAX_FILE_SIZE:
         return JsonResponse({"status": "error", "message": "Take a selfie and upload your document first."}, status=400)
-    id_type = request.POST.get("valid_id_type", "")
-    if has_photo(id_type) and request.POST.get("face_consent") != "1":
-        return JsonResponse({"status": "consent", "message": CONSENT_MESSAGE}, status=400)
-    check = compare(selfie, document, id_type)
+    check = compare(selfie, document, request.POST.get("valid_id_type", ""))
     return JsonResponse({"status": check.status, "message": MESSAGES.get(check.status, "")})

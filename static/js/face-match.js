@@ -1,5 +1,6 @@
-/* New Registration: the selfie opens after the document, and (when turned on) is compared with the
- * photo on the ID. A birth certificate has no photo, so the office compares the selfie in person. */
+/* New Registration: the selfie opens after the document. A dark selfie must be retaken (checked here,
+ * nothing is sent). When face match is on, the selfie is then compared with the photo on the ID.
+ * A birth certificate has no photo, so the office compares the selfie in person. */
 (() => {
   const form = document.getElementById('registrationForm');
   const section = document.querySelector('.profile-fields');
@@ -9,20 +10,21 @@
   const documentInput = form.elements.namedItem('valid_id_document');
   const photo = document.getElementById('photo');
   const note = document.getElementById('selfieMatchNote');
-  const consentRow = document.getElementById('faceConsentRow');
-  const consent = document.getElementById('faceConsent');
   const result = document.getElementById('faceMatchResult');
   const take = document.getElementById('takeSelfie');
-  if (!select || !documentInput || !photo) return;
+  if (!select || !documentInput || !photo || !result) return;
 
-  const enabled = form.dataset.faceMatch === '1' && Boolean(consent);
+  const enabled = form.dataset.faceMatch === '1';
   const NO_PHOTO = new Set(['PSA_BIRTH_CERTIFICATE']);
-  const BLOCKING = new Set(['not_matched', 'no_face', 'consent', 'error']);
+  const BLOCKING = new Set(['not_matched', 'no_face', 'unclear', 'error', 'too_dark']);
   const DOCUMENT_BAD = new Set(['invalid', 'mismatch', 'type_mismatch', 'error']);
-  const CONSENT = 'Tick the box above to agree to the selfie comparison.';
+  const DARK = 70;        // average brightness 0-255 below which a selfie is too dark
+  const DARK_TRIES = 3;   // after this many dark selfies the applicant may continue (office reviews)
   let documentStatus = null; // latest result of the document check
   let known = null;          // {key, status, message}
   let pending = null;
+  let quality = null;        // {key, dark}
+  let darkTries = 0;
 
   const hasPhoto = () => Boolean(select.value) && !NO_PHOTO.has(select.value);
   const documentName = () => (select.value === 'OTHER_GOVERNMENT' ? 'government-issued ID'
@@ -45,12 +47,8 @@
     if (select.value) {
       note.textContent = !hasPhoto()
         ? 'Take a selfie. Your birth certificate has no photo, so the office will compare your selfie with you in person during your biometrics visit.'
-        : enabled ? `Take a selfie. It will be compared with the photo on your ${documentName()}.`
+        : enabled ? `Your selfie will be automatically compared with the photo on your ${documentName()} to confirm your identity.`
           : `Take a selfie. The office will compare it with the photo on your ${documentName()}.`;
-    }
-    if (consentRow) {
-      consentRow.hidden = !hasPhoto();
-      consent.required = enabled && hasPhoto();
     }
   }
 
@@ -80,38 +78,67 @@
   function render(answer) {
     const status = answer.status;
     if (status === 'matched') return show('passed', answer.message);
-    if (status === 'not_matched' || status === 'no_face') return show('invalid', answer.message, true);
-    if (status === 'consent') return show('invalid', CONSENT);
+    if (['not_matched', 'no_face', 'unclear'].includes(status)) return show('invalid', answer.message, true);
     if (status === 'error') return show('invalid', answer.message || 'Take a selfie and upload your document first.');
     if (status === 'offline') return show('offline', 'You are offline. Your selfie will be compared with your ID before it is uploaded.');
     if (['flagged', 'unsure', 'unavailable'].includes(status)) return show('unavailable', answer.message);
     result.hidden = true;
   }
 
-  async function ask() {
-    const body = new FormData();
-    body.append('photo', selfie());
-    body.append('valid_id_document', documentFile());
-    body.append('valid_id_type', select.value);
-    if (consent?.checked) body.append('face_consent', '1');
-    try {
-      const response = await fetch('/face-check/', { method: 'POST', body, credentials: 'same-origin',
-        signal: AbortSignal.timeout(60000) });
-      const data = await response.json().catch(() => null);
-      return data || { status: response.ok ? 'unavailable' : 'offline' };
-    } catch {
-      return { status: 'offline' };
-    }
+  /** Average brightness (0-255) of the photo, or null when it cannot be read. */
+  function brightness(file) {
+    return new Promise(resolve => {
+      const url = URL.createObjectURL(file);
+      const image = new Image();
+      image.onload = () => {
+        try {
+          const width = 64;
+          const height = Math.max(1, Math.round(width * image.naturalHeight / Math.max(1, image.naturalWidth)));
+          const canvas = document.createElement('canvas');
+          canvas.width = width; canvas.height = height;
+          const context = canvas.getContext('2d', { willReadFrequently: true });
+          context.drawImage(image, 0, 0, width, height);
+          const pixels = context.getImageData(0, 0, width, height).data;
+          let total = 0;
+          for (let i = 0; i < pixels.length; i += 4) total += 0.2126 * pixels[i] + 0.7152 * pixels[i + 1] + 0.0722 * pixels[i + 2];
+          resolve(total / (pixels.length / 4));
+        } catch { resolve(null); } finally { URL.revokeObjectURL(url); }
+      };
+      image.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+      image.src = url;
+    });
   }
 
-  function check() {
-    if (!needsCheck() || DOCUMENT_BAD.has(documentStatus) || documentStatus === 'checking') {
-      result.hidden = true;
-      return Promise.resolve(null);
+  /** Dark selfies are retaken before anything is sent. */
+  async function checkLight() {
+    const file = selfie();
+    if (!file) { quality = null; return true; }
+    const key = fileKey(file);
+    if (quality?.key !== key) {
+      const value = await brightness(file);
+      if (fileKey(selfie()) !== key) return false; // a newer selfie was taken meanwhile
+      const dark = value !== null && value < DARK;
+      if (dark) darkTries += 1;
+      quality = { key, dark, allowed: !dark || darkTries >= DARK_TRIES };
     }
-    if (!consent.checked) { render({ status: 'consent' }); return Promise.resolve({ status: 'consent' }); }
+    if (!quality.dark) return true;
+    if (quality.allowed) {
+      show('unavailable', 'Your selfie is still dark. You can continue; the office will check it.');
+      return true;
+    }
+    show('invalid', 'Your selfie is too dark. Move to a brighter place or face a light, then retake it.', true);
+    return false;
+  }
+
+  async function check() {
+    if (!selfie()) { result.hidden = true; return null; }
+    if (!(await checkLight())) return { status: 'too_dark' };
+    if (!needsCheck() || DOCUMENT_BAD.has(documentStatus) || documentStatus === 'checking') {
+      if (!quality?.dark) result.hidden = true;
+      return null;
+    }
     const key = currentKey();
-    if (known?.key === key) { render(known); return Promise.resolve(known); }
+    if (known?.key === key) { render(known); return known; }
     if (pending?.key === key) return pending.promise;
     show('checking', 'Comparing your selfie with your ID…');
     const promise = ask().then(answer => {
@@ -125,15 +152,28 @@
     return promise;
   }
 
+  async function ask() {
+    const body = new FormData();
+    body.append('photo', selfie());
+    body.append('valid_id_document', documentFile());
+    body.append('valid_id_type', select.value);
+    try {
+      const response = await fetch('/face-check/', { method: 'POST', body, credentials: 'same-origin',
+        signal: AbortSignal.timeout(60000) });
+      const data = await response.json().catch(() => null);
+      return data || { status: response.ok ? 'unavailable' : 'offline' };
+    } catch {
+      return { status: 'offline' };
+    }
+  }
+
   /** Before Review / Submit: true when the selfie may be used. */
   async function ensure() {
-    if (!needsCheck() || officerVerified()) return true;
+    if (!selfie() || officerVerified()) return true;
     const answer = await check();
-    if (!answer || ['offline', 'disabled'].includes(answer.status)) return true;
-    if (!BLOCKING.has(answer.status)) return true;
+    if (!answer || ['offline', 'disabled'].includes(answer.status) || !BLOCKING.has(answer.status)) return true;
     window.backToForm?.();
-    (answer.status === 'consent' ? consentRow : result)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    if (answer.status === 'consent') consent.focus({ preventScroll: true });
+    result.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return false;
   }
 
@@ -146,8 +186,11 @@
     check();
   });
   photo.addEventListener('change', check);
-  consent?.addEventListener('change', check);
-  const reset = () => { known = null; pending = null; documentStatus = null; result.hidden = true; setTimeout(updateLock); };
+  const reset = () => {
+    known = null; pending = null; quality = null; darkTries = 0; documentStatus = null;
+    result.hidden = true;
+    setTimeout(updateLock);
+  };
   form.addEventListener('reset', reset);
   form.addEventListener('offline:submitted', reset);
   updateLock();
