@@ -148,7 +148,7 @@
 
   // ---------------------------------------------------------------- inline result under the upload
   function inlineBox(form) {
-    let box = form.querySelector('.doc-check-inline');
+    let box = form.querySelector('.doc-check-inline:not(.face-match-result)');
     if (!box) {
       box = el('div', { class: 'doc-check-inline', role: 'status', 'aria-live': 'polite', hidden: '' });
       (form.querySelector('.doc-camera-row') || fileInput(form)).insertAdjacentElement('afterend', box);

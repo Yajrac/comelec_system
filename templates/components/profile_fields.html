@@ -46,7 +46,7 @@
         </div>
         <p id="photoError" class="text-danger" role="alert">{{ field_errors.photo }}</p>
         {% if error %}<p class="form-text">If you selected a new photo, please select it again before submitting.</p>{% endif %}
-        {% if registration_selfie %}<div id="faceMatchResult" class="doc-check-inline" role="status" aria-live="polite" hidden></div>{% endif %}
+        {% if registration_selfie %}<div id="faceMatchResult" class="doc-check-inline face-match-result" role="status" aria-live="polite" hidden></div>{% endif %}
         <img id="photoPreview" alt="Applicant photo preview" width="160" {% if applicant.photo %}src="{{ applicant.photo.url }}"{% else %}hidden{% endif %}>
         {% if applicant.photo %}<p class="form-text">The photo shown is your current photo. Take a new selfie for this request.</p>{% endif %}
     </div>
