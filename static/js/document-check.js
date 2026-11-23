@@ -193,6 +193,7 @@
   }
 
   function renderInline(form, result) {
+    form.dispatchEvent(new CustomEvent('documentcheck:result', { detail: { status: result.status || '' } }));
     const type = result.document_type ? ` (${result.document_type})` : '';
     switch (result.status) {
       case 'checking': return showInline(form, 'checking', 'Verifying your document…');
@@ -302,7 +303,7 @@
     if (form.dataset.walkIn === '1') {
       const label = el('label', { class: 'doc-check-override' });
       const box = el('input', { type: 'checkbox', name: 'officer_verified', value: '1' });
-      label.append(box, document.createTextNode(' Manually verified by officer (skip the automatic document check)'));
+      label.append(box, document.createTextNode(' Manually verified by officer (skip the automatic checks)'));
       input.insertAdjacentElement('afterend', label);
     }
     input.addEventListener('change', () => setTimeout(() => inlineCheck(form), 0));

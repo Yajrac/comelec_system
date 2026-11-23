@@ -299,6 +299,11 @@ def new_registration(request):
             request, uploaded_document, expected_name_from(request.POST), "NEW")
         if document_error:
             return render_error(document_error)
+        from .face_match import enforce as enforce_face
+        face_check, face_error = enforce_face(
+            request, request.FILES.get("photo"), uploaded_document, request.POST.get("valid_id_type", ""))
+        if face_error:
+            return render_error(face_error)
 
         # =====================================================
         # CREATE APPLICANT
@@ -348,6 +353,8 @@ def new_registration(request):
             setattr(applicant, field, value)
         applicant.save()
         link_document_check(document_check, "NEW", applicant.id)
+        from .face_match import link as link_face_check
+        link_face_check(face_check, applicant.id)
         if possible_duplicate:
             Applicant.objects.filter(pk=applicant.pk).update(possible_duplicate_of=possible_duplicate)
 

@@ -48,7 +48,7 @@
 
             <form
                 method="post"
-                id="registrationForm"{% if document_ai_enabled %} data-document-check="NEW"{% if request.walk_in_base %} data-walk-in="1"{% endif %}{% endif %}
+                id="registrationForm"{% if document_ai_enabled %} data-document-check="NEW"{% if request.walk_in_base %} data-walk-in="1"{% endif %}{% endif %}{% if face_match_enabled %} data-face-match="1"{% endif %}
                 class="office-application-form"
                 enctype="multipart/form-data"
                 novalidate
@@ -476,7 +476,7 @@
                     </div>
                 </div>
 <div class="registration-photo-column">
-{% include "components/profile_fields.html" %}
+{% include "components/profile_fields.html" with registration_selfie=True %}
 </div>
 </div>
 
@@ -566,5 +566,6 @@
     <script src="{% static 'js/application-submit-state.js' %}"></script>
     <script src="{% static 'js/document-camera.js' %}"></script>
     <script src="{% static 'js/document-check.js' %}"></script>
+    <script src="{% static 'js/face-match.js' %}" defer></script>
     <script src="{% static 'js/pages/applicant-forms-new_registration-1.js' %}?v=attachment-previews"></script>
 {% endblock %}

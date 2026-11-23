@@ -3,11 +3,13 @@ from django.urls import path
 from . import views
 from . import offline
 from .document_check import document_check_view
+from .face_match import face_check_view
 from .status import status_lookup
 
 
 urlpatterns = [
     path('document-check/', document_check_view, name='document-check'),
+    path('face-check/', face_check_view, name='face-check'),
     path('check-status/', status_lookup, name='check-status'),
     path('offline/', offline.saved_applications, name='applicant-offline'),
     path('web-offline-sw.js', offline.service_worker, name='web-offline-worker'),

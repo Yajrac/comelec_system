@@ -452,6 +452,12 @@ def new_registration_api(request):
         if document_error:
             return JsonResponse({"success": False, "error": document_error, "message": document_error,
                                  "document_check": document_check.status}, status=400)
+        from Applicants.face_match import enforce as enforce_face
+        face_check, face_error = enforce_face(request, request.FILES.get("photo"),
+                                              request.FILES.get("valid_id_document"), str(data.get("valid_id_type", "")))
+        if face_error:
+            return JsonResponse({"success": False, "error": face_error, "message": face_error,
+                                 "face_check": face_check.status if face_check else "consent"}, status=400)
 
         applicant = Applicant.objects.create(
             suffix=data.get("suffix", "").strip(),
@@ -528,6 +534,8 @@ def new_registration_api(request):
     # =========================================================
 
     link_document_check(document_check, "NEW", applicant.id)
+    from Applicants.face_match import link as link_face_check
+    link_face_check(face_check, applicant.id)
     if possible_duplicate:
         Applicant.objects.filter(pk=applicant.pk).update(possible_duplicate_of=possible_duplicate)
         if submitted_offline:  # online applicants see it on the page instead

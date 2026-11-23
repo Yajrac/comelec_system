@@ -15,8 +15,9 @@ from .models import Barangay
 
 def shell_context():
     from .document_check import ai_enabled
+    from .face_match import enabled as face_match_enabled
     from .id_types import NOT_ACCEPTED_NOTE, VALID_ID_TYPES
-    return {'csrf_token': 'NOTPROVIDED', 'barangays': list(Barangay.objects.order_by('name')),
+    return {'face_match_enabled': face_match_enabled(), 'csrf_token': 'NOTPROVIDED', 'barangays': list(Barangay.objects.order_by('name')),
             'voter_election_date': election_date().isoformat(), 'document_ai_enabled': ai_enabled(),
             'valid_id_types': VALID_ID_TYPES, 'valid_id_note': NOT_ACCEPTED_NOTE}
 

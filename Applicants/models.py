@@ -826,6 +826,33 @@ class DocumentCheck(models.Model):
         indexes = [models.Index(fields=["application_type", "record_id"])]
 
 
+class FaceMatch(models.Model):
+    """New Registration selfie compared with the photo on the uploaded ID (record_id = Applicant id)."""
+    STATUS_CHOICES = [
+        ("matched", "Face matches the ID"),
+        ("not_matched", "Face does not match the ID"),
+        ("flagged", "Does not match - office review"),
+        ("no_face", "No face in the selfie"),
+        ("unsure", "Not sure - review manually"),
+        ("unavailable", "Not checked - review manually"),
+        ("not_applicable", "Not applicable (no photo on the document)"),
+        ("override", "Verified by officer"),
+    ]
+    selfie_digest = models.CharField(max_length=64, db_index=True)
+    document_digest = models.CharField(max_length=64, db_index=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    ai_checked = models.BooleanField(default=False)
+    ai_result = models.JSONField(default=dict, blank=True)
+    model_name = models.CharField(max_length=100, blank=True)
+    record_id = models.PositiveIntegerField(null=True, blank=True, db_index=True)
+    officer = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL,
+                                related_name="+")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+
+
 class DuplicateRegistrationNotice(models.Model):
     """SMS sent when an offline-saved registration turned out to be a duplicate (one per form, one per number a day)."""
     client_reference = models.CharField(max_length=100, unique=True)

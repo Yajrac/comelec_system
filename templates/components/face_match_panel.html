@@ -1,0 +1,48 @@
+{% comment %}New Registration: the selfie next to the ID so the officer can compare faces (face_match may be None).{% endcomment %}
+<style>
+    .face-match-panel { margin-top: 14px; padding-top: 12px; border-top: 1px solid #e4eaf4; }
+    .face-match-compare { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 10px; }
+    .face-match-compare figure { margin: 0; }
+    .face-match-compare figcaption { margin-bottom: 6px; color: #61748c; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+    .face-match-compare img { display: block; width: 100%; height: 220px; object-fit: contain; border: 1px solid #dce5f4; border-radius: 8px; background: #f8fafc; }
+    .face-match-compare .face-match-empty { display: grid; place-items: center; height: 220px; border: 1px dashed #c9d5e6; border-radius: 8px; color: #61748c; font-size: 13px; text-align: center; padding: 8px; }
+    @media (max-width: 575.98px) { .face-match-compare { grid-template-columns: minmax(0, 1fr); } }
+</style>
+<div class="face-match-panel" role="group" aria-labelledby="faceMatchTitle">
+    <strong id="faceMatchTitle">Face match:</strong>
+    {% if face_match.status == "matched" %}
+        <span class="badge bg-success"><i class="bi bi-person-check me-1" aria-hidden="true"></i>Face matches the ID</span>
+    {% elif face_match.status == "override" %}
+        <span class="badge bg-info text-dark">Verified by officer</span>
+        <small class="text-muted d-block mt-1">Automatic check overridden by {{ face_match.officer.get_username|default:"an officer" }}.</small>
+    {% elif face_match.status == "not_applicable" or not face_match and application.valid_id_type == "PSA_BIRTH_CERTIFICATE" %}
+        <span class="badge bg-secondary">Not applicable</span>
+        <small class="text-muted d-block mt-1">The document has no photo. Compare the selfie with the applicant in person during the biometrics visit.</small>
+    {% elif face_match %}
+        <span class="badge {% if face_match.status == 'not_matched' or face_match.status == 'flagged' or face_match.status == 'no_face' %}bg-danger{% else %}bg-warning text-dark{% endif %}">{{ face_match.get_status_display }}</span>
+        <small class="text-muted d-block mt-1">Compare the selfie with the photo on the ID before approving.</small>
+    {% else %}
+        <span class="badge bg-secondary">Not checked</span>
+        <small class="text-muted d-block mt-1">Compare the selfie with the photo on the ID before approving.</small>
+    {% endif %}
+    <div class="face-match-compare">
+        <figure>
+            <figcaption>Selfie</figcaption>
+            {% if application.photo %}
+                <a href="{{ application.photo.url }}" target="_blank" rel="noopener"><img src="{{ application.photo.url }}" alt="Selfie of {{ application }}"></a>
+            {% else %}
+                <div class="face-match-empty">No selfie submitted.</div>
+            {% endif %}
+        </figure>
+        <figure>
+            <figcaption>{{ application.get_valid_id_type_display|default:"Document" }}</figcaption>
+            {% if application.valid_id_document and application.valid_id_document.name|lower|slice:"-4:" != ".pdf" %}
+                <a href="{{ application.valid_id_document.url }}" target="_blank" rel="noopener"><img src="{{ application.valid_id_document.url }}" alt="Document of {{ application }}"></a>
+            {% elif application.valid_id_document %}
+                <div class="face-match-empty"><a href="{{ application.valid_id_document.url }}" target="_blank" rel="noopener">Open the PDF document</a></div>
+            {% else %}
+                <div class="face-match-empty">No document submitted.</div>
+            {% endif %}
+        </figure>
+    </div>
+</div>

@@ -2,6 +2,7 @@ from Applicants.profile_details import apply_profile_details
 from Applicants.application_types import APPLICATION_TYPE_LABELS, SK_REGISTRATION_LABEL
 from Applicants.eligibility import sk_filter
 from Applicants.document_check import latest_for as latest_document_check
+from Applicants.face_match import latest_for as latest_face_match
 from .biometric_state import SIGNATURE_FIELDS, file_exists as biometric_file_exists, signatures_complete, capture_complete, sync_completion
 import base64
 import binascii
@@ -918,6 +919,7 @@ def admin_application_new_detail(request, application_id):
         {
             "application": application,
             "document_check": latest_document_check("NEW", application.id),
+            "face_match": latest_face_match(application.id),
         }
     )
 

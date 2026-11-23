@@ -163,3 +163,12 @@
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+/* New Registration: the selfie opens after the document is uploaded. */
+.selfie-locked { margin: 0 0 12px; padding: 12px 14px; border: 1px dashed #b9c8e0; border-radius: 10px; background: #f6f9fe; color: #34445b; font-size: 13px; }
+.profile-fields:not([data-selfie-locked]) .selfie-locked { display: none; }
+.profile-fields[data-selfie-locked] :is(.selfie-actions, #photoHelp, #cameraStatus, .selfie-camera, #photoPreview, #faceMatchResult, label[for="photo"], #photo:not([hidden]), .selfie-match-note, .face-consent) { display: none !important; }
+.selfie-match-note { margin: 0 0 10px; color: #142b54; font-size: 13px; font-weight: 600; }
+.face-consent { display: flex; gap: 8px; align-items: flex-start; margin: 0 0 12px; font-size: 13px; color: #34445b; }
+.face-consent input { margin-top: 3px; flex: 0 0 auto; }
+.office-application-form .registration-upload-grid #faceMatchResult .doc-check-inline-icon { border-radius: 50% !important; }

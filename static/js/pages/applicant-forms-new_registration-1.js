@@ -237,6 +237,8 @@ function showReview() {
         if (reviewButton.disabled) return;
         window.setApplicationSubmitting(reviewButton, "Checking document...");
         window.documentCheck.ensure(form).then(function (ok) {
+            return ok && window.faceMatch ? window.faceMatch.ensure(form) : ok;
+        }).then(function (ok) {
             window.resetApplicationButton(reviewButton);
             if (!ok) return;
             showReview.documentChecked = true;
@@ -364,6 +366,8 @@ function submitApplication() {
     if (window.documentCheck && !submitApplication.documentChecked) {
         submitButton.disabled = true;
         window.documentCheck.ensure(form).then(function (ok) {
+            return ok && window.faceMatch ? window.faceMatch.ensure(form) : ok;
+        }).then(function (ok) {
             submitButton.disabled = false;
             if (!ok) return;
             submitApplication.documentChecked = true;

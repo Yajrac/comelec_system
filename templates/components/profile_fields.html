@@ -9,6 +9,16 @@
     <div class="form-section-body form-card-body card-body-government">
         <input type="hidden" name="profile_details_provided" value="1">
         <p class="form-label mb-2">Take a selfie <span class="required">*</span></p>
+        {% if registration_selfie %}
+            <p id="selfieLocked" class="selfie-locked" role="status">Upload your document first. Then take a selfie.</p>
+            <p id="selfieMatchNote" class="selfie-match-note" hidden></p>
+            {% if face_match_enabled %}
+                <label id="faceConsentRow" class="face-consent" hidden>
+                    <input type="checkbox" id="faceConsent" name="face_consent" value="1">
+                    <span>I agree that my selfie will be compared with the photo on my ID to confirm my identity.</span>
+                </label>
+            {% endif %}
+        {% endif %}
         {% if request.walk_in_base %}
             <label for="photo" class="form-label">Upload photo (walk-in, when no camera is available)</label>
             <input type="file" id="photo" name="photo" class="form-control" accept="image/jpeg,image/png,.jpg,.jpeg,.png" aria-describedby="photoHelp photoError" data-walk-in="1">
@@ -36,6 +46,7 @@
         </div>
         <p id="photoError" class="text-danger" role="alert">{{ field_errors.photo }}</p>
         {% if error %}<p class="form-text">If you selected a new photo, please select it again before submitting.</p>{% endif %}
+        {% if registration_selfie %}<div id="faceMatchResult" class="doc-check-inline" role="status" aria-live="polite" hidden></div>{% endif %}
         <img id="photoPreview" alt="Applicant photo preview" width="160" {% if applicant.photo %}src="{{ applicant.photo.url }}"{% else %}hidden{% endif %}>
         {% if applicant.photo %}<p class="form-text">The photo shown is your current photo. Take a new selfie for this request.</p>{% endif %}
     </div>
