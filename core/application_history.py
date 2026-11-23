@@ -20,12 +20,11 @@ def round_label(application_type, request_id):
 
 
 def application_history(applicant):
-    initial_date = timezone.make_aware(datetime.combine(applicant.date_joined, time.min))
     rows = [{
         'type': 'NEW', 'key': 'NEW', 'id': applicant.pk, 'label': applicant.registration_label,
         'filter_type': 'SK' if applicant.is_sk else 'NEW',
         'reference': applicant.registration_reference,
-        'submitted_at': initial_date, 'reviewed_at': None,
+        'submitted_at': applicant.submitted_on, 'has_time': applicant.submitted_at is not None, 'reviewed_at': None,
         'status': applicant.status, 'status_label': applicant.get_status_display(),
         'url': reverse('admin-application-new-detail', args=[applicant.pk]),
     }]
@@ -38,4 +37,4 @@ def application_history(applicant):
                 'status': record.status, 'status_label': record.get_status_display(),
                 'url': reverse(view, args=[record.pk]),
             })
-    return sorted(rows, key=lambda row: row['submitted_at'], reverse=True)
+    return sorted(rows, key=lambda row: (row['submitted_at'], row['id']), reverse=True)

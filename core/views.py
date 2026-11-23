@@ -623,18 +623,14 @@ def admin_applications(request):
             # Convert DateField to timezone-aware datetime
             # =================================================
 
-            application_date = timezone.make_aware(
-                datetime.combine(
-                    applicant.date_joined,
-                    datetime.min.time()
-                )
-            )
+            application_date = applicant.submitted_on
 
             applications.append({
                 "id": applicant.id,
                 "applicant": applicant,
                 "applicant_name": str(applicant),
                 "type": "NEW",
+                "has_time": applicant.submitted_at is not None,
                 "is_sk": applicant.is_sk,
                 "type_display": SK_REGISTRATION_LABEL if applicant.is_sk else APPLICATION_TYPE_LABELS["NEW"],
                 "status": applicant.status,
@@ -856,7 +852,7 @@ def admin_applications(request):
     # =========================================================
 
     applications.sort(
-        key=lambda item: item["date"],
+        key=lambda item: (item["date"], item["id"]),
         reverse=True
     )
 
@@ -2605,7 +2601,7 @@ def admin_applicants(request):
         for item in application_history(record):
             if not application_type or item['filter_type'] == application_type:
                 rows.append(dict(item, applicant=record))
-    rows.sort(key=lambda item: item['submitted_at'], reverse=True)
+    rows.sort(key=lambda item: (item['submitted_at'], item['id']), reverse=True)
     page_obj = Paginator(rows, 10).get_page(request.GET.get('page'))
     return render(request, 'comelec/applicants/list.html', {
         'history_rows': page_obj, 'page_obj': page_obj,

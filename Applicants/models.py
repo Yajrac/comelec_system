@@ -208,6 +208,22 @@ class Applicant(ProfileDetails):
         related_name="possible_duplicates",
     )
 
+    # Exact submission time. Registrations saved before this field have only date_joined (no time).
+    submitted_at = models.DateTimeField(null=True, blank=True, editable=False)
+
+    def save(self, *args, **kwargs):
+        if self._state.adding and self.submitted_at is None:
+            from django.utils import timezone
+            self.submitted_at = timezone.now()
+        super().save(*args, **kwargs)
+
+    @property
+    def submitted_on(self):
+        """When the registration was submitted: exact time, or midnight of date_joined for older records."""
+        from datetime import datetime, time
+        from django.utils import timezone
+        return self.submitted_at or timezone.make_aware(datetime.combine(self.date_joined, time.min))
+
     @property
     def is_sk(self):
         """New registration of someone 15-17 on election day (becomes regular at 18 by itself)."""
@@ -803,6 +819,8 @@ class DocumentCheck(models.Model):
         ("invalid", "Not a valid document"),
         ("mismatch", "Name does not match"),
         ("type_mismatch", "Type does not match"),
+        ("birthdate_mismatch", "Birthdate does not match"),
+        ("sex_mismatch", "Sex does not match"),
         ("unavailable", "Not checked"),
         ("override", "Verified by officer"),
     ]

@@ -224,7 +224,7 @@
 
                         <span class="registration-status-label">Date Submitted</span>
 
-                        <div class="registration-status-date">{{ application.date_joined|date:"M d, Y" }}</div>
+                        <div class="registration-status-date">{% if application.submitted_at %}{{ application.submitted_at|date:"M d, Y g:i A" }}{% else %}{{ application.date_joined|date:"M d, Y" }}{% endif %}</div>
 
                     </div>
 

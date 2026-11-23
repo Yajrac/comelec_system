@@ -84,7 +84,11 @@
         message: 'You can continue. The office will review your document.', buttons: [['Continue', 'continue', true]] });
     }
     const buttons = [['Upload another file', 'upload', true], ['Retake photo', 'retake']];
-    if (result.status === 'mismatch' && canEdit) buttons.push(['Edit details', 'edit']);
+    if (DETAILS.has(result.status) && canEdit) buttons.push(['Edit details', 'edit']);
+    if (result.status === 'birthdate_mismatch' || result.status === 'sex_mismatch') {
+      return render('mismatch', { title: result.status === 'birthdate_mismatch' ? 'Your birthdate does not match the document.'
+        : 'Your sex does not match the document.', message: result.message, details: detailsFor(result), buttons });
+    }
     if (result.status === 'type_mismatch') {
       return render('type_mismatch', { title: 'The document does not match the type you chose.', message: result.reason,
         details: detailsFor(result), buttons: [['Change type', 'type', true], ['Upload another file', 'upload'], ['Retake photo', 'retake']] });
@@ -117,7 +121,8 @@
     const value = name => form.elements.namedItem(name)?.value?.trim() || '';
     const fields = { application_type: form.dataset.documentCheck, valid_id_type: value('valid_id_type') };
     if (form.elements.namedItem('lastname')) {
-      Object.assign(fields, { lastname: value('lastname'), firstname: value('firstname'), middlename: value('middlename') });
+      Object.assign(fields, { lastname: value('lastname'), firstname: value('firstname'), middlename: value('middlename'),
+        birthdate: value('birthdate'), sex: value('sex') });
     } else {
       fields.applicant_id = value('applicant_id');
     }
@@ -125,7 +130,8 @@
   }
 
   function stateKey(file, fields) {
-    return [file.name, file.size, file.lastModified, fields.valid_id_type, fields.lastname, fields.firstname, fields.middlename, fields.applicant_id].join('|');
+    return [file.name, file.size, file.lastModified, fields.valid_id_type, fields.lastname, fields.firstname, fields.middlename,
+      fields.birthdate, fields.sex, fields.applicant_id].join('|');
   }
 
   function fileInput(form) { return form.elements.namedItem('valid_id_document'); }
@@ -179,7 +185,7 @@
     const actions = [['Upload another file', () => { input.value = ''; input.click(); }],
                      ['Retake photo', () => retake(input)]];
     if (result.status === 'type_mismatch') actions.unshift(['Change type', () => chooseType(form)]);
-    if (result.status === 'mismatch' && form.elements.namedItem('lastname')) {
+    if (DETAILS.has(result.status) && form.elements.namedItem('lastname')) {
       actions.push(['Edit details', () => { window.backToForm?.(); form.elements.namedItem('lastname').focus(); }]);
     }
     return actions;
@@ -202,6 +208,8 @@
       case 'invalid': return showInline(form, 'invalid', `This document is not valid. ${result.reason || ''}`.trim(), fixActions(form, result));
       case 'mismatch': return showInline(form, 'mismatch',
         'This document is valid, but the name on it does not match the name you entered.', fixActions(form, result));
+      case 'birthdate_mismatch':
+      case 'sex_mismatch': return showInline(form, 'mismatch', result.message, fixActions(form, result));
       case 'type_mismatch': return showInline(form, 'type_mismatch', result.reason || 'The document does not match the type you chose.', fixActions(form, result));
       case 'unavailable': return showInline(form, 'unavailable', 'Document verification is unavailable right now. The office will review your document.');
       case 'offline': return showInline(form, 'offline', 'You are offline. The document will be checked before it is uploaded.');
@@ -211,6 +219,8 @@
   }
 
   const ACCEPTED = new Set(['passed', 'unavailable', 'disabled', 'offline']);
+  // Typed details that may not match the document; the applicant can fix them with "Edit details".
+  const DETAILS = new Set(['mismatch', 'birthdate_mismatch', 'sex_mismatch']);
 
   /** Check on upload (and when the name changes); never blocks, only shows the result. */
   async function inlineCheck(form) {
@@ -270,7 +280,8 @@
   async function reviewQueued(entries, position = '') {
     const file = entriesValue(entries, 'valid_id_document');
     if (!(file instanceof Blob)) return 'upload';
-    const fields = { application_type: 'NEW', valid_id_type: entriesValue(entries, 'valid_id_type'), lastname: entriesValue(entries, 'lastname'),
+    const fields = { application_type: 'NEW', valid_id_type: entriesValue(entries, 'valid_id_type'),
+      birthdate: entriesValue(entries, 'birthdate'), sex: entriesValue(entries, 'sex'), lastname: entriesValue(entries, 'lastname'),
       firstname: entriesValue(entries, 'firstname'), middlename: entriesValue(entries, 'middlename') };
     showChecking(`Verifying document before upload${position}…`);
     const result = await requestCheck(file instanceof File ? file : new File([file], 'document'), fields);
@@ -284,9 +295,11 @@
     }
     const message = result.status === 'mismatch'
       ? 'This document is valid, but the name on it does not match the name you entered.'
+      : ['birthdate_mismatch', 'sex_mismatch'].includes(result.status) ? result.message
       : result.status === 'type_mismatch' ? result.reason
       : `This document is not valid. ${result.reason || result.message || ''}`.trim();
-    const state = ['mismatch', 'type_mismatch'].includes(result.status) ? result.status : 'invalid';
+    const state = ['mismatch', 'type_mismatch'].includes(result.status) ? result.status
+      : DETAILS.has(result.status) ? 'mismatch' : 'invalid';
     await render(state, {
       title: { mismatch: 'This document is valid, but your name does not match.',
                type_mismatch: 'The document does not match the type you chose.' }[state] || 'This document is not valid.',
@@ -313,7 +326,7 @@
     const forget = () => { results.delete(form); renderInline(form, {}); };
     form.addEventListener('offline:submitted', forget);
     form.addEventListener('reset', () => setTimeout(forget));
-    ['lastname', 'firstname', 'middlename'].forEach(name => {
+    ['lastname', 'firstname', 'middlename', 'birthdate', 'sex'].forEach(name => {
       form.elements.namedItem(name)?.addEventListener('change', () => {
         if (input.files?.length) inlineCheck(form);
       });

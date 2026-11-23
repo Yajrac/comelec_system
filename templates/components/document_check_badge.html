@@ -22,6 +22,8 @@
                 {% if document_check.document_type %}<dt>Detected</dt><dd>{{ document_check.document_type }}</dd>{% endif %}
                 <dt>Name on document</dt><dd>{{ document_check.document_name|default:"Not readable" }}</dd>
                 <dt>Name expected</dt><dd>{{ document_check.expected_name|default:"-" }}</dd>
+                {% if document_check.ai_result.birth_date %}<dt>Birthdate on document</dt><dd>{{ document_check.ai_result.birth_date }}</dd>{% endif %}
+                {% if document_check.ai_result.sex %}<dt>Sex on document</dt><dd>{{ document_check.ai_result.sex|title }}</dd>{% endif %}
             {% endif %}
         </dl>
     {% endif %}

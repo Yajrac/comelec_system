@@ -412,7 +412,7 @@
 
                                             <span class="application-date">{{ application.date|date:"M d, Y" }}</span>
 
-                                            <span class="application-time">{{ application.date|date:"g:i A" }}</span>
+                                            <span class="application-time">{% if application.has_time is False %}&mdash;{% else %}{{ application.date|date:"g:i A" }}{% endif %}</span>
 
                                         {% else %}
 
