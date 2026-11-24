@@ -11,7 +11,7 @@
 <div class="face-match-panel" role="group" aria-labelledby="faceMatchTitle">
     <strong id="faceMatchTitle">Face match:</strong>
     {% if face_match.status == "matched" %}
-        <span class="badge bg-success"><i class="bi bi-person-check me-1" aria-hidden="true"></i>Face matches the ID</span>
+        <span class="badge bg-success"><i class="bi bi-person-check me-1" aria-hidden="true"></i>Likely the same person</span>
     {% elif face_match.status == "override" %}
         <span class="badge bg-info text-dark">Verified by officer</span>
         <small class="text-muted d-block mt-1">Automatic check overridden by {{ face_match.officer.get_username|default:"an officer" }}.</small>
@@ -25,6 +25,7 @@
         <span class="badge bg-secondary">Not checked</span>
         <small class="text-muted d-block mt-1">Compare the selfie with the photo on the ID before approving.</small>
     {% endif %}
+    {% if face_match and face_match.similarity is not None %}<small class="d-block mt-1">Similarity: <strong>{{ face_match.similarity }}%</strong> (automatic estimate; confirm by looking at both photos)</small>{% endif %}
     <div class="face-match-compare">
         <figure>
             <figcaption>Selfie</figcaption>

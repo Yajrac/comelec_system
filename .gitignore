@@ -60,3 +60,6 @@ Thumbs.db
 
 # Local database and biometric backups
 /.local-backups/
+
+# Face match model files (downloaded by "python manage.py download_face_models")
+/face_models/

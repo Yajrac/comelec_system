@@ -871,6 +871,12 @@ class FaceMatch(models.Model):
     class Meta:
         ordering = ["-created_at", "-id"]
 
+    @property
+    def similarity(self):
+        """Percent shown to officers (100 = identical face), or None when nothing was compared."""
+        distance = (self.ai_result or {}).get("distance")
+        return None if distance is None else max(0, min(100, round((1 - distance) * 100)))
+
 
 class DuplicateRegistrationNotice(models.Model):
     """SMS sent when an offline-saved registration turned out to be a duplicate (one per form, one per number a day)."""

@@ -225,9 +225,14 @@ GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
 DOCUMENT_AI_MAX_PER_MINUTE = int(os.environ.get("DOCUMENT_AI_MAX_PER_MINUTE", "10"))
 # Keep well under Gunicorn's default 30-second worker timeout.
 DOCUMENT_AI_TIMEOUT_SECONDS = int(os.environ.get("DOCUMENT_AI_TIMEOUT_SECONDS", "20"))
-# Compare the New Registration selfie with the photo on the ID (needs DOCUMENT_AI_PROVIDER=gemini).
-# Off by default: the selfie and ID are sent to the service; turn on only with consent and a suitable plan.
+# Compare the New Registration selfie with the photo on the ID, on this server (DeepFace/ArcFace).
+# Needs "pip install -r requirements.txt" and "python manage.py download_face_models".
 FACE_MATCH_ENABLED = os.environ.get("FACE_MATCH_ENABLED", "").strip().lower() in {"1", "true", "yes", "on"}
+FACE_MODELS_DIR = Path(os.environ.get("FACE_MODELS_DIR", BASE_DIR / "face_models"))
+# ArcFace cosine distance (0 = identical): at or below MAX is a match, at or above REJECT is not,
+# in between is "unsure" and flagged for the office.
+FACE_MATCH_MAX_DISTANCE = float(os.environ.get("FACE_MATCH_MAX_DISTANCE", "0.60"))
+FACE_MATCH_REJECT_DISTANCE = float(os.environ.get("FACE_MATCH_REJECT_DISTANCE", "0.75"))
 # New Registration and service requests must name the document type and include a selfie.
 REQUIRE_ID_TYPE_AND_SELFIE = True
 if len(sys.argv) > 1 and sys.argv[1] == "test":
