@@ -82,9 +82,27 @@ class FaceFlowTests(TestCase):
         engine.assert_not_called()
 
     @patch(ENGINE, return_value=faces(0.85))
-    def test_second_different_selfie_is_flagged_not_blocked(self, engine, _doc):
+    def test_a_different_face_is_never_let_through(self, engine, _doc):
         self.assertEqual(self.check(image('white')).json()['status'], 'not_matched')
-        self.assertEqual(self.check(image('black')).json()['status'], 'flagged')
+        body = self.check(image('black')).json()
+        self.assertEqual(body['status'], 'not_matched')
+        self.assertIn('visit the registration office', body['message'])
+
+    def test_a_face_not_seen_twice_is_flagged_for_the_office(self, _doc):
+        with patch(ENGINE, return_value=faces(selfie_face=False)):
+            self.assertEqual(self.check(image('white')).json()['status'], 'no_face')
+            self.assertEqual(self.check(image('black')).json()['status'], 'flagged')
+
+    def test_old_attempts_do_not_count(self, _doc):
+        from datetime import timedelta
+        from django.utils import timezone
+        with patch(ENGINE, return_value=faces(selfie_face=False)):
+            self.check(image('white'))
+        FaceMatch.objects.update(created_at=timezone.now() - timedelta(hours=2))  # long ago
+        FaceMatch.objects.create(selfie_digest='x', document_digest=FaceMatch.objects.first().document_digest,
+                                 status='not_matched', ai_checked=True, ai_result={'same_person': 'no'})  # old engine
+        with patch(ENGINE, return_value=faces(selfie_face=False)):
+            self.assertEqual(self.check(image('black')).json()['status'], 'no_face')
 
     @patch(ENGINE, return_value=faces(selfie_face=False))
     def test_no_face_asks_for_a_retake(self, engine, _doc):

@@ -21,15 +21,19 @@ logger = logging.getLogger(__name__)
 
 NO_PHOTO_TYPES = {"PSA_BIRTH_CERTIFICATE"}
 BLOCKING = {"not_matched", "no_face", "unclear"}
-# A second failed selfie for the same document is let through for the office to review.
+# A face that could not be seen twice is let through for the office to review. A clearly different
+# face (not_matched) is never let through: the applicant retakes it or visits the office.
+RETRYABLE = {"no_face", "unclear"}
 FAILED = {"not_matched", "no_face", "unclear", "flagged"}
+RETRY_WINDOW_MINUTES = 60
 ENGINE = "deepface-arcface-opencv-v1"  # readings from another engine are not reused
 MODEL_NAME = "ArcFace"
 
 MESSAGES = {
     "matched": "Your selfie matches the photo on your ID.",
-    "not_matched": "Your selfie does not match the photo on your ID. Retake your selfie facing the camera in good light.",
-    "flagged": "Your selfie still could not be matched with the photo on your ID. You can continue; the office will compare them.",
+    "not_matched": ("Your selfie does not match the photo on your ID. Retake your selfie facing the camera in good light. "
+                    "If your ID photo is old or unclear, please visit the registration office."),
+    "flagged": "We still could not see your face clearly. You can continue; the office will compare your selfie with your ID.",
     "no_face": "We could not see your face clearly. Retake your selfie facing the camera in good light.",
     "unclear": "Your selfie is too dark or blurry. Retake it in good light, facing the camera.",
     "unsure": "Your selfie could not be compared with your ID. You can continue; the office will compare them.",
@@ -133,6 +137,17 @@ def evaluate(reading):
     return "unsure"
 
 
+def _failed_recently(base):
+    """An earlier failed selfie (this engine, same document, last hour) other than this one."""
+    from datetime import timedelta
+    from django.utils import timezone
+    earlier = FaceMatch.objects.filter(
+        document_digest=base["document_digest"], status__in=FAILED,
+        created_at__gte=timezone.now() - timedelta(minutes=RETRY_WINDOW_MINUTES),
+    ).exclude(selfie_digest=base["selfie_digest"])[:20]
+    return any((check.ai_result or {}).get("engine") == ENGINE for check in earlier)
+
+
 def compare(selfie, document, id_type):
     """Always returns a saved FaceMatch for this selfie and document."""
     selfie_data, document_data = _read(selfie), _read(document)
@@ -156,10 +171,8 @@ def compare(selfie, document, id_type):
             return FaceMatch.objects.create(status="unavailable", **base)
 
     status = evaluate(reading)
-    if status in BLOCKING and FaceMatch.objects.filter(
-            document_digest=base["document_digest"], status__in=FAILED
-    ).exclude(selfie_digest=base["selfie_digest"]).exists():
-        status = "flagged"  # second failed selfie: let the applicant continue, the office reviews it
+    if status in RETRYABLE and _failed_recently(base):
+        status = "flagged"  # face still not seen: let the applicant continue, the office reviews it
     return FaceMatch.objects.create(status=status, ai_checked=True, ai_result=reading, model_name=model_name, **base)
 
 
