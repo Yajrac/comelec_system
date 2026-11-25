@@ -788,6 +788,10 @@ class FingerprintCaptureRequest(models.Model):
     )
 
     message = models.CharField(max_length=255, blank=True)
+    # Officer chose to keep the next capture even if it is partial (allowed after repeated rejections).
+    accept_partial = models.BooleanField(default=False)
+    requested_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True,
+                                     on_delete=models.SET_NULL, related_name="+")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

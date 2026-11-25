@@ -233,6 +233,10 @@ FACE_MODELS_DIR = Path(os.environ.get("FACE_MODELS_DIR", BASE_DIR / "face_models
 # in between is "unsure" and flagged for the office.
 FACE_MATCH_MAX_DISTANCE = float(os.environ.get("FACE_MATCH_MAX_DISTANCE", "0.60"))
 FACE_MATCH_REJECT_DISTANCE = float(os.environ.get("FACE_MATCH_REJECT_DISTANCE", "0.75"))
+# Thumbprints showing ridges on less than this share (percent) of the scanner are rejected as partial.
+FINGERPRINT_MIN_COVERAGE = int(os.environ.get("FINGERPRINT_MIN_COVERAGE", "60"))
+# After this many rejected captures of one thumb (last 30 minutes) the officer may accept the next one.
+FINGERPRINT_PARTIAL_TRIES = int(os.environ.get("FINGERPRINT_PARTIAL_TRIES", "3"))
 # New Registration and service requests must name the document type and include a selfie.
 REQUIRE_ID_TYPE_AND_SELFIE = True
 if len(sys.argv) > 1 and sys.argv[1] == "test":

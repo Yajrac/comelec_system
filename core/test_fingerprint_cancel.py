@@ -16,8 +16,10 @@ from Applicants.models import Applicant, ApplicantBiometric, FingerprintCaptureR
 
 
 def bmp_upload():
+    """A whole 'thumbprint': ridges across the full scanner (a blank image is now rejected as partial)."""
+    from core.test_fingerprint_quality import thumb
     output = io.BytesIO()
-    Image.new('L', (256, 288), 128).save(output, format='BMP')
+    thumb().save(output, format='BMP')
     return SimpleUploadedFile('finger.bmp', output.getvalue(), content_type='image/bmp')
 
 

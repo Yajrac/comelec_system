@@ -205,10 +205,12 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (data.status === "failed") {
-                throw new Error(
+                const failure = new Error(
                     data.message ||
                     "The fingerprint device reported a failure."
                 );
+                failure.canAcceptPartial = Boolean(data.can_accept_partial);
+                throw failure;
             }
 
             if (data.status === "capturing") {
@@ -237,7 +239,25 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
-    async function captureFinger(finger) {
+    // After repeated partial thumbprints the officer may keep the next capture as it is.
+    function showAcceptPartial(finger, messageElement) {
+        let accept = document.getElementById(`${finger}AcceptPartial`);
+        if (!accept) {
+            accept = document.createElement("button");
+            accept.type = "button";
+            accept.id = `${finger}AcceptPartial`;
+            accept.className = "btn btn-sm btn-outline-warning mt-2";
+            accept.textContent = "Capture again and accept as is (officer)";
+            accept.addEventListener("click", () => {
+                if (!window.confirm("Accept the next capture even if it is partial? Use this only when a whole thumbprint cannot be taken (for example, an injured thumb).")) return;
+                accept.remove();
+                captureFinger(finger, true);
+            });
+            messageElement.insertAdjacentElement("afterend", accept);
+        }
+    }
+
+    async function captureFinger(finger, acceptPartial = false) {
         const isLeft = finger === "left";
         const button = isLeft ? leftButton : rightButton;
 
@@ -270,6 +290,7 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             const formData = new FormData();
             formData.append("finger", finger);
+            if (acceptPartial) formData.append("accept_partial", "1");
 
             const response = await fetch(startCaptureUrl, {
                 method: "POST",
@@ -358,6 +379,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 error.message || "Fingerprint capture failed.",
                 "error"
             );
+            if (error.canAcceptPartial) showAcceptPartial(finger, message);
 
             button.innerHTML = getFingerButtonLabel(finger);
 

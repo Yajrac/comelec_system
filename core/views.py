@@ -2095,6 +2095,12 @@ def admin_applicant_biometric(request, applicant_id):
             "recapture_round": round_label(biometric.application_type, biometric.application_request_id) if biometric.application_type != "NEW" else "",
             "visit_window": format_window(*visit_window(applicant)) if visit_window(applicant) else "",
             "visit_overdue": visit_overdue(applicant) and applicant.verification_status != "VERIFIED",
+            "partial_accepted": {
+                finger: FingerprintCaptureRequest.objects.filter(
+                    applicant=applicant, finger=finger, accept_partial=True, status="completed"
+                ).select_related("requested_by").order_by("-updated_at").first()
+                for finger in ("left", "right")
+            },
         }
     )
 
@@ -3576,6 +3582,8 @@ def save_fingerprint(request, applicant_id):
 
             png_image.save(output, format="PNG")
             png_data = output.getvalue()
+            from .fingerprint_quality import assess as assess_fingerprint
+            quality = assess_fingerprint(png_image)
 
     except (
         UnidentifiedImageError,
@@ -3614,6 +3622,22 @@ def save_fingerprint(request, applicant_id):
 
     finally:
         output.close()
+
+    # --------------------------------------------------
+    # 5b. Reject a partial thumbprint before anything is stored
+    # --------------------------------------------------
+    active_capture = latest_capture_request(applicant.id, finger)
+    if not quality["ok"] and not (active_capture and active_capture.accept_partial):
+        if active_capture is not None and active_capture.status in ("pending", "capturing"):
+            active_capture.status, active_capture.message = "failed", quality["message"][:255]
+            active_capture.save(update_fields=["status", "message", "updated_at"])
+        logger.info("Fingerprint rejected: applicant=%s finger=%s coverage=%s",
+                    applicant_id, finger, quality["coverage"])
+        return JsonResponse({
+            "success": False,
+            "message": quality["message"],
+            "coverage": quality["coverage"],
+        }, status=422)
 
     # --------------------------------------------------
     # 6. Retrieve or create the biometric record
@@ -3940,6 +3964,12 @@ def fingerprint_device_upload(request, applicant_id):
             status=409,
         )
 
+    if fingerprint_quality_rejected(applicant.id, finger):
+        return JsonResponse(
+            {"error": "The thumbprint image was not accepted, so its template was not saved."},
+            status=409,
+        )
+
     if not isinstance(template_b64, str) or not template_b64:
         return JsonResponse(
             {"error": "A Base64 fingerprint template is required."},
@@ -4058,6 +4088,12 @@ def start_fingerprint_capture(request, applicant_id):
         )
 
     applicant = get_object_or_404(Applicant, pk=applicant_id)
+    accept_partial = request.POST.get("accept_partial") == "1"
+    if accept_partial and partial_rejections(applicant.id, finger) < settings.FINGERPRINT_PARTIAL_TRIES:
+        return JsonResponse({
+            "success": False,
+            "error": f"Accepting a partial thumbprint is allowed after {settings.FINGERPRINT_PARTIAL_TRIES} rejected captures.",
+        }, status=400)
 
     with transaction.atomic():
         active_request = (
@@ -4079,8 +4115,10 @@ def start_fingerprint_capture(request, applicant_id):
                 f"Capture restarted. Waiting for the device to capture "
                 f"the {finger} fingerprint."
             )
+            active_request.accept_partial = accept_partial
+            active_request.requested_by = request.user
             active_request.save(
-                update_fields=["status", "message", "updated_at"]
+                update_fields=["status", "message", "accept_partial", "requested_by", "updated_at"]
             )
 
             capture_request = active_request
@@ -4099,6 +4137,8 @@ def start_fingerprint_capture(request, applicant_id):
                 finger=finger,
                 status="pending",
                 message=f"Waiting for device to capture {finger} fingerprint.",
+                accept_partial=accept_partial,
+                requested_by=request.user,
             )
             reused_request = False
 
@@ -4158,6 +4198,27 @@ def fingerprint_device_next(request):
             "applicant_id": capture_request.applicant_id,
             "finger": capture_request.finger,
         })
+
+
+def latest_capture_request(applicant_id, finger):
+    return (FingerprintCaptureRequest.objects
+            .filter(applicant_id=applicant_id, finger=finger)
+            .order_by("-created_at", "-id").first())
+
+
+def fingerprint_quality_rejected(applicant_id, finger):
+    """True when the latest capture's image was rejected as partial (its template must not be saved)."""
+    from .fingerprint_quality import REJECTED
+    latest = latest_capture_request(applicant_id, finger)
+    return latest is not None and latest.status == "failed" and latest.message.startswith(REJECTED)
+
+
+def partial_rejections(applicant_id, finger):
+    """Rejected captures of this thumb in the last 30 minutes."""
+    from .fingerprint_quality import REJECTED
+    return FingerprintCaptureRequest.objects.filter(
+        applicant_id=applicant_id, finger=finger, status="failed", message__startswith=REJECTED,
+        updated_at__gte=timezone.now() - timedelta(minutes=30)).count()
 
 
 @csrf_exempt
@@ -4270,6 +4331,9 @@ def fingerprint_capture_status(request, request_id):
         "finger": capture_request.finger,
         "status": capture_request.status,
         "message": capture_request.message,
+        "partial_rejections": partial_rejections(capture_request.applicant_id, capture_request.finger),
+        "can_accept_partial": partial_rejections(capture_request.applicant_id, capture_request.finger)
+        >= settings.FINGERPRINT_PARTIAL_TRIES,
         "created_at": capture_request.created_at.isoformat(),
         "updated_at": capture_request.updated_at.isoformat(),
     })
